@@ -2,7 +2,7 @@ export const STORAGE_KEY = "uc7_web_academy_state_v1";
 
 export function createInitialState(student = {}) {
   return {
-    meta: { schemaVersion: 3, app: "UC7 Web Academy", updatedAt: new Date().toISOString() },
+    meta: { schemaVersion: 4, app: "UC7 Web Academy", updatedAt: new Date().toISOString() },
     student: {
       name: student.name || "",
       email: student.email || "",
@@ -19,6 +19,7 @@ export function createInitialState(student = {}) {
     answers: {},
     evidence: [],
     competencies: { I1: [], I2: [], I3: [], I4: [], I5: [], I6: [] },
+    pedagogy: { selfNotes: {} },
     preferences: { reducedMotion: false }
   };
 }
