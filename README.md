@@ -82,3 +82,14 @@ HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framewor
 - área Meu Progresso integrando Jornada, EduTech, Guilda e evidências;
 - próximas ações para continuidade do estudante;
 - estrutura preparada para futura visão centralizada do instrutor quando houver backend/autenticação.
+
+
+## Fase 7 — Conteúdo da UC7
+
+- catálogo completo das 28 missões presenciais (14 fases × A/B);
+- Missões A conectadas ao Projeto Individual EduTech;
+- Missões B conectadas ao Projeto Restaurante da Guilda;
+- competências relacionadas registradas por missão;
+- sete Missões Extras correspondentes às 28h não presenciais;
+- quatro Marcos Avaliativos alinhados ao PTD;
+- conteúdo continua orientado a dados no Mission Engine, sem páginas HTML duplicadas por missão.
