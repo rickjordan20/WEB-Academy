@@ -33,6 +33,7 @@ export function saveState(state) {
   state.meta = state.meta || {};
   state.meta.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  window.dispatchEvent(new CustomEvent("uc7:state-saved",{detail:state}));
   return state;
 }
 
