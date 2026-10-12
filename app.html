@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard da UC7 Web Academy.">
+  <title>Jornada Web • UC7 Web Academy</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="logo" href="app.html" aria-label="UC7 Web Academy">
+        <span class="logo-icon">&lt;/&gt;</span>
+        <span><b>UC7</b> Web Academy</span>
+      </a>
+
+      <nav class="nav-list" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão Geral</button>
+        <button class="nav-item" data-view="journey"><span>🗺</span> Minha Jornada <em>Em breve</em></button>
+        <button class="nav-item" data-view="edutech"><span>🎓</span> EduTech <em>Em breve</em></button>
+        <button class="nav-item" data-view="guild"><span>⚔</span> Minha Guilda <em>Em breve</em></button>
+        <button class="nav-item" data-view="extras"><span>🧭</span> Missões Extras <em>Em breve</em></button>
+        <button class="nav-item" data-view="skills"><span>⚡</span> Competências <em>Em breve</em></button>
+        <button class="nav-item" data-view="achievements"><span>🏅</span> Conquistas <em>Em breve</em></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="phase-note">
+          <small>Implantação atual</small>
+          <strong>Fase 1 — Fundação</strong>
+        </div>
+        <button id="openSettings" class="nav-item"><span>⚙</span> Configurações</button>
+      </div>
+    </aside>
+
+    <div class="content-shell">
+      <header class="topbar">
+        <button id="menuButton" class="icon-btn mobile-only" aria-label="Abrir menu">☰</button>
+        <div>
+          <p class="eyebrow">Jornada Web</p>
+          <h1 id="welcomeTitle">Olá!</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="status-dot"><i></i> Dados locais</span>
+          <button id="profileButton" class="avatar" aria-label="Perfil do estudante">U</button>
+        </div>
+      </header>
+
+      <main class="dashboard" id="mainContent">
+        <section class="hero card">
+          <div>
+            <span class="pill pill-accent">JORNADA EM PREPARAÇÃO</span>
+            <h2>Prepare-se para construir a Web.</h2>
+            <p>A fundação da sua academia está pronta. Na próxima implantação, o Mapa da Jornada e o Motor de Missões serão ativados.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-demo="journey">Explorar estrutura da Jornada</button>
+              <button class="btn btn-secondary" id="showProfile">Ver meu perfil</button>
+            </div>
+          </div>
+          <div class="hero-orbit" aria-hidden="true">
+            <div class="orbit orbit-1"></div><div class="orbit orbit-2"></div>
+            <div class="core">&lt;/&gt;</div>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-card card">
+            <span class="stat-icon">⚡</span>
+            <div><small>XP</small><strong id="xpValue">0</strong><span>Experiência</span></div>
+          </article>
+          <article class="stat-card card">
+            <span class="stat-icon">⬆</span>
+            <div><small>Nível</small><strong id="levelValue">1</strong><span>Novato Web</span></div>
+          </article>
+          <article class="stat-card card">
+            <span class="stat-icon">🗺</span>
+            <div><small>Jornada</small><strong>0%</strong><span>14 fases</span></div>
+          </article>
+          <article class="stat-card card">
+            <span class="stat-icon">🏅</span>
+            <div><small>Conquistas</small><strong>0</strong><span>Desbloqueadas</span></div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="card current-mission">
+            <div class="section-heading">
+              <div><p class="eyebrow">Próxima etapa</p><h2>Fase 01 — Preparando o Ambiente</h2></div>
+              <span class="lock">🔒</span>
+            </div>
+            <p>IDE, Git e GitHub serão os primeiros desafios da Jornada Web.</p>
+            <div class="progress-meta"><span>Progresso da Jornada</span><b>0%</b></div>
+            <div class="progress"><i style="width:0%"></i></div>
+            <button class="btn btn-disabled" disabled>Missões chegam na Fase 2 da implantação</button>
+          </article>
+
+          <article class="card level-card">
+            <p class="eyebrow">Seu nível</p>
+            <div class="level-badge">1</div>
+            <h2>Novato Web</h2>
+            <p>0 / 250 XP</p>
+            <div class="progress"><i style="width:0%"></i></div>
+            <small>O sistema de XP será ativado na implantação de Gamificação.</small>
+          </article>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <div><p class="eyebrow">Seu ecossistema</p><h2>Áreas da Academia</h2></div>
+          </div>
+          <div class="area-grid">
+            <article class="area-card card"><span>🎓</span><h3>EduTech</h3><p>Seu projeto individual evolutivo.</p><b>Em preparação</b></article>
+            <article class="area-card card"><span>⚔️</span><h3>Minha Guilda</h3><p>Projeto Restaurante e trabalho colaborativo.</p><b>Em preparação</b></article>
+            <article class="area-card card"><span>🧭</span><h3>Missões Extras</h3><p>7 missões de revisão e consolidação.</p><b>0 / 7</b></article>
+            <article class="area-card card"><span>⚡</span><h3>Competências</h3><p>Evidências relacionadas aos indicadores I1–I6.</p><b>Em preparação</b></article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="settingsDialog" class="modal">
+    <form method="dialog" class="modal-card">
+      <div class="section-heading"><div><p class="eyebrow">Dados e segurança</p><h2>Configurações</h2></div><button class="icon-btn" value="cancel" aria-label="Fechar">✕</button></div>
+      <p class="muted">Os dados desta versão ficam no armazenamento local do navegador. Faça backups periódicos.</p>
+      <div class="settings-actions">
+        <button id="exportBackup" class="btn btn-primary" type="button">Exportar backup JSON</button>
+        <button id="importBackup" class="btn btn-secondary" type="button">Importar backup</button>
+        <input id="backupFile" type="file" accept=".json,application/json" hidden>
+        <button id="clearData" class="btn btn-danger" type="button">Limpar todos os dados</button>
+      </div>
+      <hr>
+      <button id="logoutButton" class="btn btn-ghost" type="button">Sair da Jornada</button>
+    </form>
+  </dialog>
+
+  <dialog id="profileDialog" class="modal">
+    <form method="dialog" class="modal-card">
+      <div class="section-heading"><div><p class="eyebrow">Perfil</p><h2>Meu perfil</h2></div><button class="icon-btn" value="cancel" aria-label="Fechar">✕</button></div>
+      <div class="profile-panel">
+        <div class="avatar avatar-lg" id="profileAvatar">U</div>
+        <div><strong id="profileName"></strong><p id="profileEmail" class="muted"></p></div>
+      </div>
+      <p class="muted">Turma 2026.36.8 • UC7 — Desenvolver aplicações web</p>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

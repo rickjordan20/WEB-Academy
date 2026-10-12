@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UC7 Web Academy — Jornada gamificada de Desenvolvimento Web.">
+  <title>UC7 Web Academy</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="landing-page">
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <div class="brand-mark" aria-hidden="true">&lt;/&gt;</div>
+      <p class="eyebrow">UC7 • Desenvolver aplicações web</p>
+      <h1>UC7 <span>Web Academy</span></h1>
+      <p class="lead">Sua Jornada Web começa aqui. Aprenda, pratique, supere desafios e acompanhe sua evolução.</p>
+
+      <div class="feature-grid" aria-label="Recursos da plataforma">
+        <article class="mini-card"><strong>14</strong><span>Fases da Jornada</span></article>
+        <article class="mini-card"><strong>7</strong><span>Missões Extras</span></article>
+        <article class="mini-card"><strong>XP</strong><span>Níveis e conquistas</span></article>
+        <article class="mini-card"><strong>2</strong><span>Projetos evolutivos</span></article>
+      </div>
+    </section>
+
+    <section class="auth-card card">
+      <span class="pill">FASE 1 • FUNDAÇÃO</span>
+      <h2>Identifique-se</h2>
+      <p class="muted">Nesta primeira versão, seus dados ficam salvos somente neste navegador.</p>
+
+      <form id="loginForm" class="form-stack">
+        <label for="studentName">Seu nome</label>
+        <input id="studentName" name="studentName" type="text" autocomplete="name" maxlength="100"
+               placeholder="Digite seu nome completo" required>
+
+        <label for="studentEmail">E-mail <span class="optional">(opcional no MVP)</span></label>
+        <input id="studentEmail" name="studentEmail" type="email" autocomplete="email" maxlength="160"
+               placeholder="seuemail@exemplo.com">
+
+        <button class="btn btn-primary btn-lg" type="submit">Entrar na Jornada <span aria-hidden="true">→</span></button>
+      </form>
+
+      <div class="auth-actions">
+        <button id="importOnLogin" class="btn btn-ghost" type="button">Importar backup</button>
+        <input id="backupFileLogin" type="file" accept=".json,application/json" hidden>
+      </div>
+
+      <p class="privacy-note">Nenhum dado é enviado para servidor nesta versão.</p>
+    </section>
+  </main>
+
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

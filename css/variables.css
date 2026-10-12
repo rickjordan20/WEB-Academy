@@ -1,0 +1,7 @@
+:root{
+  --bg:#07111f;--bg-soft:#0b1728;--surface:#101e31;--surface-2:#15263b;
+  --text:#f5f8fc;--muted:#9fb0c5;--line:rgba(255,255,255,.10);
+  --primary:#6d5dfc;--primary-2:#8b7fff;--accent:#20d6b5;--warning:#ffbd59;--danger:#ff6678;
+  --shadow:0 18px 50px rgba(0,0,0,.28);--radius:20px;--radius-sm:13px;
+  --sidebar:270px;--max:1440px;
+}
