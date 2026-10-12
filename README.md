@@ -60,3 +60,15 @@ HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framewor
 - galeria de Conquistas
 - dashboard conectado ao XP, nível e conquistas reais
 - XP é motivacional e não substitui menção, indicadores ou avaliação do instrutor
+
+
+## Fase 5 — Projetos e Guildas
+
+- área dedicada ao Projeto Individual EduTech;
+- repositório e evidências do projeto individual;
+- área da Guilda para o Projeto Restaurante;
+- cadastro local de nome, integrantes e repositório da Guilda;
+- Quadro de Missões em Kanban (A Fazer, Em Missão, Em Revisão e Concluído);
+- responsável, competências, evidência e histórico por tarefa;
+- registro de contribuição individual da Guilda;
+- persistência local integrada ao backup existente.
