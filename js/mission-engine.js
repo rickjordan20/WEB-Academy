@@ -1,64 +1,14 @@
 import { JOURNEY } from "../data/journey.js";
-import { MISSIONS, getMission, getPhaseMissions } from "../data/missions.js";
-import { getState, saveState } from "./storage.js";
-
-export const STATUS = {LOCKED:"locked",AVAILABLE:"available",IN_PROGRESS:"in-progress",COMPLETED:"completed"};
-
-export function ensureJourneyState(){
-  const state=getState();
-  if(!state) return null;
-  state.journey ||= {};
-  state.journey.currentPhase ||= 1;
-  state.journey.completedMissions ||= [];
-  state.journey.unlockedMissions ||= ["1A"];
-  state.journey.missionProgress ||= {};
-  if(!state.journey.unlockedMissions.includes("1A")) state.journey.unlockedMissions.push("1A");
-  saveState(state);
-  return state;
-}
-export function missionStatus(id,state=ensureJourneyState()){
-  if(state.journey.completedMissions.includes(id)) return STATUS.COMPLETED;
-  if(state.journey.missionProgress[id]?.startedAt) return STATUS.IN_PROGRESS;
-  if(state.journey.unlockedMissions.includes(id)) return STATUS.AVAILABLE;
-  return STATUS.LOCKED;
-}
-export function phaseStatus(phase,state=ensureJourneyState()){
-  const ids=[`${phase}A`,`${phase}B`];
-  if(ids.every(id=>state.journey.completedMissions.includes(id))) return STATUS.COMPLETED;
-  if(ids.some(id=>missionStatus(id,state)!==STATUS.LOCKED)) return phase===state.journey.currentPhase?STATUS.IN_PROGRESS:STATUS.AVAILABLE;
-  return STATUS.LOCKED;
-}
-export function startMission(id){
-  const state=ensureJourneyState(), mission=getMission(id);
-  if(!mission || missionStatus(id,state)===STATUS.LOCKED) return false;
-  state.journey.missionProgress[id] ||= {currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};
-  saveState(state); return true;
-}
-export function completeStep(missionId,stepId){
-  const state=ensureJourneyState(), mission=getMission(missionId);
-  if(!mission) return false;
-  state.journey.missionProgress[missionId] ||= {currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};
-  const p=state.journey.missionProgress[missionId];
-  if(!p.completedSteps.includes(stepId)) p.completedSteps.push(stepId);
-  p.currentStep=Math.min(p.completedSteps.length,mission.steps.length-1);
-  if(p.completedSteps.length===mission.steps.length) completeMission(missionId,state);
-  else saveState(state);
-  return true;
-}
-export function completeMission(id,state=ensureJourneyState()){
-  if(!state.journey.completedMissions.includes(id)) state.journey.completedMissions.push(id);
-  const m=getMission(id); if(!m){saveState(state);return;}
-  if(id.endsWith("A")){
-    const b=`${m.phase}B`; if(!state.journey.unlockedMissions.includes(b)) state.journey.unlockedMissions.push(b);
-  } else {
-    const next=m.phase+1;
-    if(next<=JOURNEY.length){const a=`${next}A`;if(!state.journey.unlockedMissions.includes(a)) state.journey.unlockedMissions.push(a);state.journey.currentPhase=Math.max(state.journey.currentPhase,next);}
-  }
-  state.journey.progress=Math.round((state.journey.completedMissions.length/(JOURNEY.length*2))*100);
-  saveState(state);
-}
-export function getJourneyView(){
-  const state=ensureJourneyState();
-  return JOURNEY.map(p=>({...p,status:phaseStatus(p.phase,state),missions:getPhaseMissions(p.phase).map(m=>({...m,status:missionStatus(m.id,state)}))}));
-}
-export { JOURNEY, MISSIONS, getMission };
+import { MISSIONS,getMission,getPhaseMissions } from "../data/missions.js";
+import { getState,saveState } from "./storage.js";
+export const STATUS={LOCKED:"locked",AVAILABLE:"available",IN_PROGRESS:"in-progress",COMPLETED:"completed"};
+export function ensureJourneyState(){const s=getState();if(!s)return null;s.journey||={};s.journey.currentPhase||=1;s.journey.completedMissions||=[];s.journey.unlockedMissions||=["1A"];s.journey.missionProgress||={};s.answers||={};s.evidence||=[];if(!s.journey.unlockedMissions.includes("1A"))s.journey.unlockedMissions.push("1A");saveState(s);return s}
+export function missionStatus(id,s=ensureJourneyState()){if(s.journey.completedMissions.includes(id))return STATUS.COMPLETED;if(s.journey.missionProgress[id]?.startedAt)return STATUS.IN_PROGRESS;if(s.journey.unlockedMissions.includes(id))return STATUS.AVAILABLE;return STATUS.LOCKED}
+export function phaseStatus(phase,s=ensureJourneyState()){const ids=[`${phase}A`,`${phase}B`];if(ids.every(id=>s.journey.completedMissions.includes(id)))return STATUS.COMPLETED;if(ids.some(id=>missionStatus(id,s)!==STATUS.LOCKED))return phase===s.journey.currentPhase?STATUS.IN_PROGRESS:STATUS.AVAILABLE;return STATUS.LOCKED}
+export function startMission(id){const s=ensureJourneyState(),m=getMission(id);if(!m||missionStatus(id,s)===STATUS.LOCKED)return false;s.journey.missionProgress[id]||={currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};saveState(s);return true}
+export function saveAnswer(missionId,stepId,value){const s=ensureJourneyState();s.answers[`${missionId}:${stepId}`]=value;saveState(s)}
+export function getAnswer(missionId,stepId){return ensureJourneyState().answers?.[`${missionId}:${stepId}`]}
+export function completeStep(missionId,stepId){const s=ensureJourneyState(),m=getMission(missionId);if(!m)return false;s.journey.missionProgress[missionId]||={currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};const p=s.journey.missionProgress[missionId];if(!p.completedSteps.includes(stepId))p.completedSteps.push(stepId);p.currentStep=Math.min(p.completedSteps.length,m.steps.length-1);if(p.completedSteps.length===m.steps.length)completeMission(missionId,s);else saveState(s);return true}
+export function completeMission(id,s=ensureJourneyState()){if(!s.journey.completedMissions.includes(id))s.journey.completedMissions.push(id);const m=getMission(id);if(!m){saveState(s);return}if(id.endsWith("A")){const b=`${m.phase}B`;if(!s.journey.unlockedMissions.includes(b))s.journey.unlockedMissions.push(b)}else{const next=m.phase+1;if(next<=JOURNEY.length){const a=`${next}A`;if(!s.journey.unlockedMissions.includes(a))s.journey.unlockedMissions.push(a);s.journey.currentPhase=Math.max(s.journey.currentPhase,next)}}s.journey.progress=Math.round((s.journey.completedMissions.length/(JOURNEY.length*2))*100);saveState(s)}
+export function getJourneyView(){const s=ensureJourneyState();return JOURNEY.map(p=>({...p,status:phaseStatus(p.phase,s),missions:getPhaseMissions(p.phase).map(m=>({...m,status:missionStatus(m.id,s)}))}))}
+export {JOURNEY,MISSIONS,getMission};

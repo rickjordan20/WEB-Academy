@@ -1,0 +1,28 @@
+import { completeStep,saveAnswer,getAnswer } from "./mission-engine.js";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+export function renderStep(step,missionId,done){
+ const saved=getAnswer(missionId,step.id);
+ const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
+ let body="";
+ if(step.type==="content")body=`${(step.body||[]).map(p=>`<p>${esc(p)}</p>`).join("")}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
+ if(step.type==="quiz")body=`<fieldset class="quiz-options"><legend>${esc(step.question)}</legend>${step.options.map((o,i)=>`<label><input type="radio" name="q-${step.id}" value="${i}" ${String(saved)===String(i)?"checked":""}> <span>${esc(o)}</span></label>`).join("")}</fieldset><div class="feedback" data-feedback></div>`;
+ if(step.type==="complete-code")body=`<div class="code-complete"><code>${esc(step.prefix)}</code><input data-code-answer placeholder="${esc(step.placeholder)}" value="${esc(saved||"")}"></div><div class="feedback" data-feedback></div>`;
+ if(step.type==="editor")body=`<div class="lab-grid"><div><div class="lab-toolbar"><b>Editor HTML</b><button class="btn btn-secondary" data-run>Executar ▶</button></div><textarea class="code-editor" data-editor spellcheck="false">${esc(saved||step.starter)}</textarea></div><div><div class="lab-toolbar"><b>Preview</b></div><iframe class="preview-frame" data-preview title="Resultado do código"></iframe></div></div>`;
+ if(step.type==="guided")body=`<ol class="instruction-list">${step.instructions.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+ if(step.type==="reflection")body=`<div class="reflection-fields">${step.prompts.map((p,i)=>`<label>${esc(p)}<textarea data-reflection="${i}" placeholder="Escreva sua resposta...">${esc(saved?.[i]||"")}</textarea></label>`).join("")}</div>`;
+ if(step.type==="checkpoint")body=`<p class="checkpoint-question">${esc(step.question)}</p><div class="checkpoint-options">${step.options.map((o,i)=>`<label><input type="radio" name="cp-${step.id}" value="${i}" ${String(saved)===String(i)?"checked":""}> ${esc(o)}</label>`).join("")}</div>`;
+ if(step.type==="evidence")body=`<div class="reflection-fields">${step.fields.map((p,i)=>`<label>${esc(p)}<textarea data-evidence="${i}" placeholder="Registre aqui...">${esc(saved?.[i]||"")}</textarea></label>`).join("")}</div>`;
+ return `<article class="learning-step card ${done?"done":""}" data-step-card="${step.id}">${head}<div class="learning-body">${body}</div><div class="learning-actions"><span class="save-state">${done?"✓ Etapa concluída":"Seu progresso é salvo neste navegador"}</span><button class="btn ${done?"btn-secondary":"btn-primary"}" data-complete-step="${step.id}" ${done?"disabled":""}>${done?"Concluído":"Concluir etapa"}</button></div></article>`;
+}
+export function bindStep(step,missionId,onChange){
+ const card=document.querySelector(`[data-step-card="${step.id}"]`);if(!card)return;
+ const finish=()=>{completeStep(missionId,step.id);onChange()};
+ if(step.type==="quiz"){card.querySelector("[data-complete-step]").onclick=()=>{const v=card.querySelector("input:checked")?.value,f=card.querySelector("[data-feedback]");if(v==null){f.textContent="Escolha uma alternativa.";return}saveAnswer(missionId,step.id,Number(v));if(Number(v)!==step.answer){f.textContent="Ainda não. "+step.feedback;f.className="feedback error";return}f.textContent="Correto! "+step.feedback;f.className="feedback success";setTimeout(finish,500)};return}
+ if(step.type==="complete-code"){card.querySelector("[data-complete-step]").onclick=()=>{const input=card.querySelector("[data-code-answer]"),f=card.querySelector("[data-feedback]"),v=input.value.trim();saveAnswer(missionId,step.id,v);if(v!==step.expected){f.textContent="Revise o comando e tente novamente.";f.className="feedback error";return}f.textContent="Comando correto!";f.className="feedback success";setTimeout(finish,400)};return}
+ if(step.type==="editor"){const ed=card.querySelector("[data-editor]"),preview=card.querySelector("[data-preview]");const run=()=>{preview.srcdoc=ed.value;saveAnswer(missionId,step.id,ed.value)};card.querySelector("[data-run]").onclick=run;ed.addEventListener("input",()=>saveAnswer(missionId,step.id,ed.value));setTimeout(run,0)}
+ if(step.type==="reflection"){card.querySelector("[data-complete-step]").onclick=()=>{const vals=[...card.querySelectorAll("[data-reflection]")].map(x=>x.value.trim());if(vals.some(v=>!v)){alert("Responda aos dois registros antes de concluir.");return}saveAnswer(missionId,step.id,vals);finish()};return}
+ if(step.type==="evidence"){card.querySelector("[data-complete-step]").onclick=()=>{const vals=[...card.querySelectorAll("[data-evidence]")].map(x=>x.value.trim());if(vals.some(v=>!v)){alert("Preencha os registros da evidência.");return}saveAnswer(missionId,step.id,vals);finish()};return}
+ if(step.type==="checkpoint"){card.querySelector("[data-complete-step]").onclick=()=>{const v=card.querySelector("input:checked")?.value;if(v==null){alert("Selecione uma opção.");return}saveAnswer(missionId,step.id,Number(v));finish()};return}
+ card.querySelector("[data-complete-step]")?.addEventListener("click",finish);
+}
+function label(type){return({content:"Trilha de Conhecimento",quiz:"Checkpoint",editor:"Laboratório",guided:"Desafio Guiado","complete-code":"Complete o Código",reflection:"Autoavaliação",checkpoint:"Checkpoint Final",evidence:"Evidência da Missão"}[type]||"Desafio")}
