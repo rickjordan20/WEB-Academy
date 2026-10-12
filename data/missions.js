@@ -1,18 +1,20 @@
 export const MISSIONS = [
-  {id:"1A",phase:1,type:"training",title:"Ambiente Dev e Versionamento",subtitle:"Preparação do EduTech",project:"edutech",hours:4,steps:[
-    {id:"intro",type:"content",title:"Briefing da missão",summary:"Conheça o objetivo da primeira missão da Jornada Web."},
-    {id:"ide",type:"content",title:"Preparando o ambiente",summary:"IDE, organização do projeto e ferramentas essenciais."},
-    {id:"git",type:"content",title:"Versionamento",summary:"Git, repositório e fluxo básico de versionamento."},
-    {id:"guided",type:"guided",title:"Desafio Guiado — EduTech",summary:"Prepare a estrutura inicial do seu projeto individual."},
-    {id:"checkpoint",type:"checkpoint",title:"Checkpoint",summary:"Registre o que aprendeu e conclua a missão."}
-  ]},
-  {id:"1B",phase:1,type:"guild",title:"Ambiente Dev e Versionamento",subtitle:"Preparação do Projeto Restaurante",project:"restaurante",hours:4,steps:[
-    {id:"briefing",type:"content",title:"Briefing da Guilda",summary:"Entenda o desafio colaborativo desta fase."},
-    {id:"roles",type:"challenge",title:"Organização da Guilda",summary:"Organize responsabilidades e ambiente colaborativo."},
-    {id:"repo",type:"challenge",title:"Repositório do Projeto",summary:"Prepare o espaço versionado do Projeto Restaurante."},
-    {id:"evidence",type:"evidence",title:"Evidência da Missão",summary:"Registre a participação e o resultado da Guilda."}
-  ]}
-];
-
-export const getMission = id => MISSIONS.find(m => m.id === id);
-export const getPhaseMissions = phase => MISSIONS.filter(m => m.phase === Number(phase));
+{id:"1A",phase:1,type:"training",title:"Ambiente Dev e Versionamento",subtitle:"Preparação do EduTech",project:"edutech",hours:4,steps:[
+{id:"intro",type:"content",title:"Briefing da missão",summary:"Prepare seu ambiente de desenvolvimento e entenda por que versionar desde o primeiro dia.",body:["Nesta fase você vai organizar o ambiente que acompanhará toda a Jornada Web.","Um bom ambiente reduz erros, facilita testes e permite registrar a evolução do projeto."]},
+{id:"ide",type:"content",title:"IDE e organização do projeto",summary:"Conheça o papel da IDE e uma estrutura inicial de projeto.",body:["A IDE ou editor concentra recursos para escrever, organizar e testar código.","No projeto EduTech, comece com uma pasta própria e arquivos separados para estrutura, estilo e comportamento."],code:"edutech/\n├── index.html\n├── css/\n│   └── style.css\n└── js/\n    └── app.js"},
+{id:"quiz-ide",type:"quiz",title:"Checkpoint rápido",summary:"Verifique se o conceito ficou claro.",question:"Qual alternativa descreve melhor o papel da IDE no desenvolvimento?",options:["Guardar o site obrigatoriamente na internet","Apoiar escrita, organização, execução e depuração do código","Substituir HTML, CSS e JavaScript","Funcionar como banco de dados"],answer:1,feedback:"A IDE apoia o fluxo de desenvolvimento; ela não substitui as tecnologias da aplicação."},
+{id:"git",type:"content",title:"Versionamento com Git",summary:"Registre a evolução do código.",body:["Git registra versões do projeto e permite acompanhar alterações ao longo do desenvolvimento.","Commits devem representar mudanças compreensíveis e possuir mensagens objetivas."],code:"git init\ngit add .\ngit commit -m \"chore: estrutura inicial do EduTech\""},
+{id:"complete-git",type:"complete-code",title:"Complete o comando",summary:"Complete o comando que prepara os arquivos para o próximo commit.",prefix:"git ",expected:"add .",placeholder:"Digite apenas a parte que falta"},
+{id:"lab",type:"editor",title:"Laboratório HTML",summary:"Teste se o ambiente está pronto criando a primeira página do EduTech.",starter:"<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>EduTech</title>\n</head>\n<body>\n  <h1>EduTech</h1>\n  <p>Minha Jornada Web começou!</p>\n</body>\n</html>"},
+{id:"guided",type:"guided",title:"Desafio Guiado — EduTech",summary:"Crie localmente a estrutura inicial do seu projeto.",instructions:["Crie a pasta do projeto EduTech.","Crie index.html e as pastas css e js.","Abra o projeto no VS Code.","Inicialize o Git no projeto.","Faça o primeiro commit com uma mensagem clara."]},
+{id:"reflection",type:"reflection",title:"Registro de aprendizagem",summary:"Registre como foi sua experiência.",prompts:["O que você conseguiu realizar sem ajuda?","Em qual parte encontrou maior dificuldade?"]},
+{id:"checkpoint",type:"checkpoint",title:"Checkpoint final",summary:"Confirme a preparação do ambiente.",question:"Você conseguiu organizar o projeto e registrar a primeira versão com Git?",options:["Sim, concluí","Concluí com ajuda","Ainda preciso revisar"]}
+]},
+{id:"1B",phase:1,type:"guild",title:"Ambiente Dev e Versionamento",subtitle:"Preparação do Projeto Restaurante",project:"restaurante",hours:4,steps:[
+{id:"briefing",type:"content",title:"Briefing da Guilda",summary:"Prepare a equipe para desenvolver o Projeto Restaurante.",body:["A Guilda representa sua equipe de desenvolvimento. O produto é coletivo, mas a participação de cada integrante deve ser identificável.","Nesta missão, a equipe organiza o ambiente e combina um fluxo de trabalho para o projeto."]},
+{id:"roles",type:"guided",title:"Organização da Guilda",summary:"Definam responsabilidades iniciais.",instructions:["Confirme os integrantes da Guilda.","Defina responsabilidades iniciais.","Combine como serão registradas as contribuições.","Organize a pasta do Projeto Restaurante."]},
+{id:"repo",type:"guided",title:"Repositório do Projeto",summary:"Prepare o versionamento do projeto coletivo.",instructions:["Crie ou escolha o repositório do projeto.","Defina uma estrutura inicial de arquivos.","Registre o primeiro commit.","Confirme que a equipe compreende como identificar suas contribuições."]},
+{id:"evidence",type:"evidence",title:"Evidência da Missão",summary:"Registre o resultado da Guilda.",fields:["Nome da Guilda","Link do repositório","Qual foi sua contribuição nesta missão?"]}
+]}];
+export const getMission=id=>MISSIONS.find(m=>m.id===id);
+export const getPhaseMissions=phase=>MISSIONS.filter(m=>m.phase===Number(phase));
