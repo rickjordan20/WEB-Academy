@@ -2,7 +2,7 @@ export const STORAGE_KEY = "uc7_web_academy_state_v1";
 
 export function createInitialState(student = {}) {
   return {
-    meta: { schemaVersion: 2, app: "UC7 Web Academy", updatedAt: new Date().toISOString() },
+    meta: { schemaVersion: 3, app: "UC7 Web Academy", updatedAt: new Date().toISOString() },
     student: {
       name: student.name || "",
       email: student.email || "",
@@ -12,8 +12,8 @@ export function createInitialState(student = {}) {
     },
     journey: { currentPhase: 1, completedMissions: [], unlockedMissions: [], progress: 0 },
     gamification: { xp: 0, level: 1, levelName: "Novato Web", achievements: [], xpHistory: [] },
-    edutech: { progress: 0, evidence: [] },
-    guild: { id: null, name: "", members: [], tasks: [], evidence: [], progress: 0 },
+    edutech: { progress: 0, repository: "", evidence: [], history: [] },
+    guild: { id: null, name: "", members: [], repository: "", tasks: [], evidence: [], history: [], progress: 0 },
     extraMissions: { completed: [], total: 7 },
     checkpoints: {},
     answers: {},
