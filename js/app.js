@@ -13,6 +13,12 @@ function render() {
   $("#levelValue").textContent = state.gamification?.level ?? 1;
   const journeyProgress = state.journey?.progress ?? 0;
   const journeyStat = $("#journeyStat"); if (journeyStat) journeyStat.textContent = `${journeyProgress}%`;
+  const journeyText = $("#journeyProgressText"); if (journeyText) journeyText.textContent = `${journeyProgress}%`;
+  const journeyBar = $("#journeyProgressBar"); if (journeyBar) journeyBar.style.width = `${journeyProgress}%`;
+  const completed = state.journey?.completedMissions || [];
+  const unlocked = state.journey?.unlockedMissions || ["1A"];
+  const nextId = unlocked.find(id => !completed.includes(id)) || "1A";
+  const nextButton = $("#nextMissionButton"); if (nextButton) { nextButton.href = `mission.html?id=${nextId}`; nextButton.textContent = completed.length ? `Continuar Missão ${nextId} →` : "Iniciar Missão 1A →"; }
   $("#profileButton").textContent = initials(state.student.name);
   $("#profileAvatar").textContent = initials(state.student.name);
   $("#profileName").textContent = state.student.name;
