@@ -1,5 +1,6 @@
 import { getState, exportState, importState, clearState } from "./storage.js";
 import { ensureGamification,nextLevelInfo } from "./gamification.js";
+import {getSupabase,getSession} from "./supabase-client.js";
 
 const state = ensureGamification(getState());
 if (!state?.student?.name) location.replace("index.html");
@@ -34,6 +35,7 @@ function render() {
   $("#profileEmail").textContent = state.student.email || "E-mail não informado";
 }
 render();
+const sb=await getSupabase();const cloudSession=sb?await getSession():null;if(cloudSession){const ds=$("#dataStatus");if(ds)ds.innerHTML="<i></i> Sincronizado";}
 
 const settings = $("#settingsDialog"), profile = $("#profileDialog");
 $("#openSettings").addEventListener("click", () => settings.showModal());
@@ -63,7 +65,7 @@ $("#clearData").addEventListener("click", () => {
   if (again) { clearState(); location.replace("index.html"); }
 });
 
-$("#logoutButton").addEventListener("click", () => location.replace("index.html"));
+$("#logoutButton").addEventListener("click", async () => {if(sb)await sb.auth.signOut();location.replace(sb?"auth.html":"index.html");});
 
 const sidebar = $("#sidebar");
 $("#menuButton")?.addEventListener("click", () => sidebar.classList.toggle("open"));
