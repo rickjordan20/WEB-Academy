@@ -11,6 +11,8 @@ function render() {
   $("#welcomeTitle").textContent = `Olá, ${first}!`;
   $("#xpValue").textContent = state.gamification?.xp ?? 0;
   $("#levelValue").textContent = state.gamification?.level ?? 1;
+  const journeyProgress = state.journey?.progress ?? 0;
+  const journeyStat = $("#journeyStat"); if (journeyStat) journeyStat.textContent = `${journeyProgress}%`;
   $("#profileButton").textContent = initials(state.student.name);
   $("#profileAvatar").textContent = initials(state.student.name);
   $("#profileName").textContent = state.student.name;

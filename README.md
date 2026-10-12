@@ -1,44 +1,42 @@
-# UC7 Web Academy — Fase 1: Fundação
+# UC7 Web Academy — Fase 2: Motor da Jornada
 
-MVP inicial da plataforma gamificada de apoio à UC7 — Desenvolver aplicações web.
+Plataforma web gamificada de apoio à UC7 — Desenvolver aplicações web.
 
-## O que já está implementado
+## Implementado
 
-- Identidade visual responsiva da UC7 Web Academy
-- Tela de identificação do estudante
-- Dashboard inicial
-- Navegação preparada para as áreas futuras
-- Estrutura visual da Jornada Web
-- Estrutura-base das 14 Fases
-- Modelo inicial das 6 competências oficiais
-- Estado do estudante em `localStorage`
-- Exportação de backup JSON
-- Importação/restauração de backup
-- Limpeza de dados com dupla confirmação
-- Estrutura modular em HTML, CSS e JavaScript puro
-- Base preparada para a Fase 2 — Motor da Jornada
+### Fundação
+- identidade visual responsiva
+- identificação do estudante e dashboard
+- persistência em `localStorage`
+- backup/restauração JSON
+- estrutura modular HTML/CSS/JavaScript puro
+
+### Motor da Jornada
+- mapa interativo das 14 Fases
+- estados: bloqueada, disponível, em andamento e concluída
+- progressão e desbloqueio sequencial
+- retomada da missão pelo estado salvo
+- Mission Engine orientado a dados
+- Missão 1A e 1B como demonstração funcional do motor
+- etapas internas com conclusão persistente
+- atualização do progresso geral da Jornada
+- separação entre Missão de Treinamento e Missão da Guilda
+
+## Fluxo atual
+
+`Dashboard → Mapa da Jornada → Fase → Missão → Etapas → Conclusão → Desbloqueio`
+
+A Fase 01 começa com a Missão 1A disponível. Ao concluí-la, a 1B é desbloqueada. Ao concluir a 1B, a Fase 02 passa a ser a fase atual.
+
+## Importante
+
+O Motor de Missões já funciona, mas o conteúdo didático completo ainda não foi implementado. As etapas atuais da Fase 01 demonstram arquitetura, progressão e persistência.
+
+A próxima implantação é o **Ambiente Interativo de Aprendizagem**, com conteúdos, checkpoints, desafios, editor HTML/CSS/JavaScript, preview e feedback.
 
 ## Como executar
 
-A opção mais simples é abrir `index.html` no navegador.
-
-Para desenvolvimento, recomenda-se servir a pasta por um servidor local, por exemplo a extensão Live Server do VS Code.
-
-## Persistência
-
-Nesta Fase 1, os dados ficam apenas no navegador do dispositivo utilizado (`localStorage`).
-
-Isso significa que os dados **não são sincronizados entre dispositivos** e o instrutor não recebe automaticamente o progresso dos estudantes. Use o recurso de backup JSON para preservar/restaurar o estado.
-
-## Próxima implantação
-
-Fase 2 — Motor da Jornada:
-- mapa interativo das 14 Fases
-- desbloqueio e progressão
-- estados das missões
-- Mission Engine orientado a dados
-- retomada de missão
-- estrutura para Missão de Treinamento e Missão da Guilda
+Use um servidor local, como Live Server no VS Code, para garantir o funcionamento consistente dos módulos ES.
 
 ## Tecnologias
 
