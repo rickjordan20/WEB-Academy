@@ -21,7 +21,7 @@
 
       <nav class="nav-list" aria-label="Navegação principal">
         <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão Geral</button>
-        <button class="nav-item" data-view="journey"><span>🗺</span> Minha Jornada <em>Em breve</em></button>
+        <a class="nav-item" href="journey.html"><span>🗺</span> Minha Jornada <em>14 fases</em></a>
         <button class="nav-item" data-view="edutech"><span>🎓</span> EduTech <em>Em breve</em></button>
         <button class="nav-item" data-view="guild"><span>⚔</span> Minha Guilda <em>Em breve</em></button>
         <button class="nav-item" data-view="extras"><span>🧭</span> Missões Extras <em>Em breve</em></button>
@@ -32,7 +32,7 @@
       <div class="sidebar-footer">
         <div class="phase-note">
           <small>Implantação atual</small>
-          <strong>Fase 1 — Fundação</strong>
+          <strong>Fase 2 — Motor da Jornada</strong>
         </div>
         <button id="openSettings" class="nav-item"><span>⚙</span> Configurações</button>
       </div>
@@ -54,11 +54,11 @@
       <main class="dashboard" id="mainContent">
         <section class="hero card">
           <div>
-            <span class="pill pill-accent">JORNADA EM PREPARAÇÃO</span>
+            <span class="pill pill-accent">JORNADA ATIVADA</span>
             <h2>Prepare-se para construir a Web.</h2>
-            <p>A fundação da sua academia está pronta. Na próxima implantação, o Mapa da Jornada e o Motor de Missões serão ativados.</p>
+            <p>O Mapa da Jornada está ativo. Explore as 14 fases e comece pelas primeiras missões da Fase 01.</p>
             <div class="hero-actions">
-              <button class="btn btn-primary" data-demo="journey">Explorar estrutura da Jornada</button>
+              <a class="btn btn-primary" href="journey.html">Explorar Mapa da Jornada</a>
               <button class="btn btn-secondary" id="showProfile">Ver meu perfil</button>
             </div>
           </div>
@@ -79,7 +79,7 @@
           </article>
           <article class="stat-card card">
             <span class="stat-icon">🗺</span>
-            <div><small>Jornada</small><strong>0%</strong><span>14 fases</span></div>
+            <div><small>Jornada</small><strong id="journeyStat">0%</strong><span>14 fases</span></div>
           </article>
           <article class="stat-card card">
             <span class="stat-icon">🏅</span>
@@ -91,12 +91,12 @@
           <article class="card current-mission">
             <div class="section-heading">
               <div><p class="eyebrow">Próxima etapa</p><h2>Fase 01 — Preparando o Ambiente</h2></div>
-              <span class="lock">🔒</span>
+              <span class="lock">🟢</span>
             </div>
             <p>IDE, Git e GitHub serão os primeiros desafios da Jornada Web.</p>
             <div class="progress-meta"><span>Progresso da Jornada</span><b>0%</b></div>
             <div class="progress"><i style="width:0%"></i></div>
-            <button class="btn btn-disabled" disabled>Missões chegam na Fase 2 da implantação</button>
+            <a class="btn btn-primary" href="mission.html?id=1A">Iniciar Missão 1A →</a>
           </article>
 
           <article class="card level-card">
