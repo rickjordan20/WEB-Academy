@@ -26,13 +26,13 @@
         <button class="nav-item" data-view="guild"><span>⚔</span> Minha Guilda <em>Em breve</em></button>
         <button class="nav-item" data-view="extras"><span>🧭</span> Missões Extras <em>Em breve</em></button>
         <button class="nav-item" data-view="skills"><span>⚡</span> Competências <em>Em breve</em></button>
-        <button class="nav-item" data-view="achievements"><span>🏅</span> Conquistas <em>Em breve</em></button>
+        <a class="nav-item" href="achievements.html"><span>🏅</span> Conquistas <em id="navAchievementCount">0</em></a>
       </nav>
 
       <div class="sidebar-footer">
         <div class="phase-note">
           <small>Implantação atual</small>
-          <strong>Fase 3 — Ambiente Interativo</strong>
+          <strong>Fase 4 — Gamificação</strong>
         </div>
         <button id="openSettings" class="nav-item"><span>⚙</span> Configurações</button>
       </div>
@@ -75,7 +75,7 @@
           </article>
           <article class="stat-card card">
             <span class="stat-icon">⬆</span>
-            <div><small>Nível</small><strong id="levelValue">1</strong><span>Novato Web</span></div>
+            <div><small>Nível</small><strong id="levelValue">1</strong><span id="levelNameStat">Novato Web</span></div>
           </article>
           <article class="stat-card card">
             <span class="stat-icon">🗺</span>
@@ -83,7 +83,7 @@
           </article>
           <article class="stat-card card">
             <span class="stat-icon">🏅</span>
-            <div><small>Conquistas</small><strong>0</strong><span>Desbloqueadas</span></div>
+            <div><small>Conquistas</small><strong id="achievementCount">0</strong><span>Desbloqueadas</span></div>
           </article>
         </section>
 
@@ -101,11 +101,11 @@
 
           <article class="card level-card">
             <p class="eyebrow">Seu nível</p>
-            <div class="level-badge">1</div>
-            <h2>Novato Web</h2>
-            <p>0 / 250 XP</p>
-            <div class="progress"><i style="width:0%"></i></div>
-            <small>O sistema de XP será ativado na implantação de Gamificação.</small>
+            <div class="level-badge" id="levelBadge">1</div>
+            <h2 id="levelName">Novato Web</h2>
+            <p id="levelXp">0 / 250 XP</p>
+            <div class="progress"><i id="levelProgress" style="width:0%"></i></div>
+            <small id="levelHint">Complete missões para ganhar XP e avançar de nível.</small>
           </article>
         </section>
 

@@ -1,6 +1,7 @@
 import { getState, exportState, importState, clearState } from "./storage.js";
+import { ensureGamification,nextLevelInfo } from "./gamification.js";
 
-const state = getState();
+const state = ensureGamification(getState());
 if (!state?.student?.name) location.replace("index.html");
 
 const $ = (s) => document.querySelector(s);
@@ -11,6 +12,14 @@ function render() {
   $("#welcomeTitle").textContent = `Olá, ${first}!`;
   $("#xpValue").textContent = state.gamification?.xp ?? 0;
   $("#levelValue").textContent = state.gamification?.level ?? 1;
+  const li=nextLevelInfo(state);
+  $("#levelNameStat").textContent=state.gamification.levelName;
+  $("#levelBadge").textContent=state.gamification.level;
+  $("#levelName").textContent=state.gamification.levelName;
+  $("#levelXp").textContent=li.next?`${state.gamification.xp} / ${li.next.min} XP`:`${state.gamification.xp} XP • Nível máximo`;
+  $("#levelProgress").style.width=`${li.pct}%`;
+  $("#achievementCount").textContent=state.gamification.achievements.length;
+  $("#navAchievementCount").textContent=state.gamification.achievements.length;
   const journeyProgress = state.journey?.progress ?? 0;
   const journeyStat = $("#journeyStat"); if (journeyStat) journeyStat.textContent = `${journeyProgress}%`;
   const journeyText = $("#journeyProgressText"); if (journeyText) journeyText.textContent = `${journeyProgress}%`;
