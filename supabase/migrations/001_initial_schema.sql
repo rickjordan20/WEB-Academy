@@ -45,6 +45,7 @@ alter table public.class_members enable row level security;
 alter table public.guilds enable row level security;
 alter table public.guild_members enable row level security;
 alter table public.student_states enable row level security;
+create policy profiles_self_insert on public.profiles for insert to authenticated with check(id=auth.uid());
 create policy profiles_self_select on public.profiles for select to authenticated using(id=auth.uid());
 create policy profiles_self_update on public.profiles for update to authenticated using(id=auth.uid()) with check(id=auth.uid());
 create policy states_self_all on public.student_states for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
