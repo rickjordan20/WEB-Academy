@@ -50,3 +50,13 @@ Use um servidor local, como Live Server no VS Code, e abra `index.html`.
 ## Tecnologias
 
 HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framework.
+
+
+## Fase 4 — Gamificação
+- XP concedido uma única vez por missão concluída (anti-farming)
+- níveis progressivos da Jornada Web
+- atualização automática do nível conforme XP
+- conquistas iniciais: Primeira Missão, Primeiro Commit, Guilda em Ação e Fase Conquistada
+- galeria de Conquistas
+- dashboard conectado ao XP, nível e conquistas reais
+- XP é motivacional e não substitui menção, indicadores ou avaliação do instrutor
