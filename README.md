@@ -72,3 +72,13 @@ HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framewor
 - responsável, competências, evidência e histórico por tarefa;
 - registro de contribuição individual da Guilda;
 - persistência local integrada ao backup existente.
+
+
+## Fase 6 — Acompanhamento Pedagógico
+
+- área Competências da Jornada com os seis indicadores oficiais I1–I6;
+- registros reflexivos do estudante por competência;
+- contagem de evidências sem conversão automática em menção;
+- área Meu Progresso integrando Jornada, EduTech, Guilda e evidências;
+- próximas ações para continuidade do estudante;
+- estrutura preparada para futura visão centralizada do instrutor quando houver backend/autenticação.
