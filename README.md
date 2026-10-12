@@ -93,3 +93,13 @@ HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framewor
 - sete Missões Extras correspondentes às 28h não presenciais;
 - quatro Marcos Avaliativos alinhados ao PTD;
 - conteúdo continua orientado a dados no Mission Engine, sem páginas HTML duplicadas por missão.
+
+
+## Fase 8 — Validação e Publicação
+
+- diagnóstico local de integridade da aplicação e do estado;
+- relatório individual consolidado para impressão ou salvamento em PDF pelo navegador;
+- revisão do estado inicial e do anti-farming da gamificação;
+- identificação visual do MVP atualizada;
+- preparação para testes finais em navegadores/dispositivos e publicação estática;
+- backend, autenticação real e dados centralizados permanecem como evolução de produção.
