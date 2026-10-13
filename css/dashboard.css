@@ -25,3 +25,15 @@
 .guild-function-status{min-height:14px;font-size:.65rem;font-weight:700}.guild-function-status.is-saving{color:var(--muted)}.guild-function-status.is-saved{color:var(--accent)}.guild-function-status.is-error{color:#ff8f8f}
 .guild-member-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.75rem;border-top:1px solid var(--line)}
 @media(max-width:680px){.guild-member-main{grid-template-columns:1fr}.guild-function-picker{max-width:none}}
+
+/* Guild member cards: explicit spacing to avoid generic list rules collapsing labels/badges. */
+.guild-member-list>li.guild-member-card{display:block!important}
+.guild-member-card .guild-member-main{display:grid!important;grid-template-columns:minmax(0,1fr) 230px!important;gap:1.25rem!important;align-items:center!important}
+.guild-member-card .guild-member-identity{display:grid!important;grid-template-columns:1fr!important;justify-items:start!important;align-content:center!important;gap:.45rem!important}
+.guild-member-card .guild-member-identity>b{display:block!important;line-height:1.35!important;font-size:1rem!important;letter-spacing:.01em}
+.guild-member-card .guild-role-badge,.guild-member-card .guild-function-badge{display:inline-flex!important;width:max-content!important;margin:0!important;line-height:1!important}
+.guild-member-card .guild-function-picker{display:grid!important;grid-template-columns:1fr!important;gap:.4rem!important;margin:0!important}
+.guild-member-card .guild-function-picker>span{display:block!important;line-height:1.2!important;color:var(--text)}
+.guild-member-card .guild-function-picker select{display:block!important;width:100%!important;box-sizing:border-box!important;appearance:auto}
+.guild-member-card .guild-member-actions{display:flex!important;align-items:center!important;gap:.55rem!important}
+@media(max-width:760px){.guild-member-card .guild-member-main{grid-template-columns:1fr!important}.guild-member-card .guild-function-picker{max-width:100%!important}}
