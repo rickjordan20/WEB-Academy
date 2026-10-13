@@ -38,18 +38,24 @@ function startGuildTaskRealtime(){
  guildTaskChannel=sb.channel("guild-kanban-"+officialGuild.id).on("postgres_changes",{event:"*",schema:"public",table:"guild_tasks",filter:"guild_id=eq."+officialGuild.id},async()=>{try{await loadSharedTasks();render()}catch(e){console.warn("Kanban em tempo real indisponível:",e)}}).subscribe();
 }
 
+async function loadAvailableStudents(guildId=null){
+ const {data,error}=await sb.rpc("get_available_guild_students",{p_guild_id:guildId});
+ if(error)throw error;availableStudents=data||[];
+}
 async function loadOfficialGuild(){
- const cm=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").maybeSingle();if(cm.error)throw cm.error;if(cm.data){const cr=await sb.from("classes").select("id").eq("id",cm.data.class_id).single();if(cr.error)throw cr.error;classRow=cr.data}
+ const cm=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").maybeSingle();
+ if(cm.error)throw cm.error;
+ if(cm.data){const cr=await sb.from("classes").select("id").eq("id",cm.data.class_id).single();if(cr.error)throw cr.error;classRow=cr.data}
  const gm=await sb.from("guild_members").select("guild_id,role").eq("user_id",session.user.id).maybeSingle();
  if(gm.error)throw gm.error;
- if(!gm.data){officialGuild=null;officialMembers=[];if(classRow){const cms=await sb.from("class_members").select("user_id").eq("class_id",classRow.id).eq("status","active");if(cms.error)throw cms.error;const used=await sb.from("guild_members").select("user_id");if(used.error)throw used.error;const usedIds=new Set((used.data||[]).map(x=>x.user_id));const ids=(cms.data||[]).map(x=>x.user_id).filter(id=>!usedIds.has(id)&&id!==session.user.id);if(ids.length){const ps=await sb.from("profiles").select("id,full_name").in("id",ids);if(ps.error)throw ps.error;availableStudents=ps.data||[]}}return}
+ if(!gm.data){officialGuild=null;officialMembers=[];await loadAvailableStudents(null);return}
  const gr=await sb.from("guilds").select("id,name,repository").eq("id",gm.data.guild_id).single();if(gr.error)throw gr.error;
  officialGuild={...gr.data,role:gm.data.role};
  const members=await sb.from("guild_members").select("user_id,role").eq("guild_id",gm.data.guild_id);if(members.error)throw members.error;
  const ids=(members.data||[]).map(x=>x.user_id);let profiles=[];
  if(ids.length){const pr=await sb.from("profiles").select("id,full_name").in("id",ids);if(pr.error)throw pr.error;profiles=pr.data||[]}
  officialMembers=(members.data||[]).map(m=>({...m,name:profiles.find(p=>p.id===m.user_id)?.full_name||"Estudante"}));
- availableStudents=[];if(officialGuild.role==="leader"&&classRow){const cms=await sb.from("class_members").select("user_id").eq("class_id",classRow.id).eq("status","active");if(cms.error)throw cms.error;const candidateIds=(cms.data||[]).map(x=>x.user_id).filter(id=>id!==session.user.id);let usedIds=new Set();if(candidateIds.length){const used=await sb.from("guild_members").select("user_id").in("user_id",candidateIds);if(used.error)throw used.error;usedIds=new Set((used.data||[]).map(x=>x.user_id))}const free=candidateIds.filter(id=>!usedIds.has(id));if(free.length){const ps=await sb.from("profiles").select("id,full_name").in("id",free);if(ps.error)throw ps.error;availableStudents=ps.data||[]}}
+ if(officialGuild.role==="leader")await loadAvailableStudents(officialGuild.id);else availableStudents=[];
 }
 
 async function createGuild(e){e.preventDefault();const form=e.currentTarget,fd=new FormData(form),fb=document.querySelector("#createGuildFeedback");try{if(!classRow)throw new Error("Turma não encontrada.");const name=String(fd.get("name")||"").trim(),repository=String(fd.get("repository")||"").trim();const created=await sb.from("guilds").insert({class_id:classRow.id,name,repository,created_by:session.user.id}).select("id").single();if(created.error)throw created.error;const leader=await sb.from("guild_members").insert({guild_id:created.data.id,user_id:session.user.id,role:"leader"});if(leader.error)throw leader.error;const members=fd.getAll("members");if(members.length){const added=await sb.from("guild_members").insert(members.map(user_id=>({guild_id:created.data.id,user_id,role:"member"})));if(added.error)throw added.error}await loadOfficialGuild();render()}catch(err){fb.textContent=err.message||"Não foi possível criar a Guilda.";fb.className="feedback error"}}
