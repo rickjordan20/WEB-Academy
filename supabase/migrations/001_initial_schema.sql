@@ -57,10 +57,10 @@ revoke all on function public.is_class_instructor(uuid) from public;
 revoke all on function public.is_active_class_member(uuid) from public;
 revoke all on function public.is_instructor_of_student(uuid) from public;
 revoke all on function public.is_instructor_of_guild(uuid) from public;
-grant execute on function public.is_class_instructor(uuid) to authenticated;
-grant execute on function public.is_active_class_member(uuid) to authenticated;
-grant execute on function public.is_instructor_of_student(uuid) to authenticated;
-grant execute on function public.is_instructor_of_guild(uuid) to authenticated;
+revoke execute on function public.is_class_instructor(uuid) from public;
+revoke execute on function public.is_active_class_member(uuid) from public;
+revoke execute on function public.is_instructor_of_student(uuid) from public;
+revoke execute on function public.is_instructor_of_guild(uuid) from public;
 
 create or replace function public.protect_profile_role()
 returns trigger language plpgsql set search_path=public as $$
@@ -100,6 +100,8 @@ create policy guilds_instructor_all on public.guilds for all to authenticated us
 create policy guild_members_select on public.guild_members for select to authenticated using(user_id=auth.uid() or public.is_instructor_of_guild(guild_id));
 create policy guild_members_instructor_all on public.guild_members for all to authenticated using(public.is_instructor_of_guild(guild_id)) with check(public.is_instructor_of_guild(guild_id));
 
+create index classes_instructor_idx on public.classes(instructor_id);
 create index class_members_user_idx on public.class_members(user_id);
 create index guilds_class_idx on public.guilds(class_id);
+create index guilds_created_by_idx on public.guilds(created_by);
 create index guild_members_user_idx on public.guild_members(user_id);
