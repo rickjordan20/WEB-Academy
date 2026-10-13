@@ -5,7 +5,7 @@ const meResult=await sb.from("profiles").select("id,full_name,role").eq("id",ses
 if(meResult.error||meResult.data?.role!=="instructor"){location.replace("app.html");throw new Error("INSTRUCTOR_REQUIRED")}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-let students=[],guilds=[],memberships=[],classRow=null,selectedGuildId=null;
+let students=[],guilds=[],memberships=[],classRow=null,selectedGuildId=null,realtimeChannel=null,realtimeTimer=null,isReloading=false,reloadQueued=false;
 async function load(){
  const cr=await sb.from("classes").select("id,code,name,uc").eq("instructor_id",session.user.id).eq("code","2026.36.8").single();if(cr.error)throw cr.error;classRow=cr.data;
  const mr=await sb.from("class_members").select("user_id,status").eq("class_id",classRow.id).eq("status","active");if(mr.error)throw mr.error;const ids=(mr.data||[]).map(x=>x.user_id);
@@ -15,6 +15,30 @@ async function load(){
  students=profiles.map(p=>{const st=states.find(x=>x.user_id===p.id),m=memberships.find(x=>x.user_id===p.id),g=guilds.find(x=>x.id===m?.guild_id);return {...p,state:st?.state||null,updated_at:st?.updated_at||null,guild:g?.name||"—"}});
  $("#classTitle").textContent="Turma "+classRow.code;$("#classMeta").textContent=classRow.name+" • "+classRow.uc;render();
 }
+
+async function reloadFromRealtime(){
+ if(isReloading){reloadQueued=true;return}
+ isReloading=true;
+ try{
+  const openStudentId=$("#studentDialog")?.open?$("#studentDialog").dataset.studentId:null;
+  await load();
+  if(openStudentId)openStudent(openStudentId,{keepOpen:true});
+  if(selectedGuildId&&$("#guildManageDialog")?.open)renderGuildManager();
+ }catch(err){console.error("Falha ao atualizar dados em tempo real",err)}
+ finally{isReloading=false;if(reloadQueued){reloadQueued=false;reloadFromRealtime()}}
+}
+function scheduleRealtimeReload(){clearTimeout(realtimeTimer);realtimeTimer=setTimeout(reloadFromRealtime,250)}
+function startRealtime(){
+ if(realtimeChannel||!classRow)return;
+ realtimeChannel=sb.channel("instructor-dashboard-"+classRow.id)
+  .on("postgres_changes",{event:"*",schema:"public",table:"student_states"},scheduleRealtimeReload)
+  .on("postgres_changes",{event:"*",schema:"public",table:"guilds",filter:"class_id=eq."+classRow.id},scheduleRealtimeReload)
+  .on("postgres_changes",{event:"*",schema:"public",table:"guild_members"},scheduleRealtimeReload)
+  .on("postgres_changes",{event:"*",schema:"public",table:"class_members",filter:"class_id=eq."+classRow.id},scheduleRealtimeReload)
+  .subscribe(status=>{const label=document.querySelector(".status-dot");if(!label)return;if(status==="SUBSCRIBED")label.innerHTML="<i></i> Tempo real";else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")label.innerHTML="<i></i> Nuvem"})
+}
+window.addEventListener("beforeunload",()=>{if(realtimeChannel)sb.removeChannel(realtimeChannel)});
+
 function evidenceCount(value){return Array.isArray(value)?value.length:(value&&typeof value==="object"?Object.keys(value).length:(value?1:0))}
 function studentMetrics(s){const st=s.state||{},journey=st.journey||{};return {progress:Number(journey.progress||0),xp:Number(st.gamification?.xp||0),missions:(journey.completedMissions||[]).length,extras:(journey.completedExtras||st.extras?.completed||[]).length}}
 function renderOverview(){
@@ -43,8 +67,8 @@ async function adminRemoveMember(userId){const row=memberships.find(m=>m.guild_i
 async function adminTransferLeader(userId){if(!confirm("Definir este estudante como novo líder da Guilda?"))return;const {error}=await sb.rpc("transfer_guild_leadership",{p_guild_id:selectedGuildId,p_new_leader:userId});if(error)return adminGuildError(error);await refreshGuildManager()}
 function adminGuildError(err){const fb=$("#manageGuildFeedback");fb.textContent=err.message||"Não foi possível concluir a operação.";fb.className="feedback error"}
 
-function openStudent(id){
- const s=students.find(x=>x.id===id);if(!s)return;
+function openStudent(id,{keepOpen=false}={}){
+ const s=students.find(x=>x.id===id);if(!s)return;$("#studentDialog").dataset.studentId=id;
  $("#studentDetailName").textContent=s.full_name;
  $("#studentDetailEmail").textContent=s.email||"";
  const st=s.state||{},journey=st.journey||{},game=st.gamification||{},projects=st.projects||{};
@@ -54,7 +78,7 @@ function openStudent(id){
  const competencyCards=indicators.map(i=>{const value=evidence[i];const count=Array.isArray(value)?value.length:(value&&typeof value==="object"?Object.keys(value).length:(value?1:0));return "<article class='detail-mini'><b>"+i+"</b><span>"+count+" evidência(s)</span></article>"}).join("");
  const edu=projects.edutech||st.edutech||{},guild=projects.guild||st.guild||{};
  $("#studentDetailBody").innerHTML="<div class='detail-stats'><article><small>Progresso</small><b>"+(journey.progress||0)+"%</b></article><article><small>XP</small><b>"+(game.xp||0)+"</b></article><article><small>Nível</small><b>"+(game.level||1)+"</b></article><article><small>Missões</small><b>"+completed.length+"/28</b></article></div><section class='detail-section'><h3>Competências I1–I6</h3><div class='detail-competencies'>"+competencyCards+"</div><p class='muted'>Evidências da plataforma apoiam o acompanhamento; a menção oficial continua sendo definida pelo instrutor.</p></section><section class='detail-section'><h3>Projetos</h3><div class='detail-projects'><article><b>🎓 EduTech</b><span>"+(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)</span></article><article><b>⚔️ Guilda</b><span>"+esc(s.guild)+" • "+(guild.progress||0)+"%</span></article></div></section><section class='detail-section'><h3>Atividade</h3><p>"+completed.length+" missão(ões) presencial(is) concluída(s) • "+extras.length+" missão(ões) extra(s).</p><p class='muted'>Última sincronização: "+(s.updated_at?new Date(s.updated_at).toLocaleString("pt-BR"):"Sem sincronização")+"</p></section>";
- $("#studentDialog").showModal();
+ if(!keepOpen&&!$("#studentDialog").open)$("#studentDialog").showModal();
 }
 function setAdminView(view,{updateHash=true}={}){
  const valid=["overview","students","guilds"];if(!valid.includes(view))view="overview";
@@ -76,4 +100,4 @@ $("#deleteGuildButton").onclick=async()=>{const g=guilds.find(x=>x.id===selected
 $("#studentSearch").addEventListener("input",render);const dlg=$("#guildDialog");$("#newGuildButton").onclick=()=>dlg.showModal();$("#closeGuild").onclick=()=>dlg.close();
 $("#guildForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),name=String(fd.get("name")||"").trim(),repository=String(fd.get("repository")||"").trim(),members=fd.getAll("members"),fb=$("#guildFeedback");try{const created=await sb.from("guilds").insert({class_id:classRow.id,name,repository,created_by:session.user.id}).select("id").single();if(created.error)throw created.error;if(members.length){const added=await sb.from("guild_members").insert(members.map((user_id,i)=>({guild_id:created.data.id,user_id,role:i===0?"leader":"member"})));if(added.error)throw added.error}dlg.close();e.currentTarget.reset();await load()}catch(err){fb.textContent=err.message||"Não foi possível criar a Guilda."}};
 $("#logoutButton").onclick=async()=>{await sb.auth.signOut();location.replace("auth.html")};
-try{await load()}catch(err){console.error(err);$("#classMeta").textContent="Não foi possível carregar a turma. Verifique o Console."}
+try{await load();startRealtime()}catch(err){console.error(err);$("#classMeta").textContent="Não foi possível carregar a turma. Verifique o Console."}
