@@ -1,0 +1,38 @@
+export const DEFAULT_REQUIREMENTS={
+edutech:[
+["RF01","functional","Estrutura e navegação","Organizar as páginas e a navegação do EduTech.",["Páginas organizadas","Navegação funcional"],["I2"]],
+["RF02","functional","Catálogo de conteúdos","Apresentar conteúdos educacionais de forma organizada.",["Conteúdos identificáveis","Lista ou cards organizados"],["I2","I3"]],
+["RF03","functional","Cadastro e contato","Coletar dados por formulário.",["Campos identificados","Entradas adequadas"],["I2","I5"]],
+["RF04","functional","Interatividade","Responder às ações do usuário com JavaScript.",["Eventos funcionam","Interface é atualizada"],["I2","I5"]],
+["RF05","functional","Validação","Validar dados e orientar correções.",["Entradas inválidas são identificadas","Mensagens são claras"],["I2","I5"]],
+["RF06","functional","Integração por API","Trocar dados por HTTP e JSON.",["Requisição funciona","Resposta é apresentada"],["I2","I5"]],
+["RF07","functional","Persistência","Gravar e recuperar dados no banco.",["Conexão funciona","Dados persistem"],["I2","I4","I5"]],
+["RF08","functional","Autenticação","Permitir entrada e saída de usuários.",["Entrada válida funciona","Saída encerra a sessão"],["I2","I4","I5"]],
+["RF09","functional","Controle de acesso","Restringir áreas conforme o perfil do usuário.",["Áreas protegidas exigem acesso","Permissões são respeitadas"],["I2","I4","I5"]],
+["RF10","functional","Gestão de conteúdos","Cadastrar, consultar, alterar e excluir conteúdos.",["CRUD funciona","Alterações persistem"],["I2","I4","I5"]],
+["RNF01","non_functional","Responsividade","Adaptar a interface a diferentes telas.",["Layout se adapta","Sem rolagem horizontal indevida"],["I3","I5"]],
+["RNF02","non_functional","Usabilidade visual","Manter interface consistente e clara.",["Padrão visual consistente","Ações apresentam retorno"],["I3","I5"]],
+["RNF03","non_functional","Acessibilidade básica","Usar estrutura semântica e controles identificáveis.",["HTML semântico","Formulários identificados"],["I2","I3","I5"]],
+["RNF04","non_functional","Versionamento","Manter histórico do projeto em Git e GitHub.",["Commits objetivos","Repositório atualizado"],["I1","I6"]],
+["RNF05","non_functional","Proteção de acesso","Proteger áreas e operações restritas.",["Operações restritas são controladas","Dados privados não ficam expostos"],["I4","I5"]],
+["RNF06","non_functional","Qualidade e publicação","Testar, documentar e publicar a versão final.",["Fluxos principais testados","Projeto documentado e publicado"],["I1","I2","I3","I4","I5","I6"]]
+],
+restaurante:[
+["RF01","functional","Apresentação do restaurante","Apresentar identidade e informações do restaurante.",["Informações organizadas","Navegação funcional"],["I2","I3"]],
+["RF02","functional","Cardápio","Apresentar itens do cardápio.",["Nome e descrição visíveis","Itens organizados"],["I2","I3"]],
+["RF03","functional","Contato e reserva","Receber contato ou solicitação de reserva.",["Formulário identificado","Usuário recebe retorno"],["I2","I5"]],
+["RF04","functional","Interatividade do cardápio","Permitir interações com o conteúdo.",["Eventos funcionam","DOM é atualizado"],["I2","I5"]],
+["RF05","functional","Validação","Validar formulários antes do processamento.",["Dados inválidos são identificados","Mensagens são claras"],["I2","I5"]],
+["RF06","functional","Integração cliente-servidor","Trocar dados por HTTP e JSON.",["Requisições funcionam","Falhas recebem tratamento"],["I2","I5"]],
+["RF07","functional","Persistência do cardápio","Gravar e recuperar o cardápio no banco.",["Conexão funciona","Dados persistem"],["I2","I4","I5"]],
+["RF08","functional","Autenticação administrativa","Permitir entrada e saída da área administrativa.",["Entrada válida funciona","Saída encerra a sessão"],["I2","I4","I5"]],
+["RF09","functional","Área administrativa","Restringir funções de gestão.",["Área exige acesso","Permissões são respeitadas"],["I2","I4","I5"]],
+["RF10","functional","CRUD do cardápio","Cadastrar, consultar, editar e excluir itens.",["CRUD funciona","Alterações persistem"],["I2","I4","I5"]],
+["RF11","functional","Gestão de contatos e reservas","Consultar e tratar registros enviados por clientes.",["Registros são listados","Alterações previstas persistem"],["I2","I4","I5"]],
+["RNF01","non_functional","Responsividade","Adaptar o site a diferentes telas.",["Layout se adapta","Formulários continuam utilizáveis"],["I3","I5"]],
+["RNF02","non_functional","Identidade visual e usabilidade","Manter visual coerente e interface clara.",["Padrão visual consistente","Ações apresentam retorno"],["I3","I5"]],
+["RNF03","non_functional","Acessibilidade básica","Usar estrutura semântica e controles identificáveis.",["HTML semântico","Formulários identificados"],["I2","I3","I5"]],
+["RNF04","non_functional","Versionamento colaborativo","Manter histórico das contribuições da Guilda.",["Commits objetivos","Contribuições rastreáveis"],["I1","I6"]],
+["RNF05","non_functional","Proteção administrativa","Proteger operações de gestão.",["Operações restritas são controladas","Dados privados não ficam expostos"],["I4","I5"]],
+["RNF06","non_functional","Qualidade e publicação","Testar, documentar e publicar a versão final.",["Fluxos principais testados","Projeto documentado e publicado"],["I1","I2","I3","I4","I5","I6"]]
+]};
