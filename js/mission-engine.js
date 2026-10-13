@@ -10,6 +10,23 @@ export function startMission(id){const s=ensureJourneyState(),m=getMission(id);i
 export function saveAnswer(missionId,stepId,value){const s=ensureJourneyState();s.answers[`${missionId}:${stepId}`]=value;saveState(s)}
 export function getAnswer(missionId,stepId){return ensureJourneyState().answers?.[`${missionId}:${stepId}`]}
 export function completeStep(missionId,stepId){const s=ensureJourneyState(),m=getMission(missionId);if(!m)return false;s.journey.missionProgress[missionId]||={currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};const p=s.journey.missionProgress[missionId];if(!p.completedSteps.includes(stepId))p.completedSteps.push(stepId);p.currentStep=Math.min(p.completedSteps.length,m.steps.length-1);if(p.completedSteps.length===m.steps.length)completeMission(missionId,s);else saveState(s);return true}
-export function completeMission(id,s=ensureJourneyState()){const already=s.journey.completedMissions.includes(id);if(!already)s.journey.completedMissions.push(id);const m=getMission(id);if(!m){saveState(s);return}if(!already)rewardMission(m,s);if(id.endsWith("A")){const b=`${m.phase}B`;if(!s.journey.unlockedMissions.includes(b))s.journey.unlockedMissions.push(b)}else{const next=m.phase+1;if(next<=JOURNEY.length){const a=`${next}A`;if(!s.journey.unlockedMissions.includes(a))s.journey.unlockedMissions.push(a);s.journey.currentPhase=Math.max(s.journey.currentPhase,next)}}s.journey.progress=Math.round((s.journey.completedMissions.length/(JOURNEY.length*2))*100);saveState(s)}
+function evidenceValue(v){return Array.isArray(v)?v.map(x=>String(x||"").trim()).filter(Boolean):[]}
+function registerMissionEvidence(s,m){
+ if(!m?.competencies?.length)return;
+ s.competencies||={I1:[],I2:[],I3:[],I4:[],I5:[],I6:[]};
+ const evidenceSteps=m.steps.filter(step=>step.type==="evidence");
+ const evidencePayload=evidenceSteps.flatMap(step=>evidenceValue(s.answers?.[`${m.id}:${step.id}`]));
+ if(!evidencePayload.length)return;
+ m.competencies.forEach(indicator=>{
+  s.competencies[indicator]||=[];
+  const key=`mission-${m.id}-${indicator}`;
+  const item={id:key,type:"mission-evidence",source:m.id,missionId:m.id,project:m.project,phase:m.phase,title:`${m.id} — ${m.title}`,summary:evidencePayload.join(" • "),createdAt:new Date().toISOString()};
+  const existing=s.competencies[indicator].findIndex(e=>e.id===key);
+  if(existing>=0)item.createdAt=s.competencies[indicator][existing].createdAt||item.createdAt,s.competencies[indicator][existing]={...s.competencies[indicator][existing],...item,updatedAt:new Date().toISOString()};
+  else s.competencies[indicator].push(item);
+ });
+}
+
+export function completeMission(id,s=ensureJourneyState()){const already=s.journey.completedMissions.includes(id);if(!already)s.journey.completedMissions.push(id);const m=getMission(id);if(!m){saveState(s);return}if(!already)rewardMission(m,s);registerMissionEvidence(s,m);if(id.endsWith("A")){const b=`${m.phase}B`;if(!s.journey.unlockedMissions.includes(b))s.journey.unlockedMissions.push(b)}else{const next=m.phase+1;if(next<=JOURNEY.length){const a=`${next}A`;if(!s.journey.unlockedMissions.includes(a))s.journey.unlockedMissions.push(a);s.journey.currentPhase=Math.max(s.journey.currentPhase,next)}}s.journey.progress=Math.round((s.journey.completedMissions.length/(JOURNEY.length*2))*100);saveState(s)}
 export function getJourneyView(){const s=ensureJourneyState();return JOURNEY.map(p=>({...p,status:phaseStatus(p.phase,s),missions:getPhaseMissions(p.phase).map(m=>({...m,status:missionStatus(m.id,s)}))}))}
 export {JOURNEY,MISSIONS,getMission};
