@@ -1,12 +1,14 @@
 import {getSupabase,getSession} from "./supabase-client.js";
+import {DEFAULT_REQUIREMENTS} from "../data/project-defaults.js";
 export async function getMissionProjectContext(mission){
  try{
   const sb=await getSupabase(),session=await getSession();if(!sb||!session||!mission)return null;
   const cr=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1).maybeSingle();if(cr.error||!cr.data)return null;
   const pr=await sb.from("learning_projects").select("*").eq("class_id",cr.data.class_id).eq("slug",mission.project).eq("active",true).maybeSingle();if(pr.error||!pr.data)return null;
   const rr=await sb.from("project_requirements").select("*").eq("project_id",pr.data.id).eq("active",true).order("sort_order");if(rr.error)return null;
-  const codes=new Set(mission.requirements||[]);
-  return {project:pr.data,requirements:(rr.data||[]).filter(x=>codes.has(x.code)),competencies:mission.competencies||[]};
+  const codes=new Set(mission.requirements||[]),stored=rr.data||[],defaults=DEFAULT_REQUIREMENTS[mission.project]||[];
+  const requirements=[...codes].map(code=>stored.find(x=>x.code===code)||(()=>{const d=defaults.find(x=>x[0]===code);return d?{code:d[0],requirement_type:d[1],title:d[2],description:d[3],acceptance_criteria:d[4],indicators:d[5]}:null})()).filter(Boolean);
+  return {project:pr.data,requirements,competencies:mission.competencies||[]};
  }catch(error){console.warn("Contexto do projeto indisponível",error);return null}
 }
 export function renderProjectContext(ctx){
