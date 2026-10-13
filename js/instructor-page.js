@@ -93,11 +93,11 @@ function openStudent(id,{keepOpen=false}={}){
  if(!keepOpen&&!$("#studentDialog").open)$("#studentDialog").showModal();
 }
 function setAdminView(view,{updateHash=true}={}){
- const valid=["overview","students","guilds","projects"];if(!valid.includes(view))view="overview";
+ const valid=["overview","students","guilds","projects","indicators"];if(!valid.includes(view))view="overview";
  document.querySelectorAll(".admin-view").forEach(el=>el.hidden=true);
  const target=document.querySelector("#"+view+"View");if(target)target.hidden=false;
  document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.adminView===view));
- const titles={overview:["Gestão da turma","Área do Instrutor"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"]};
+ const titles={overview:["Gestão da turma","Área do Instrutor"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"],indicators:["Currículo da UC","Indicadores"]};
  const [eyebrow,title]=titles[view];document.querySelector(".topbar .eyebrow").textContent=eyebrow;document.querySelector(".topbar h1").textContent=title;
  if(updateHash)history.replaceState(null,"","#"+view);
 }
