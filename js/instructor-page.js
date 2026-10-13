@@ -67,6 +67,11 @@ async function adminRemoveMember(userId){const row=memberships.find(m=>m.guild_i
 async function adminTransferLeader(userId){if(!confirm("Definir este estudante como novo líder da Guilda?"))return;const {error}=await sb.rpc("transfer_guild_leadership",{p_guild_id:selectedGuildId,p_new_leader:userId});if(error)return adminGuildError(error);await refreshGuildManager()}
 function adminGuildError(err){const fb=$("#manageGuildFeedback");fb.textContent=err.message||"Não foi possível concluir a operação.";fb.className="feedback error"}
 
+function competencyEvidenceItems(st,indicator){const root=st?.competencies?.evidence||st?.competencies||{},v=root[indicator];if(Array.isArray(v))return v;if(v&&typeof v==="object")return Object.values(v);return v?[v]:[]}
+function evidenceOrigin(e){if(e?.type==="mission-evidence")return "Missão "+(e.missionId||e.source||"")+" • "+(e.project==="edutech"?"EduTech":"Projeto Restaurante");if(e?.type==="self-reflection")return "Registro reflexivo do estudante";return e?.title||e?.source||"Evidência registrada"}
+function evidenceDate(e){const d=e?.updatedAt||e?.createdAt;return d?new Date(d).toLocaleString("pt-BR"):"Data não registrada"}
+function renderStudentCompetencyEvidence(st,indicator){const items=competencyEvidenceItems(st,indicator);if(!items.length)return "<p class='muted'>Nenhuma evidência vinculada a este indicador.</p>";return items.map(e=>"<article class='instructor-evidence-item'><div class='instructor-evidence-head'><b>"+esc(evidenceOrigin(e))+"</b><small>"+esc(evidenceDate(e))+"</small></div>"+(e?.title&&evidenceOrigin(e)!==e.title?"<span>"+esc(e.title)+"</span>":"")+"<p>"+esc(e?.summary||e?.text||e?.note||"Registro vinculado ao indicador.")+"</p></article>").join("")}
+
 function openStudent(id,{keepOpen=false}={}){
  const s=students.find(x=>x.id===id);if(!s)return;$("#studentDialog").dataset.studentId=id;
  $("#studentDetailName").textContent=s.full_name;
@@ -75,9 +80,16 @@ function openStudent(id,{keepOpen=false}={}){
  const completed=journey.completedMissions||[],extras=journey.completedExtras||st.extras?.completed||[];
  const evidence=st.competencies?.evidence||st.competencies||{};
  const indicators=["I1","I2","I3","I4","I5","I6"];
- const competencyCards=indicators.map(i=>{const value=evidence[i];const count=Array.isArray(value)?value.length:(value&&typeof value==="object"?Object.keys(value).length:(value?1:0));return "<article class='detail-mini'><b>"+i+"</b><span>"+count+" evidência(s)</span></article>"}).join("");
+ const competencyCards=indicators.map(i=>{const count=competencyEvidenceItems(st,i).length;return "<button type='button' class='detail-mini detail-competency-button' data-detail-indicator='"+i+"' aria-expanded='false'><b>"+i+"</b><span>"+count+" evidência(s)</span><small>"+(count?"Ver registros":"Sem registros")+"</small></button>"}).join("");
  const edu=projects.edutech||st.edutech||{},guild=projects.guild||st.guild||{};
  $("#studentDetailBody").innerHTML="<div class='detail-stats'><article><small>Progresso</small><b>"+(journey.progress||0)+"%</b></article><article><small>XP</small><b>"+(game.xp||0)+"</b></article><article><small>Nível</small><b>"+(game.level||1)+"</b></article><article><small>Missões</small><b>"+completed.length+"/28</b></article></div><section class='detail-section'><h3>Competências I1–I6</h3><div class='detail-competencies'>"+competencyCards+"</div><p class='muted'>Evidências da plataforma apoiam o acompanhamento; a menção oficial continua sendo definida pelo instrutor.</p></section><section class='detail-section'><h3>Projetos</h3><div class='detail-projects'><article><b>🎓 EduTech</b><span>"+(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)</span></article><article><b>⚔️ Guilda</b><span>"+esc(s.guild)+" • "+(guild.progress||0)+"%</span></article></div></section><section class='detail-section'><h3>Atividade</h3><p>"+completed.length+" missão(ões) presencial(is) concluída(s) • "+extras.length+" missão(ões) extra(s).</p><p class='muted'>Última sincronização: "+(s.updated_at?new Date(s.updated_at).toLocaleString("pt-BR"):"Sem sincronização")+"</p></section>";
+ $("#studentDetailBody").querySelectorAll("[data-detail-indicator]").forEach(btn=>btn.onclick=()=>{
+  const indicator=btn.dataset.detailIndicator,existing=$("#studentEvidencePanel");
+  if(existing?.dataset.indicator===indicator){existing.remove();btn.setAttribute("aria-expanded","false");return}
+  existing?.remove();$("#studentDetailBody").querySelectorAll("[data-detail-indicator]").forEach(x=>x.setAttribute("aria-expanded","false"));btn.setAttribute("aria-expanded","true");
+  const panel=document.createElement("section");panel.id="studentEvidencePanel";panel.dataset.indicator=indicator;panel.className="detail-section instructor-evidence-panel";panel.innerHTML="<div class='section-heading'><div><p class='eyebrow'>"+indicator+"</p><h3>Evidências registradas</h3></div><span class='pill'>"+competencyEvidenceItems(st,indicator).length+" registro(s)</span></div>"+renderStudentCompetencyEvidence(st,indicator);
+  btn.closest(".detail-section").after(panel);
+ });
  if(!keepOpen&&!$("#studentDialog").open)$("#studentDialog").showModal();
 }
 function setAdminView(view,{updateHash=true}={}){
