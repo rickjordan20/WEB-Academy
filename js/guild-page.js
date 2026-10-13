@@ -1,3 +1,4 @@
+import "./cloud-bootstrap.js";
 import { getState } from "./storage.js";
 import { ensureProjects,addEvidence,STATUS_LABEL } from "./projects.js";
 import {getSupabase,getSession} from "./supabase-client.js";
