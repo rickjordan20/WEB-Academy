@@ -7,3 +7,14 @@
 #studentDialog .detail-stats,#studentDialog .detail-competencies,#studentDialog .detail-projects{min-width:0}
 #studentDialog .detail-stats article,#studentDialog .detail-mini,#studentDialog .detail-projects article{min-width:0}
 @media(max-width:700px){#studentDialog{width:calc(100vw - 20px);max-height:calc(100vh - 20px)}#studentDialog .student-detail-card{max-height:calc(100vh - 20px);padding:1rem}.detail-stats{grid-template-columns:1fr 1fr}.detail-competencies{grid-template-columns:1fr 1fr}.detail-projects{grid-template-columns:1fr}}
+
+.instructor-dashboard{border-top:3px solid rgba(32,214,181,.55)}
+.instructor-mode-label{display:inline-flex;align-items:center;gap:.45rem;padding:.45rem .7rem;border-radius:999px;background:rgba(32,214,181,.09);border:1px solid rgba(32,214,181,.24);color:var(--accent);font-size:.7rem;font-weight:900;letter-spacing:.08em}
+.nav-separator{height:1px;background:var(--line);margin:.55rem .4rem}.nav-student-preview{margin-top:.15rem;opacity:.78}
+.admin-guild-card{display:flex;flex-direction:column;justify-content:space-between;gap:1rem;min-height:190px}.admin-guild-card h3{margin:.35rem 0}.admin-guild-card small{display:block;color:var(--muted);margin-top:.65rem}.admin-guild-card .btn{align-self:flex-start}
+#guildManageDialog{width:min(760px,calc(100vw - 32px));max-width:760px;max-height:calc(100vh - 32px);padding:0;overflow:hidden}
+#guildManageDialog .guild-manage-card{box-sizing:border-box;width:100%;max-width:none;max-height:calc(100vh - 32px);overflow:auto}
+.guild-admin-block{margin-top:1.4rem;padding-top:1.1rem;border-top:1px solid var(--line)}.guild-admin-block h3{margin:0 0 .75rem}
+.guild-admin-member{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem .85rem;margin:.5rem 0;border:1px solid var(--line);border-radius:11px;background:#0b1929}.guild-admin-member small{display:block;color:var(--muted);margin-top:.2rem}.guild-admin-actions{display:flex;gap:.45rem;flex-wrap:wrap}
+.danger-zone{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:1.5rem;padding:1rem;border:1px solid rgba(255,92,115,.28);border-radius:12px;background:rgba(255,92,115,.05)}.danger-zone p{margin:.25rem 0 0;font-size:.8rem}
+@media(max-width:620px){.guild-admin-member,.danger-zone{align-items:stretch;flex-direction:column}.guild-admin-actions{display:grid}.guild-admin-actions .btn,.danger-zone .btn{width:100%}}
