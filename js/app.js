@@ -1,4 +1,4 @@
-import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState } from "./storage.js";
+import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
 import { ensureGamification,nextLevelInfo } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 
@@ -38,7 +38,7 @@ async function refreshStudentFromCloud(){
  const {data,error}=await sb.from("student_states").select("state,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
  if(error||!data?.state)return;
  const localUpdated=Date.parse(state?.meta?.updatedAt||0),cloudUpdated=Date.parse(data.updated_at||0);
- if(cloudUpdated>=localUpdated){state=ensureGamification(data.state);saveState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Última sincronização: "+new Date(data.updated_at).toLocaleString("pt-BR")}
+ if(cloudUpdated>localUpdated){state=ensureGamification(data.state);cacheCloudState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Última sincronização: "+new Date(data.updated_at).toLocaleString("pt-BR")}
 }
 function startStudentRealtime(){
  if(!cloudSession||studentRealtimeChannel)return;
