@@ -37,3 +37,7 @@
 .guild-member-card .guild-function-picker select{display:block!important;width:100%!important;box-sizing:border-box!important;appearance:auto}
 .guild-member-card .guild-member-actions{display:flex!important;align-items:center!important;gap:.55rem!important}
 @media(max-width:760px){.guild-member-card .guild-member-main{grid-template-columns:1fr!important}.guild-member-card .guild-function-picker{max-width:100%!important}}
+
+.task-card-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.75rem;padding-top:.65rem;border-top:1px solid var(--line)}
+.task-card label select,.project-form select{width:100%;box-sizing:border-box;min-height:42px;padding:.6rem .7rem;border:1px solid var(--line);border-radius:10px;background:#091625;color:var(--text);outline:none}
+.task-card label select:focus,.project-form select:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(109,93,252,.14)}
