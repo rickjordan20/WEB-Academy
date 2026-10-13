@@ -51,13 +51,8 @@ if(cloudSession){
   if(ds)ds.innerHTML="<i></i> Conectado";
   const pr=await sb.from("profiles").select("role").eq("id",cloudSession.user.id).single();
   if(!pr.error&&pr.data?.role==="instructor"){
-    const nav=document.createElement("a");
-    nav.className="nav-item";
-    nav.id="instructorNav";
-    nav.href="instructor.html";
-    nav.textContent="Área do Instrutor";
-    const list=document.querySelector(".nav-list");
-    if(list)list.insertBefore(nav,list.children[1]||null);
+    location.replace("instructor.html");
+    throw new Error("INSTRUCTOR_REDIRECT");
   }
   window.addEventListener("uc7:cloud-synced",()=>{if(ds)ds.innerHTML="<i></i> Sincronizado"});
 }
