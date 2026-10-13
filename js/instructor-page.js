@@ -38,6 +38,19 @@ function openStudent(id){
  $("#studentDetailBody").innerHTML="<div class='detail-stats'><article><small>Progresso</small><b>"+(journey.progress||0)+"%</b></article><article><small>XP</small><b>"+(game.xp||0)+"</b></article><article><small>Nível</small><b>"+(game.level||1)+"</b></article><article><small>Missões</small><b>"+completed.length+"/28</b></article></div><section class='detail-section'><h3>Competências I1–I6</h3><div class='detail-competencies'>"+competencyCards+"</div><p class='muted'>Evidências da plataforma apoiam o acompanhamento; a menção oficial continua sendo definida pelo instrutor.</p></section><section class='detail-section'><h3>Projetos</h3><div class='detail-projects'><article><b>🎓 EduTech</b><span>"+(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)</span></article><article><b>⚔️ Guilda</b><span>"+esc(s.guild)+" • "+(guild.progress||0)+"%</span></article></div></section><section class='detail-section'><h3>Atividade</h3><p>"+completed.length+" missão(ões) presencial(is) concluída(s) • "+extras.length+" missão(ões) extra(s).</p><p class='muted'>Última sincronização: "+(s.updated_at?new Date(s.updated_at).toLocaleString("pt-BR"):"Sem sincronização")+"</p></section>";
  $("#studentDialog").showModal();
 }
+function setAdminView(view,{updateHash=true}={}){
+ const valid=["overview","students","guilds"];if(!valid.includes(view))view="overview";
+ document.querySelectorAll(".admin-view").forEach(el=>el.hidden=true);
+ const target=document.querySelector("#"+view+"View");if(target)target.hidden=false;
+ document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.adminView===view));
+ const titles={overview:["Gestão da turma","Área do Instrutor"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"]};
+ const [eyebrow,title]=titles[view];document.querySelector(".topbar .eyebrow").textContent=eyebrow;document.querySelector(".topbar h1").textContent=title;
+ if(updateHash)history.replaceState(null,"","#"+view);
+}
+document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.onclick=()=>setAdminView(btn.dataset.adminView));
+window.addEventListener("hashchange",()=>setAdminView(location.hash.slice(1),{updateHash:false}));
+setAdminView(location.hash.slice(1)||"overview",{updateHash:false});
+
 $("#closeStudent").onclick=()=>$("#studentDialog").close();
 $("#closeManageGuild").onclick=()=>$("#guildManageDialog").close();
 $("#manageGuildForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),fb=$("#manageGuildFeedback");const {error}=await sb.from("guilds").update({name:String(fd.get("name")||"").trim(),repository:String(fd.get("repository")||"").trim()}).eq("id",selectedGuildId);if(error)return adminGuildError(error);fb.textContent="Guilda atualizada.";fb.className="feedback success";await refreshGuildManager()};
