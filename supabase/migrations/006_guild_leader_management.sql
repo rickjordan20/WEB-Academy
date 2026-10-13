@@ -28,3 +28,25 @@ begin
 end $$;
 revoke all on function public.transfer_guild_leadership(uuid,uuid) from public, anon;
 grant execute on function public.transfer_guild_leadership(uuid,uuid) to authenticated;
+
+
+-- Instructor and guild leader management policies.
+drop policy if exists guild_members_insert on public.guild_members;
+create policy guild_members_insert on public.guild_members for insert to authenticated with check(
+ private.is_instructor_of_guild(guild_id) or private.is_guild_leader(guild_id)
+ or (user_id=(select auth.uid()) and role='leader' and exists(select 1 from public.guilds g where g.id=guild_id and g.created_by=(select auth.uid())))
+);
+drop policy if exists guild_members_update on public.guild_members;
+create policy guild_members_update on public.guild_members for update to authenticated
+using(private.is_instructor_of_guild(guild_id) or private.is_guild_leader(guild_id))
+with check(private.is_instructor_of_guild(guild_id) or private.is_guild_leader(guild_id));
+drop policy if exists guild_members_delete on public.guild_members;
+create policy guild_members_delete on public.guild_members for delete to authenticated
+using(private.is_instructor_of_guild(guild_id) or private.is_guild_leader(guild_id));
+drop policy if exists guilds_update on public.guilds;
+create policy guilds_update on public.guilds for update to authenticated
+using(private.is_instructor_of_guild(id) or private.is_guild_leader(id))
+with check(private.is_instructor_of_guild(id) or private.is_guild_leader(id));
+drop policy if exists guilds_delete on public.guilds;
+create policy guilds_delete on public.guilds for delete to authenticated
+using(private.is_instructor_of_guild(id) or private.is_guild_leader(id));
