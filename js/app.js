@@ -1,9 +1,20 @@
-import { getState, exportState, importState, clearState } from "./storage.js";
+import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState } from "./storage.js";
 import { ensureGamification,nextLevelInfo } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 
-const state = ensureGamification(getState());
-if (!state?.student?.name) location.replace("index.html");
+const sb=await getSupabase();
+const cloudSession=sb?await getSession():null;
+if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw new Error("AUTH_REDIRECT")}
+if(cloudSession)setActiveUser(cloudSession.user.id);
+
+let state=getState();
+if(!state&&cloudSession){
+ const name=cloudSession.user.user_metadata?.full_name||cloudSession.user.email?.split("@")[0]||"Estudante";
+ state=createInitialState({name,email:cloudSession.user.email||""});
+ saveState(state,cloudSession.user.id);
+}
+state=ensureGamification(state);
+if(!state?.student?.name){location.replace(sb?"auth.html":"index.html");throw new Error("STATE_REDIRECT")}
 
 const $ = (s) => document.querySelector(s);
 const initials = (name="U") => name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
@@ -35,52 +46,18 @@ function render() {
   $("#profileEmail").textContent = state.student.email || "E-mail não informado";
 }
 render();
-const sb=await getSupabase();const cloudSession=sb?await getSession():null;if(cloudSession){const ds=$("#dataStatus");if(ds)ds.innerHTML="<i></i> Sincronizado";}
+if(cloudSession){const ds=$("#dataStatus");if(ds)ds.innerHTML="<i></i> Sincronizado";}
 
 const settings = $("#settingsDialog"), profile = $("#profileDialog");
 $("#openSettings").addEventListener("click", () => settings.showModal());
 $("#profileButton").addEventListener("click", () => profile.showModal());
 $("#showProfile").addEventListener("click", () => profile.showModal());
-
-$("#exportBackup").addEventListener("click", () => {
-  try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); }
-});
-
+$("#exportBackup").addEventListener("click", () => { try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); } });
 const picker = $("#backupFile");
 $("#importBackup").addEventListener("click", () => picker.click());
-picker.addEventListener("change", async () => {
-  try {
-    if (!picker.files[0]) return;
-    await importState(picker.files[0]);
-    toast("Backup importado. Recarregando...");
-    setTimeout(()=>location.reload(),700);
-  } catch(e) { toast(e.message || "Falha ao importar."); }
-  finally { picker.value=""; }
-});
-
-$("#clearData").addEventListener("click", () => {
-  const ok = confirm("ATENÇÃO: isso apagará todos os dados locais da UC7 Web Academy neste navegador. Deseja continuar?");
-  if (!ok) return;
-  const again = confirm("Confirme novamente: deseja apagar definitivamente os dados locais?");
-  if (again) { clearState(); location.replace("index.html"); }
-});
-
-$("#logoutButton").addEventListener("click", async () => {if(sb)await sb.auth.signOut();location.replace(sb?"auth.html":"index.html");});
-
-const sidebar = $("#sidebar");
-$("#menuButton")?.addEventListener("click", () => sidebar.classList.toggle("open"));
-
-document.querySelectorAll(".nav-item[data-view], [data-demo]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const view = btn.dataset.view || btn.dataset.demo;
-    if (view === "dashboard") return;
-    toast("Esta área será ativada nas próximas fases de implantação.");
-    sidebar.classList.remove("open");
-  });
-});
-
-let toastTimer;
-function toast(message) {
-  const el = $("#toast"); el.textContent = message; el.classList.add("show");
-  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove("show"),2600);
-}
+picker.addEventListener("change", async () => { try { if (!picker.files[0]) return; await importState(picker.files[0]); toast("Backup importado. Recarregando..."); setTimeout(()=>location.reload(),700); } catch(e) { toast(e.message || "Falha ao importar."); } finally { picker.value=""; } });
+$("#clearData").addEventListener("click", () => { const ok=confirm("ATENÇÃO: isso apagará todos os dados locais da UC7 Web Academy neste navegador. Deseja continuar?");if(!ok)return;const again=confirm("Confirme novamente: deseja apagar definitivamente os dados locais?");if(again){clearState();location.replace(sb?"auth.html":"index.html")} });
+$("#logoutButton").addEventListener("click", async () => {if(sb)await sb.auth.signOut();setActiveUser(null);location.replace(sb?"auth.html":"index.html");});
+const sidebar=$("#sidebar");$("#menuButton")?.addEventListener("click",()=>sidebar.classList.toggle("open"));
+document.querySelectorAll(".nav-item[data-view], [data-demo]").forEach(btn=>{btn.addEventListener("click",()=>{const view=btn.dataset.view||btn.dataset.demo;if(view==="dashboard")return;toast("Esta área será ativada nas próximas fases de implantação.");sidebar.classList.remove("open")})});
+let toastTimer;function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600)}
