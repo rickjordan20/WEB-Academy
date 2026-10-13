@@ -58,7 +58,7 @@ const phaseRequirementMap={
 11:{edutech:["RF07"],restaurante:["RF07","RF11"]},
 12:{edutech:["RF08","RF09","RNF05"],restaurante:["RF08","RF09","RNF05"]},
 13:{edutech:["RF07","RF09","RF10"],restaurante:["RF07","RF09","RF10","RF11"]},
-14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06"]}
+14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"]}
 };
 export const MISSIONS=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>[
 {id:`${phase}A`,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,competencies,requirements:phaseRequirementMap[phase].edutech,steps:trainingSteps(phase,topic,a,axis)},
