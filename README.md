@@ -103,3 +103,18 @@ HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framewor
 - identificação visual do MVP atualizada;
 - preparação para testes finais em navegadores/dispositivos e publicação estática;
 - backend, autenticação real e dados centralizados permanecem como evolução de produção.
+
+
+## Fase 9 — Backend, Banco de Dados e Autenticação
+
+- integração preparada para Supabase/PostgreSQL;
+- autenticação real por e-mail e senha;
+- cadastro e recuperação de senha;
+- perfis aluno/instrutor;
+- modelo de turmas, estudantes, Guildas e integrantes;
+- Row Level Security no schema inicial;
+- sincronização do estado da Jornada com student_states;
+- localStorage preservado como cache/contingência;
+- fallback automático para o MVP local enquanto o projeto Supabase não estiver configurado.
+
+A criação do projeto Supabase e a aplicação da migração exigem a escolha explícita da organização e confirmação de eventual custo antes da ativação.

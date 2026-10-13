@@ -1,3 +1,4 @@
+import "./cloud-bootstrap.js";
 import { getJourneyView, STATUS } from "./mission-engine.js";
 import { getState } from "./storage.js";
 const state=getState(); if(!state?.student?.name) location.replace("index.html");

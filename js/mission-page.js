@@ -1,3 +1,4 @@
+import "./cloud-bootstrap.js";
 import { getMission,startMission,missionStatus,STATUS } from "./mission-engine.js";
 import { getState } from "./storage.js";
 import { renderStep,bindStep } from "./step-renderer.js";

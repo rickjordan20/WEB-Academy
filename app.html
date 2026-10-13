@@ -20,7 +20,7 @@
       </a>
 
       <nav class="nav-list" aria-label="Navegação principal">
-        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão Geral</button>
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão Geral</button>\n        
         <a class="nav-item" href="journey.html"><span>🗺</span> Minha Jornada <em>14 fases</em></a>
         <a class="nav-item" href="edutech.html"><span>🎓</span> EduTech <em>Projeto</em></a>
         <a class="nav-item" href="guild.html"><span>⚔</span> Minha Guilda <em>Kanban</em></a>
@@ -32,7 +32,7 @@
       <div class="sidebar-footer">
         <div class="phase-note">
           <small>Implantação atual</small>
-          <strong>Fase 8 — Validação e Publicação</strong>
+          <strong>Fase 9 — Backend e Autenticação</strong>
         </div>
         <a class="nav-item" href="report.html"><span>📄</span> Relatório</a><a class="nav-item" href="validation.html"><span>🩺</span> Diagnóstico</a><button id="openSettings" class="nav-item"><span>⚙</span> Configurações</button>
       </div>
@@ -46,7 +46,7 @@
           <h1 id="welcomeTitle">Olá!</h1>
         </div>
         <div class="topbar-actions">
-          <span class="status-dot"><i></i> Dados locais</span>
+          <span class="status-dot" id="dataStatus"><i></i> Dados locais</span>
           <button id="profileButton" class="avatar" aria-label="Perfil do estudante">U</button>
         </div>
       </header>
@@ -109,6 +109,29 @@
           </article>
         </section>
 
+        <section class="student-dashboard-grid">
+          <article class="card student-overview-panel">
+            <div class="section-heading"><div><p class="eyebrow">Hoje na Jornada</p><h2>Seu avanço</h2></div><a class="btn btn-ghost btn-small" href="progress.html">Detalhes</a></div>
+            <div class="student-mini-stats"><div><b id="completedMissionCount">0/28</b><span>Missões</span></div><div><b id="currentPhaseCount">1/14</b><span>Fase atual</span></div><div><b id="extraMissionCount">0/7</b><span>Extras</span></div><div><b id="competencyEvidenceCount">0</b><span>Evidências</span></div></div>
+            <div class="progress-meta"><span>Jornada completa</span><b id="dashboardJourneyProgress">0%</b></div><div class="progress"><i id="dashboardJourneyBar" style="width:0%"></i></div>
+          </article>
+          <article class="card student-overview-panel">
+            <div class="section-heading"><div><p class="eyebrow">Competências</p><h2>I1–I6</h2></div><a class="btn btn-ghost btn-small" href="competencies.html">Abrir</a></div>
+            <div id="studentCompetencySummary" class="student-competency-summary"></div>
+            <p class="muted student-dashboard-note">Evidências registradas durante a Jornada. A avaliação oficial é realizada pelo instrutor.</p>
+          </article>
+        </section>
+        <section class="student-dashboard-grid">
+          <article class="card student-overview-panel">
+            <div class="section-heading"><div><p class="eyebrow">Seus projetos</p><h2>EduTech e Guilda</h2></div></div>
+            <div class="student-project-summary"><a href="edutech.html"><span>🎓</span><div><b>EduTech</b><small id="edutechDashboard">0% • 0 evidências</small><small id="edutechRepoDashboard" class="project-repo-summary">Repositório não informado</small></div></a><a href="guild.html"><span>⚔️</span><div><b id="guildDashboardName">Minha Guilda</b><small id="guildDashboardMeta">Ver equipe e projeto</small><small id="guildRepoDashboard" class="project-repo-summary">Repositório não informado</small></div></a></div>
+          </article>
+          <article class="card student-overview-panel">
+            <div class="section-heading"><div><p class="eyebrow">Sincronização</p><h2>Seu progresso está seguro</h2></div><span class="status-dot" id="dashboardCloudStatus"><i></i> Nuvem</span></div>
+            <p class="muted">As alterações da sua conta são sincronizadas com a Web Academy e este painel acompanha atualizações recebidas em tempo real.</p><small id="lastCloudUpdate" class="student-sync-time">Aguardando sincronização...</small>
+          </article>
+        </section>
+
         <section>
           <div class="section-heading">
             <div><p class="eyebrow">Seu ecossistema</p><h2>Áreas da Academia</h2></div>
@@ -127,11 +150,15 @@
   <dialog id="settingsDialog" class="modal">
     <form method="dialog" class="modal-card">
       <div class="section-heading"><div><p class="eyebrow">Dados e segurança</p><h2>Configurações</h2></div><button class="icon-btn" value="cancel" aria-label="Fechar">✕</button></div>
-      <p class="muted">Os dados desta versão ficam no armazenamento local do navegador. Faça backups periódicos.</p>
+      <p class="muted">Seu progresso é sincronizado com a nuvem quando você está autenticado. O armazenamento local funciona como apoio e o backup JSON continua disponível como cópia adicional.</p>
       <div class="settings-actions">
         <button id="exportBackup" class="btn btn-primary" type="button">Exportar backup JSON</button>
         <button id="importBackup" class="btn btn-secondary" type="button">Importar backup</button>
         <input id="backupFile" type="file" accept=".json,application/json" hidden>
+        <div id="backupRestoreStatus" class="backup-restore-status" hidden role="status" aria-live="polite">
+          <span class="backup-restore-icon">✓</span>
+          <div><strong>Backup restaurado com sucesso</strong><p id="backupRestoreMessage">Os dados foram salvos neste dispositivo.</p><small id="backupRestoreTime"></small></div>
+        </div>
         <button id="clearData" class="btn btn-danger" type="button">Limpar todos os dados</button>
       </div>
       <hr>
