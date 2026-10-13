@@ -9,3 +9,19 @@
 .backup-restore-status strong,.backup-restore-status p,.backup-restore-status small{display:block}
 .backup-restore-status p{margin:.25rem 0;color:var(--text);font-size:.84rem}
 .backup-restore-status small{color:var(--muted);font-size:.72rem}
+
+.guild-member-list{display:grid;gap:.7rem;padding:0;margin:.85rem 0 1.15rem;list-style:none}
+.guild-member-card{padding:1rem;border:1px solid var(--line);border-radius:14px;background:#0b1929}
+.guild-member-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,220px);gap:1rem;align-items:center}
+.guild-member-identity{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;min-width:0}
+.guild-member-identity>b{font-size:.95rem}
+.guild-role-badge,.guild-function-badge{display:inline-flex;align-items:center;min-height:26px;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--line);font-size:.7rem;color:var(--muted);background:rgba(255,255,255,.025)}
+.guild-role-badge.is-leader{color:var(--accent);border-color:rgba(32,214,181,.28);background:rgba(32,214,181,.07)}
+.guild-function-badge{color:#d8d3ff;border-color:rgba(139,127,255,.28);background:rgba(109,93,252,.09)}
+.guild-function-picker{display:grid;gap:.3rem;font-size:.7rem;font-weight:700;color:var(--muted)}
+.guild-function-picker select{width:100%;min-height:40px;padding:.55rem .7rem;border:1px solid var(--line);border-radius:10px;background:#091625;color:var(--text);outline:none}
+.guild-function-picker select:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(109,93,252,.14)}
+.guild-function-picker select.is-saving{opacity:.65}
+.guild-function-status{min-height:14px;font-size:.65rem;font-weight:700}.guild-function-status.is-saving{color:var(--muted)}.guild-function-status.is-saved{color:var(--accent)}.guild-function-status.is-error{color:#ff8f8f}
+.guild-member-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.75rem;border-top:1px solid var(--line)}
+@media(max-width:680px){.guild-member-main{grid-template-columns:1fr}.guild-function-picker{max-width:none}}
