@@ -25,3 +25,5 @@
 .guild-management ul{list-style:none;padding:0;display:grid;gap:.5rem}
 .guild-management li{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.65rem .75rem;border:1px solid var(--line);border-radius:10px}
 @media(max-width:700px){#createGuildForm,.guild-management .project-form{grid-template-columns:1fr}#createGuildForm .member-picker,#createGuildFeedback,#createGuildForm>.btn{grid-column:1}.guild-management .project-form .btn{justify-self:stretch}}
+
+.competency-evidence-list{margin:.8rem 0 1rem;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.02);padding:.7rem .8rem}.competency-evidence-list summary{cursor:pointer;font-weight:800;color:var(--primary-2);font-size:.78rem}.competency-evidence-item{padding:.7rem 0;border-top:1px solid var(--line)}.competency-evidence-item:first-of-type{margin-top:.55rem}.competency-evidence-item b{font-size:.75rem}.competency-evidence-item p{font-size:.72rem;color:var(--muted);margin:.25rem 0 0;line-height:1.45}
