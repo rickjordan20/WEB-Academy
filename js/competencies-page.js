@@ -1,3 +1,4 @@
+import "./cloud-bootstrap.js";
 import {getState,saveState} from "./storage.js";
 import {COMPETENCIES} from "./../data/competencies.js";
 let s=getState();if(!s?.student?.name)location.replace("index.html");
