@@ -93,9 +93,10 @@ function render() {
   const journeyText = $("#journeyProgressText"); if (journeyText) journeyText.textContent = `${journeyProgress}%`;
   const journeyBar = $("#journeyProgressBar"); if (journeyBar) journeyBar.style.width = `${journeyProgress}%`;
   const completed = state.journey?.completedMissions || [];
-  const unlocked = state.journey?.unlockedMissions || ["1A"];
-  const nextId = unlocked.find(id => !completed.includes(id)) || "1A";
-  const nextButton = $("#nextMissionButton"); if (nextButton) { nextButton.href = `mission.html?id=${nextId}`; nextButton.textContent = completed.length ? `Continuar Missão ${nextId} →` : "Iniciar Missão 1A →"; }
+  const unlocked=state.journey?.unlockedMissions||["1A"];
+  const nextId=unlocked.find(id=>!completed.includes(id))||"1A";
+  const phase=Number.parseInt(nextId,10)||1,number=(phase-1)*2+(nextId.endsWith("B")?2:1);
+  const nextButton=$("#nextMissionButton");if(nextButton){nextButton.href=`mission.html?id=${nextId}`;nextButton.textContent=completed.length?`Continuar Missão ${String(number).padStart(2,"0")} →`:"Iniciar Missão 01 →";}
   $("#profileButton").textContent = initials(state.student.name);
   $("#profileAvatar").textContent = initials(state.student.name);
   $("#profileName").textContent = state.student.name;
