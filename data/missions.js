@@ -44,9 +44,25 @@ const guildSteps=(p,topic,sub,axis)=>p===1?phase1GuildSteps:[
 {id:`g${p}-mission`,type:"guided",title:`Missão da Guilda — ${sub}`,summary:"Planeje, desenvolva, teste e versione em equipe.",instructions:["Revise os requisitos da fase no Projeto Restaurante.","Distribua tarefas no Quadro de Missões entre os integrantes.","Implemente a evolução prevista para esta fase.","Teste o que foi desenvolvido e corrija problemas encontrados.","Registre commits e evidências de forma que a contribuição individual possa ser acompanhada."]},
 {id:`g${p}-evidence`,type:"evidence",title:"Evidência da Missão",summary:"Registre o resultado e sua contribuição individual.",fields:["Link do repositório, commit ou evidência","O que a Guilda entregou nesta fase?","Qual foi sua contribuição individual?"]}
 ];
+const phaseRequirementMap={
+1:{edutech:["RNF04"],restaurante:["RNF04"]},
+2:{edutech:["RF01"],restaurante:["RF01"]},
+3:{edutech:["RF01","RNF03"],restaurante:["RF01","RNF03"]},
+4:{edutech:["RF03"],restaurante:["RF03"]},
+5:{edutech:["RF01","RF02","RNF02"],restaurante:["RF01","RF02","RNF02"]},
+6:{edutech:["RNF01","RNF02"],restaurante:["RNF01","RNF02"]},
+7:{edutech:["RF04"],restaurante:["RF04"]},
+8:{edutech:["RF02","RF04"],restaurante:["RF02","RF04"]},
+9:{edutech:["RF03","RF05"],restaurante:["RF03","RF05"]},
+10:{edutech:["RF06"],restaurante:["RF06"]},
+11:{edutech:["RF07"],restaurante:["RF07","RF11"]},
+12:{edutech:["RF08","RF09","RNF05"],restaurante:["RF08","RF09","RNF05"]},
+13:{edutech:["RF07","RF09","RF10"],restaurante:["RF07","RF09","RF10","RF11"]},
+14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06"]}
+};
 export const MISSIONS=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>[
-{id:`${phase}A`,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,competencies,steps:trainingSteps(phase,topic,a,axis)},
-{id:`${phase}B`,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,competencies,steps:guildSteps(phase,topic,b,axis)}
+{id:`${phase}A`,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,competencies,requirements:phaseRequirementMap[phase].edutech,steps:trainingSteps(phase,topic,a,axis)},
+{id:`${phase}B`,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,competencies,requirements:phaseRequirementMap[phase].restaurante,steps:guildSteps(phase,topic,b,axis)}
 ]);
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
