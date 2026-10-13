@@ -27,7 +27,7 @@ async function syncReleasedMissionTasks(){
  const missing=released.filter(m=>!existing.has(m.id));
  if(!missing.length)return;
  const rows=missing.map(m=>({guild_id:officialGuild.id,mission_id:m.id,source:"mission",title:`${m.id} — ${m.subtitle}`,description:m.steps.find(s=>s.id===`g${m.phase}-mission`)?.instructions?.join(" • ")||`Missão da Guilda da Fase ${m.phase}.`,phase:m.phase,status:"todo",responsible:"",responsible_user_id:null,competencies:m.competencies||[],evidence:"",history:[{from:null,to:"todo",at:new Date().toISOString(),source:"mission-release"}],created_by:session.user.id}));
- const {error}=await sb.from("guild_tasks").upsert(rows,{onConflict:"guild_id,mission_id",ignoreDuplicates:true});if(error)throw error;
+ const {error}=await sb.from("guild_tasks").insert(rows);if(error&&error.code!=="23505")throw error;
  await loadSharedTasks();
 }
 const memberName=id=>officialMembers.find(m=>m.user_id===id)?.name||"";
