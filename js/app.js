@@ -94,7 +94,29 @@ $("#exportBackup").addEventListener("click", () => { try { exportState(); toast(
 const picker = $("#backupFile");
 $("#importBackup").addEventListener("click", () => picker.click());
 picker.addEventListener("change", async () => { try { if (!picker.files[0]) return; await importState(picker.files[0]); toast("Backup importado. Recarregando..."); setTimeout(()=>location.reload(),700); } catch(e) { toast(e.message || "Falha ao importar."); } finally { picker.value=""; } });
-$("#clearData").addEventListener("click", () => { const ok=confirm("ATENÇÃO: isso apagará todos os dados locais da UC7 Web Academy neste navegador. Deseja continuar?");if(!ok)return;const again=confirm("Confirme novamente: deseja apagar definitivamente os dados locais?");if(again){clearState();location.replace(sb?"auth.html":"index.html")} });
+$("#clearData").addEventListener("click", async () => {
+ const scope=cloudSession?"deste navegador e da sua conta na nuvem":"deste navegador";
+ const ok=confirm(`ATENÇÃO: isso apagará todos os dados da UC7 Web Academy ${scope}. Esta ação zera missões, XP, evidências, projetos e preferências. Deseja continuar?`);
+ if(!ok)return;
+ const again=confirm("Confirme novamente: deseja zerar definitivamente seu progresso? Faça um backup JSON antes se quiser guardar uma cópia.");
+ if(!again)return;
+ try{
+  if(cloudSession){
+   const fresh=createInitialState({name:state.student?.name||cloudSession.user.user_metadata?.full_name||"",email:state.student?.email||cloudSession.user.email||""});
+   const {error}=await sb.from("student_states").upsert({user_id:cloudSession.user.id,state:fresh,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+   if(error)throw error;
+   clearState(cloudSession.user.id);
+   cacheCloudState(fresh,cloudSession.user.id);
+   state=ensureGamification(fresh);
+   render();
+   settings.close();
+   toast("Progresso zerado neste dispositivo e na nuvem.");
+  }else{
+   clearState();
+   location.replace("index.html");
+  }
+ }catch(e){toast("Não foi possível limpar os dados: "+(e?.message||"erro desconhecido"))}
+});
 $("#logoutButton").addEventListener("click", async () => {if(sb)await sb.auth.signOut();setActiveUser(null);location.replace(sb?"auth.html":"index.html");});
 const sidebar=$("#sidebar");$("#menuButton")?.addEventListener("click",()=>sidebar.classList.toggle("open"));
 document.querySelectorAll(".nav-item[data-view], [data-demo]").forEach(btn=>{btn.addEventListener("click",()=>{const view=btn.dataset.view||btn.dataset.demo;if(view==="dashboard")return;toast("Esta área será ativada nas próximas fases de implantação.");sidebar.classList.remove("open")})});
