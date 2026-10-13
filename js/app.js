@@ -88,6 +88,15 @@ if(cloudSession){
 }
 
 const settings = $("#settingsDialog"), profile = $("#profileDialog");
+const BACKUP_RESTORE_KEY="uc7_web_academy_last_backup_restore";
+function showBackupRestoreStatus(info){
+ const box=$("#backupRestoreStatus"),msg=$("#backupRestoreMessage"),time=$("#backupRestoreTime");
+ if(!box||!info)return;
+ msg.textContent=info.cloud?"Os dados foram salvos neste dispositivo e sincronizados com a nuvem.":"Os dados foram restaurados neste dispositivo.";
+ time.textContent="Último backup restaurado: "+new Date(info.at).toLocaleString("pt-BR");
+ box.hidden=false;
+}
+try{const saved=localStorage.getItem(BACKUP_RESTORE_KEY);if(saved)showBackupRestoreStatus(JSON.parse(saved))}catch{};
 $("#openSettings").addEventListener("click", () => settings.showModal());
 $("#profileButton").addEventListener("click", () => profile.showModal());
 $("#showProfile").addEventListener("click", () => profile.showModal());
@@ -102,8 +111,12 @@ picker.addEventListener("change", async () => {
    const result=await pushCloudState(restored);
    if(!result?.synced)throw new Error("O backup foi restaurado neste navegador, mas não foi possível confirmar a sincronização com a nuvem.");
   }
+  const restoreInfo={at:new Date().toISOString(),cloud:!!cloudSession};
+  localStorage.setItem(BACKUP_RESTORE_KEY,JSON.stringify(restoreInfo));
+  state=ensureGamification(restored);
+  render();
+  showBackupRestoreStatus(restoreInfo);
   toast(cloudSession?"Backup restaurado e sincronizado com a nuvem.":"Backup restaurado neste navegador.");
-  setTimeout(()=>location.reload(),900);
  }catch(e){toast(e.message||"Falha ao importar o backup.");}
  finally{picker.value="";}
 });
