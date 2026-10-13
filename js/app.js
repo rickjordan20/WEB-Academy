@@ -1,12 +1,12 @@
 import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
 import { ensureGamification,nextLevelInfo } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
-import {pushCloudState} from "./cloud-sync.js";
+import {pullCloudState,pushCloudState} from "./cloud-sync.js";
 
 const sb=await getSupabase();
 const cloudSession=sb?await getSession():null;
 if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw new Error("AUTH_REDIRECT")}
-if(cloudSession)setActiveUser(cloudSession.user.id);
+if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
 
 let state=getState();
 let studentRealtimeChannel=null,guildRealtimeChannel=null,realtimeRefreshTimer=null;
