@@ -1,3 +1,4 @@
+import "./cloud-bootstrap.js";
 import { getState } from "./storage.js";import { ensureProjects,saveProjectSettings,addEvidence,projectProgress } from "./projects.js";
 if(!getState()?.student?.name)location.replace("index.html");const root=document.querySelector("#projectRoot");
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
