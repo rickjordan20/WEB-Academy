@@ -8,6 +8,7 @@ if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw ne
 if(cloudSession)setActiveUser(cloudSession.user.id);
 
 let state=getState();
+let studentRealtimeChannel=null,realtimeRefreshTimer=null;
 if(!state&&cloudSession){
  const name=cloudSession.user.user_metadata?.full_name||cloudSession.user.email?.split("@")[0]||"Estudante";
  state=createInitialState({name,email:cloudSession.user.email||""});
@@ -18,6 +19,32 @@ if(!state?.student?.name){location.replace(sb?"auth.html":"index.html");throw ne
 
 const $ = (s) => document.querySelector(s);
 const initials = (name="U") => name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
+
+const evidenceCount=v=>Array.isArray(v)?v.length:(v&&typeof v==="object"?Object.keys(v).length:(v?1:0));
+function renderStudentOverview(){
+ const completed=state.journey?.completedMissions||[],extras=state.journey?.completedExtras||state.extraMissions?.completed||[];
+ const competencies=state.competencies?.evidence||state.competencies||{},inds=["I1","I2","I3","I4","I5","I6"];
+ const counts=inds.map(i=>evidenceCount(competencies[i])),totalEvidence=counts.reduce((a,n)=>a+n,0),progress=state.journey?.progress||0;
+ $("#completedMissionCount").textContent=completed.length+"/28";$("#extraMissionCount").textContent=extras.length+"/7";$("#competencyEvidenceCount").textContent=totalEvidence;
+ $("#dashboardJourneyProgress").textContent=progress+"%";$("#dashboardJourneyBar").style.width=progress+"%";
+ $("#studentCompetencySummary").innerHTML=inds.map((i,n)=>"<div><b>"+i+"</b><strong>"+counts[n]+"</strong><span>evidência(s)</span></div>").join("");
+ const edu=state.projects?.edutech||state.edutech||{},guild=state.projects?.guild||state.guild||{};
+ $("#edutechDashboard").textContent=(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)";
+ $("#guildDashboardName").textContent=guild.name||"Minha Guilda";$("#guildDashboardMeta").textContent=guild.name?((guild.progress||0)+"% • Projeto Restaurante"):"Ver equipe e projeto";
+ const updated=state.meta?.updatedAt;$("#lastCloudUpdate").textContent=updated?"Última atualização local: "+new Date(updated).toLocaleString("pt-BR"):"Aguardando sincronização...";
+}
+async function refreshStudentFromCloud(){
+ if(!cloudSession)return;
+ const {data,error}=await sb.from("student_states").select("state,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+ if(error||!data?.state)return;
+ const localUpdated=Date.parse(state?.meta?.updatedAt||0),cloudUpdated=Date.parse(data.updated_at||0);
+ if(cloudUpdated>=localUpdated){state=ensureGamification(data.state);saveState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Sincronizado: "+new Date(data.updated_at).toLocaleString("pt-BR")}
+}
+function startStudentRealtime(){
+ if(!cloudSession||studentRealtimeChannel)return;
+ studentRealtimeChannel=sb.channel("student-dashboard-"+cloudSession.user.id).on("postgres_changes",{event:"*",schema:"public",table:"student_states",filter:"user_id=eq."+cloudSession.user.id},()=>{clearTimeout(realtimeRefreshTimer);realtimeRefreshTimer=setTimeout(refreshStudentFromCloud,200)}).subscribe(status=>{const cs=$("#dashboardCloudStatus");if(status==="SUBSCRIBED"){if(cs)cs.innerHTML="<i></i> Tempo real"}else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){if(cs)cs.innerHTML="<i></i> Nuvem"}});
+}
+window.addEventListener("beforeunload",()=>{if(studentRealtimeChannel)sb?.removeChannel(studentRealtimeChannel)});
 
 function render() {
   const first = state.student.name.split(/\s+/)[0];
@@ -44,6 +71,7 @@ function render() {
   $("#profileAvatar").textContent = initials(state.student.name);
   $("#profileName").textContent = state.student.name;
   $("#profileEmail").textContent = state.student.email || "E-mail não informado";
+  renderStudentOverview();
 }
 render();
 if(cloudSession){
@@ -54,7 +82,8 @@ if(cloudSession){
     location.replace("instructor.html");
     throw new Error("INSTRUCTOR_REDIRECT");
   }
-  window.addEventListener("uc7:cloud-synced",()=>{if(ds)ds.innerHTML="<i></i> Sincronizado"});
+  window.addEventListener("uc7:cloud-synced",()=>{if(ds)ds.innerHTML="<i></i> Sincronizado";const cs=$("#dashboardCloudStatus");if(cs)cs.innerHTML="<i></i> Sincronizado";state=ensureGamification(getState());render()});
+  startStudentRealtime();
 }
 
 const settings = $("#settingsDialog"), profile = $("#profileDialog");
