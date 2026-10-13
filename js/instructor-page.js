@@ -10,7 +10,7 @@ async function load(){
  const cr=await sb.from("classes").select("id,code,name,uc").eq("instructor_id",session.user.id).eq("code","2026.36.8").single();if(cr.error)throw cr.error;classRow=cr.data;
  const mr=await sb.from("class_members").select("user_id,status").eq("class_id",classRow.id).eq("status","active");if(mr.error)throw mr.error;const ids=(mr.data||[]).map(x=>x.user_id);
  let profiles=[],states=[];if(ids.length){const pr=await sb.from("profiles").select("id,full_name,email").in("id",ids);if(pr.error)throw pr.error;profiles=pr.data||[];const sr=await sb.from("student_states").select("user_id,state,updated_at").in("user_id",ids);if(sr.error)throw sr.error;states=sr.data||[]}
- const gr=await sb.from("guilds").select("id,name,repository,created_at").eq("class_id",classRow.id).order("name");if(gr.error)throw gr.error;guilds=gr.data||[];
+ const gr=await sb.from("guilds").select("id,name,repository").eq("class_id",classRow.id).order("name");if(gr.error)throw gr.error;guilds=gr.data||[];
  let memberships=[];const gids=guilds.map(g=>g.id);if(gids.length){const gmr=await sb.from("guild_members").select("guild_id,user_id,role").in("guild_id",gids);if(gmr.error)throw gmr.error;memberships=gmr.data||[]}
  students=profiles.map(p=>{const st=states.find(x=>x.user_id===p.id),m=memberships.find(x=>x.user_id===p.id),g=guilds.find(x=>x.id===m?.guild_id);return {...p,state:st?.state||null,updated_at:st?.updated_at||null,guild:g?.name||"—"}});
  $("#classTitle").textContent="Turma "+classRow.code;$("#classMeta").textContent=classRow.name+" • "+classRow.uc;render();
