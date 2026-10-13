@@ -33,9 +33,9 @@ async function syncReleasedMissionTasks(){
 const memberName=id=>officialMembers.find(m=>m.user_id===id)?.name||"";
 const responsibleOptions=value=>`<option value="">Sem responsável</option>`+officialMembers.map(m=>`<option value="${m.user_id}" ${m.user_id===value?"selected":""}>${esc(m.name)} — ${esc(PROJECT_FUNCTIONS[m.project_function]||PROJECT_FUNCTIONS.not_defined)}</option>`).join("");
 async function addSharedTask(data){
- const responsible_user_id=data.responsible_user_id||null,responsible=responsible_user_id?memberName(responsible_user_id):"";
- const row={guild_id:officialGuild.id,mission_id:null,source:"manual",title:data.title.trim(),description:data.description.trim(),phase:Number(data.phase)||1,status:"todo",responsible,responsible_user_id,competencies:[],evidence:"",history:[{from:null,to:"todo",at:new Date().toISOString(),responsible}],created_by:session.user.id};
- const {error}=await sb.from("guild_tasks").insert(row);if(error)throw error;await loadSharedTasks();render();
+ const responsible_user_id=data.responsible_user_id||null;
+ const {error}=await sb.rpc("create_guild_manual_task",{p_guild_id:officialGuild.id,p_title:data.title.trim(),p_description:data.description.trim(),p_phase:Number(data.phase)||1,p_responsible_user_id:responsible_user_id});if(error)throw error;
+ await loadSharedTasks();render();
 }
 async function deleteSharedTask(id){
  const task=sharedTasks.find(t=>t.id===id);if(!task)return;
