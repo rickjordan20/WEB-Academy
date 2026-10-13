@@ -45,15 +45,17 @@ async function deleteSharedTask(id){
  const {error}=await sb.from("guild_tasks").delete().eq("id",id).eq("guild_id",officialGuild.id);if(error)throw error;
  await loadSharedTasks();render();
 }
-async function editSharedTask(id){
+function closeTaskEditor(){document.querySelector("#taskEditModal")?.remove()}
+function openTaskEditor(id){
  const task=sharedTasks.find(t=>t.id===id);if(!task)return;
  if(officialGuild.role!=="leader"){alert("Somente o líder da Guilda ou o instrutor pode editar a estrutura das tarefas.");return}
  if(task.source==="mission"){alert("O título, a descrição e a fase de uma missão liberada são definidos pela Jornada e não podem ser alterados aqui.");return}
- const title=prompt("Título da tarefa:",task.title);if(title===null)return;
- const description=prompt("Descrição da tarefa:",task.description);if(description===null)return;
- const phase=prompt("Fase da Jornada (1 a 14):",String(task.phase));if(phase===null)return;
- const n=Number(phase);if(!title.trim()||!description.trim()||!Number.isInteger(n)||n<1||n>14){alert("Informe título, descrição e uma fase entre 1 e 14.");return}
- await updateSharedTask(id,{title:title.trim(),description:description.trim(),phase:n});
+ closeTaskEditor();
+ document.body.insertAdjacentHTML("beforeend",`<div class="guild-modal-backdrop" id="taskEditModal"><section class="guild-task-modal" role="dialog" aria-modal="true" aria-labelledby="taskEditTitle"><div class="guild-task-modal-head"><div><p class="eyebrow">Quadro de Missões</p><h2 id="taskEditTitle">Editar tarefa</h2></div><button type="button" class="btn btn-ghost btn-small" data-close-task-editor aria-label="Fechar">Fechar</button></div><form id="taskEditForm" class="guild-task-edit-form"><label>Título<input name="title" required maxlength="140" value="${esc(task.title)}"></label><label>Descrição<textarea name="description" required rows="5">${esc(task.description)}</textarea></label><label>Fase da Jornada<input name="phase" type="number" min="1" max="14" required value="${task.phase}"></label><div class="guild-task-modal-actions"><button type="button" class="btn btn-ghost" data-close-task-editor>Cancelar</button><button type="submit" class="btn btn-primary">Salvar alterações</button></div><p id="taskEditFeedback" class="feedback" aria-live="polite"></p></form></section></div>`);
+ const modal=document.querySelector("#taskEditModal"),form=document.querySelector("#taskEditForm"),feedback=document.querySelector("#taskEditFeedback");
+ modal.querySelectorAll("[data-close-task-editor]").forEach(b=>b.onclick=closeTaskEditor);
+ modal.onclick=e=>{if(e.target===modal)closeTaskEditor()};
+ form.onsubmit=async e=>{e.preventDefault();const fd=new FormData(form),title=String(fd.get("title")||"").trim(),description=String(fd.get("description")||"").trim(),phase=Number(fd.get("phase"));if(!title||!description||!Number.isInteger(phase)||phase<1||phase>14){feedback.textContent="Preencha título, descrição e uma fase entre 1 e 14.";feedback.className="feedback error";return}const submit=form.querySelector('button[type="submit"]');submit.disabled=true;feedback.textContent="Salvando...";feedback.className="feedback";try{await updateSharedTask(id,{title,description,phase});closeTaskEditor()}catch(err){feedback.textContent=err.message||"Não foi possível salvar a tarefa.";feedback.className="feedback error";submit.disabled=false}};
 }
 async function updateSharedTask(id,patch){
  const current=sharedTasks.find(t=>t.id===id);if(!current)return;
@@ -140,7 +142,7 @@ function render(){
  document.querySelector("#guildEvidence").onsubmit=e=>{e.preventDefault();addEvidence("guild",Object.fromEntries(new FormData(e.currentTarget)));render()};
  document.querySelectorAll("[data-status]").forEach(el=>el.onchange=async()=>{try{await updateSharedTask(el.dataset.status,{status:el.value})}catch(err){alert(err.message)}});
  document.querySelectorAll("[data-responsible]").forEach(el=>el.onchange=async()=>{try{const uid=el.value||null;await updateSharedTask(el.dataset.responsible,{responsible_user_id:uid,responsible:uid?memberName(uid):""})}catch(err){alert(err.message)}});
- document.querySelectorAll("[data-edit-task]").forEach(el=>el.onclick=async()=>{try{await editSharedTask(el.dataset.editTask)}catch(err){alert(err.message||"Não foi possível editar a tarefa.")}});
+ document.querySelectorAll("[data-edit-task]").forEach(el=>el.onclick=async()=>{try{openTaskEditor(el.dataset.editTask)}catch(err){alert(err.message||"Não foi possível editar a tarefa.")}});
  document.querySelectorAll("[data-delete-task]").forEach(el=>el.onclick=async()=>{try{await deleteSharedTask(el.dataset.deleteTask)}catch(err){alert(err.message||"Não foi possível excluir a tarefa.")}});
  document.querySelectorAll("[data-task-evidence]").forEach(el=>el.onchange=async()=>{try{await updateSharedTask(el.dataset.taskEvidence,{evidence:el.value.trim()})}catch(err){alert(err.message)}});
 }
