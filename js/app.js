@@ -25,20 +25,20 @@ function renderStudentOverview(){
  const completed=state.journey?.completedMissions||[],extras=state.journey?.completedExtras||state.extraMissions?.completed||[];
  const competencies=state.competencies?.evidence||state.competencies||{},inds=["I1","I2","I3","I4","I5","I6"];
  const counts=inds.map(i=>evidenceCount(competencies[i])),totalEvidence=counts.reduce((a,n)=>a+n,0),progress=state.journey?.progress||0;
- $("#completedMissionCount").textContent=completed.length+"/28";$("#extraMissionCount").textContent=extras.length+"/7";$("#competencyEvidenceCount").textContent=totalEvidence;
+ $("#completedMissionCount").textContent=completed.length+"/28";$("#currentPhaseCount").textContent=Math.min(Number(state.journey?.currentPhase||1),14)+"/14";$("#extraMissionCount").textContent=extras.length+"/7";$("#competencyEvidenceCount").textContent=totalEvidence;
  $("#dashboardJourneyProgress").textContent=progress+"%";$("#dashboardJourneyBar").style.width=progress+"%";
  $("#studentCompetencySummary").innerHTML=inds.map((i,n)=>"<div><b>"+i+"</b><strong>"+counts[n]+"</strong><span>evidência(s)</span></div>").join("");
  const edu=state.projects?.edutech||state.edutech||{},guild=state.projects?.guild||state.guild||{};
- $("#edutechDashboard").textContent=(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)";
- $("#guildDashboardName").textContent=guild.name||"Minha Guilda";$("#guildDashboardMeta").textContent=guild.name?((guild.progress||0)+"% • Projeto Restaurante"):"Ver equipe e projeto";
- const updated=state.meta?.updatedAt;$("#lastCloudUpdate").textContent=updated?"Última atualização local: "+new Date(updated).toLocaleString("pt-BR"):"Aguardando sincronização...";
+ $("#edutechDashboard").textContent=(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)";$("#edutechRepoDashboard").textContent=edu.repository?"Repositório: "+edu.repository:"Repositório não informado";
+ $("#guildDashboardName").textContent=guild.name||"Minha Guilda";$("#guildDashboardMeta").textContent=guild.name?((guild.progress||0)+"% • Projeto Restaurante"):"Ver equipe e projeto";$("#guildRepoDashboard").textContent=guild.repository?"Repositório: "+guild.repository:"Repositório não informado";
+ const updated=state.meta?.updatedAt;$("#lastCloudUpdate").textContent=updated?"Última alteração neste dispositivo: "+new Date(updated).toLocaleString("pt-BR"):"Aguardando sincronização...";
 }
 async function refreshStudentFromCloud(){
  if(!cloudSession)return;
  const {data,error}=await sb.from("student_states").select("state,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
  if(error||!data?.state)return;
  const localUpdated=Date.parse(state?.meta?.updatedAt||0),cloudUpdated=Date.parse(data.updated_at||0);
- if(cloudUpdated>=localUpdated){state=ensureGamification(data.state);saveState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Sincronizado: "+new Date(data.updated_at).toLocaleString("pt-BR")}
+ if(cloudUpdated>=localUpdated){state=ensureGamification(data.state);saveState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Última sincronização: "+new Date(data.updated_at).toLocaleString("pt-BR")}
 }
 function startStudentRealtime(){
  if(!cloudSession||studentRealtimeChannel)return;
