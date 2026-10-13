@@ -11,8 +11,17 @@ create table if not exists public.mission_curriculum_links (
  updated_by uuid references public.profiles(id),
  updated_at timestamptz not null default now(),
  unique(class_id,mission_id),
- check (mission_id ~ '^[0-9]{1,2}[AB]$'),
- check (indicator_codes <@ array['I1','I2','I3','I4','I5','I6']::text[])
+ check (mission_id ~ '^[0-9]{1,2}[AB]);
+alter table public.mission_curriculum_links enable row level security;
+create policy mission_curriculum_class_select on public.mission_curriculum_links for select to authenticated
+using(public.is_class_instructor(class_id) or public.is_active_class_member(class_id));
+create policy mission_curriculum_instructor_all on public.mission_curriculum_links for all to authenticated
+using(public.is_class_instructor(class_id)) with check(public.is_class_instructor(class_id));
+grant select on public.mission_curriculum_links to authenticated;
+grant insert,update,delete on public.mission_curriculum_links to authenticated;
+create index if not exists mission_curriculum_class_idx on public.mission_curriculum_links(class_id);
+create index if not exists mission_curriculum_project_idx on public.mission_curriculum_links(project_id);
+)
 );
 alter table public.mission_curriculum_links enable row level security;
 create policy mission_curriculum_class_select on public.mission_curriculum_links for select to authenticated
