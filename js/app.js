@@ -1,6 +1,7 @@
 import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
 import { ensureGamification,nextLevelInfo } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
+import {pushCloudState} from "./cloud-sync.js";
 
 const sb=await getSupabase();
 const cloudSession=sb?await getSession():null;
@@ -93,7 +94,19 @@ $("#showProfile").addEventListener("click", () => profile.showModal());
 $("#exportBackup").addEventListener("click", () => { try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); } });
 const picker = $("#backupFile");
 $("#importBackup").addEventListener("click", () => picker.click());
-picker.addEventListener("change", async () => { try { if (!picker.files[0]) return; await importState(picker.files[0]); toast("Backup importado. Recarregando..."); setTimeout(()=>location.reload(),700); } catch(e) { toast(e.message || "Falha ao importar."); } finally { picker.value=""; } });
+picker.addEventListener("change", async () => {
+ try{
+  if(!picker.files[0])return;
+  const restored=await importState(picker.files[0]);
+  if(cloudSession){
+   const result=await pushCloudState(restored);
+   if(!result?.synced)throw new Error("O backup foi restaurado neste navegador, mas não foi possível confirmar a sincronização com a nuvem.");
+  }
+  toast(cloudSession?"Backup restaurado e sincronizado com a nuvem.":"Backup restaurado neste navegador.");
+  setTimeout(()=>location.reload(),900);
+ }catch(e){toast(e.message||"Falha ao importar o backup.");}
+ finally{picker.value="";}
+});
 $("#clearData").addEventListener("click", async () => {
  const scope=cloudSession?"deste navegador e da sua conta na nuvem":"deste navegador";
  const ok=confirm(`ATENÇÃO: isso apagará todos os dados da UC7 Web Academy ${scope}. Esta ação zera missões, XP, evidências, projetos e preferências. Deseja continuar?`);
