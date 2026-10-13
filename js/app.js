@@ -9,7 +9,8 @@ if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw ne
 if(cloudSession)setActiveUser(cloudSession.user.id);
 
 let state=getState();
-let studentRealtimeChannel=null,realtimeRefreshTimer=null;
+let studentRealtimeChannel=null,guildRealtimeChannel=null,realtimeRefreshTimer=null;
+let officialGuildSummary=null;
 if(!state&&cloudSession){
  const name=cloudSession.user.user_metadata?.full_name||cloudSession.user.email?.split("@")[0]||"Estudante";
  state=createInitialState({name,email:cloudSession.user.email||""});
@@ -29,10 +30,30 @@ function renderStudentOverview(){
  $("#completedMissionCount").textContent=completed.length+"/28";$("#currentPhaseCount").textContent=Math.min(Number(state.journey?.currentPhase||1),14)+"/14";$("#extraMissionCount").textContent=extras.length+"/7";$("#competencyEvidenceCount").textContent=totalEvidence;
  $("#dashboardJourneyProgress").textContent=progress+"%";$("#dashboardJourneyBar").style.width=progress+"%";
  $("#studentCompetencySummary").innerHTML=inds.map((i,n)=>"<div><b>"+i+"</b><strong>"+counts[n]+"</strong><span>evidência(s)</span></div>").join("");
- const edu=state.projects?.edutech||state.edutech||{},guild=state.projects?.guild||state.guild||{};
+ const edu=state.projects?.edutech||state.edutech||{},localGuild=state.projects?.guild||state.guild||{},guild=officialGuildSummary||localGuild;
  $("#edutechDashboard").textContent=(edu.progress||0)+"% • "+((edu.evidence||[]).length)+" evidência(s)";$("#edutechRepoDashboard").textContent=edu.repository?"Repositório: "+edu.repository:"Repositório não informado";
- $("#guildDashboardName").textContent=guild.name||"Minha Guilda";$("#guildDashboardMeta").textContent=guild.name?((guild.progress||0)+"% • Projeto Restaurante"):"Ver equipe e projeto";$("#guildRepoDashboard").textContent=guild.repository?"Repositório: "+guild.repository:"Repositório não informado";
+ $("#guildDashboardName").textContent=guild.name||"Minha Guilda";
+ if(officialGuildSummary){
+  const leader=officialGuildSummary.leaderName||"Não definido",count=officialGuildSummary.memberCount||0;
+  $("#guildDashboardMeta").textContent=`${count} integrante(s) • Líder: ${leader}`;
+ }else $("#guildDashboardMeta").textContent=cloudSession?"Você ainda não participa de uma Guilda.":"Ver equipe e projeto";
+ $("#guildRepoDashboard").textContent=guild.repository?"Repositório: "+guild.repository:"Repositório não informado";
  const updated=state.meta?.updatedAt;$("#lastCloudUpdate").textContent=updated?"Última alteração neste dispositivo: "+new Date(updated).toLocaleString("pt-BR"):"Aguardando sincronização...";
+}
+async function loadOfficialGuildSummary(){
+ if(!cloudSession)return null;
+ const gm=await sb.from("guild_members").select("guild_id,role").eq("user_id",cloudSession.user.id).maybeSingle();
+ if(gm.error)throw gm.error;
+ if(!gm.data){officialGuildSummary=null;renderStudentOverview();return null}
+ const [gr,members]=await Promise.all([
+  sb.from("guilds").select("id,name,repository").eq("id",gm.data.guild_id).single(),
+  sb.from("guild_members").select("user_id,role").eq("guild_id",gm.data.guild_id)
+ ]);
+ if(gr.error)throw gr.error;if(members.error)throw members.error;
+ const rows=members.data||[],leader=rows.find(m=>m.role==="leader");let leaderName="";
+ if(leader){const pr=await sb.from("profiles").select("full_name").eq("id",leader.user_id).maybeSingle();if(!pr.error)leaderName=pr.data?.full_name||""}
+ officialGuildSummary={...gr.data,memberCount:rows.length,leaderName};
+ renderStudentOverview();return officialGuildSummary;
 }
 async function refreshStudentFromCloud(){
  if(!cloudSession)return;
@@ -41,11 +62,18 @@ async function refreshStudentFromCloud(){
  const localUpdated=Date.parse(state?.meta?.updatedAt||0),cloudUpdated=Date.parse(data.updated_at||0);
  if(cloudUpdated>localUpdated){state=ensureGamification(data.state);cacheCloudState(state,cloudSession.user.id);render();const ds=$("#dataStatus"),cs=$("#dashboardCloudStatus");if(ds)ds.innerHTML="<i></i> Tempo real";if(cs)cs.innerHTML="<i></i> Tempo real";$("#lastCloudUpdate").textContent="Última sincronização: "+new Date(data.updated_at).toLocaleString("pt-BR")}
 }
+function startGuildRealtime(){
+ if(!cloudSession||guildRealtimeChannel)return;
+ guildRealtimeChannel=sb.channel("student-guild-summary-"+cloudSession.user.id)
+  .on("postgres_changes",{event:"*",schema:"public",table:"guild_members"},()=>{clearTimeout(realtimeRefreshTimer);realtimeRefreshTimer=setTimeout(()=>loadOfficialGuildSummary().catch(()=>{}),200)})
+  .on("postgres_changes",{event:"*",schema:"public",table:"guilds"},()=>{clearTimeout(realtimeRefreshTimer);realtimeRefreshTimer=setTimeout(()=>loadOfficialGuildSummary().catch(()=>{}),200)})
+  .subscribe();
+}
 function startStudentRealtime(){
  if(!cloudSession||studentRealtimeChannel)return;
  studentRealtimeChannel=sb.channel("student-dashboard-"+cloudSession.user.id).on("postgres_changes",{event:"*",schema:"public",table:"student_states",filter:"user_id=eq."+cloudSession.user.id},()=>{clearTimeout(realtimeRefreshTimer);realtimeRefreshTimer=setTimeout(refreshStudentFromCloud,200)}).subscribe(status=>{const cs=$("#dashboardCloudStatus");if(status==="SUBSCRIBED"){if(cs)cs.innerHTML="<i></i> Tempo real"}else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){if(cs)cs.innerHTML="<i></i> Nuvem"}});
 }
-window.addEventListener("beforeunload",()=>{if(studentRealtimeChannel)sb?.removeChannel(studentRealtimeChannel)});
+window.addEventListener("beforeunload",()=>{if(studentRealtimeChannel)sb?.removeChannel(studentRealtimeChannel);if(guildRealtimeChannel)sb?.removeChannel(guildRealtimeChannel)});
 
 function render() {
   const first = state.student.name.split(/\s+/)[0];
@@ -84,7 +112,9 @@ if(cloudSession){
     throw new Error("INSTRUCTOR_REDIRECT");
   }
   window.addEventListener("uc7:cloud-synced",()=>{if(ds)ds.innerHTML="<i></i> Sincronizado";const cs=$("#dashboardCloudStatus");if(cs)cs.innerHTML="<i></i> Sincronizado";state=ensureGamification(getState());render()});
+  try{await loadOfficialGuildSummary()}catch(e){console.warn("Resumo da Guilda indisponível:",e)}
   startStudentRealtime();
+  startGuildRealtime();
 }
 
 const settings = $("#settingsDialog"), profile = $("#profileDialog");
