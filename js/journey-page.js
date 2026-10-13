@@ -12,7 +12,7 @@ function render(){
   <div class="phase-number"><span>${p.icon}</span></div>
   <div class="phase-info"><p class="eyebrow">Fase ${String(p.phase).padStart(2,"0")}</p><h2>${p.title}</h2><p>${p.axis}</p></div>
   <span class="phase-status">${p.status===STATUS.LOCKED?"🔒 ":""}${labels[p.status]}</span>
-  <div class="phase-missions">${p.missions.length?p.missions.map(m=>`<button class="mission-chip ${m.status}" data-mission="${m.id}" ${m.status===STATUS.LOCKED?"disabled":""}><strong>${m.id} — ${m.type==="training"?"Missão de Treinamento":"Missão da Guilda"}</strong><small>${m.subtitle}</small></button>`).join(""):`<button class="mission-chip" disabled><strong>Missões em preparação</strong><small>O conteúdo será liberado progressivamente.</small></button>`}</div>
+  <div class="phase-missions"><button class="mission-chip fundamentals-chip ${p.fundamental.status}" data-fundamental="${p.phase}" ${p.fundamental.status===STATUS.LOCKED?"disabled":""}><strong>📘 Fundamentos — APRENDER</strong><small>${p.fundamental.title} • 1h30</small></button>${p.missions.map(m=>`<button class="mission-chip ${m.status}" data-mission="${m.id}" ${m.status===STATUS.LOCKED?"disabled":""}><strong>${m.id} — ${m.type==="training"?"Prática Guiada EduTech":"Missão da Guilda"}</strong><small>${m.subtitle} • ${m.hours}h</small></button>`).join("")}</div>
  </article>`).join("");
- document.querySelectorAll("[data-mission]").forEach(b=>b.addEventListener("click",()=>location.href=`mission.html?id=${b.dataset.mission}`));
+ document.querySelectorAll("[data-fundamental]").forEach(b=>b.addEventListener("click",()=>location.href=`fundamentals.html?phase=${b.dataset.fundamental}`)); document.querySelectorAll("[data-mission]").forEach(b=>b.addEventListener("click",()=>location.href=`mission.html?id=${b.dataset.mission}`));
 } render();
