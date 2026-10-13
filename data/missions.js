@@ -46,8 +46,8 @@ const phaseRequirementMap={
 14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"]}
 };
 export const MISSIONS=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>[
-{id:`${phase}A`,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:2.5,competencies,requirements:phaseRequirementMap[phase].edutech,steps:guidedSteps(phase,topic,a)},
-{id:`${phase}B`,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,competencies,requirements:phaseRequirementMap[phase].restaurante,steps:guildSteps(phase,topic,b,axis)}
+{id:`${phase}A`,number:(phase-1)*2+1,lesson:(phase-1)*2+1,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,structure:[{kind:"fundamentals",label:"Fundamentos",hours:1.5},{kind:"guided",label:"Prática Guiada EduTech",hours:2},{kind:"report",label:"Relatório Individual",hours:.5}],competencies,requirements:phaseRequirementMap[phase].edutech,steps:guidedSteps(phase,topic,a)},
+{id:`${phase}B`,number:(phase-1)*2+2,lesson:(phase-1)*2+2,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,structure:[{kind:"guild",label:"Missão da Guilda",hours:4}],competencies,requirements:phaseRequirementMap[phase].restaurante,steps:guildSteps(phase,topic,b,axis)}
 ]);
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
@@ -65,4 +65,5 @@ export const ASSESSMENT_MILESTONES=[
 {id:"FINAL",title:"Aplicação Web Completa",official:"Avaliação 4 — Projeto Web Integrado: Consolidação Final da UC7",after:"14B",competencies:["I1","I2","I3","I4","I5","I6"]}
 ];
 export const getMission=id=>MISSIONS.find(m=>m.id===id);
+export const getMissionByNumber=number=>MISSIONS.find(m=>m.number===Number(number));
 export const getPhaseMissions=phase=>MISSIONS.filter(m=>m.phase===Number(phase));
