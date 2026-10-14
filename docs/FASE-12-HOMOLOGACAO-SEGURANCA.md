@@ -36,17 +36,17 @@ Referência: https://supabase.com/docs/guides/database/database-linter?lint=0029
 | Saída de integrante / exclusão de tarefa | Não executado | Exige ambiente isolado e dados descartáveis |
 | Concorrência de dois usuários | Não executado | Exige sessões simultâneas |
 | Backup e restauração | Não executado | Não existe cópia restaurada validada |
-| Playwright e pgTAP pós-auditoria | Não executado nesta rodada | Reexecutar no ambiente local |
+| Playwright e pgTAP pós-auditoria | **Aprovado — 64/64** | Resultado enviado pelo instrutor: 48 pgTAP (5 arquivos) e 16 Playwright Edge, sem falhas |
 | Auditoria de evidência e colaborador | Parcial | Triggers presentes; requer teste autenticado de ponta a ponta |
 | Revisão de funções SECURITY DEFINER | Parcial | Avisos documentados; não equivale a vulnerabilidade confirmada |
 
 ## Decisão de homologação
 
-**Fase 12 ainda NÃO homologada integralmente.** O banco online foi consultado, não modificado. Não foram criados usuários fictícios, excluídas tarefas ou aplicadas alterações de permissões.
+**Fase 12 ainda NÃO homologada integralmente.** Os testes automatizados existentes foram aprovados (64/64), mas não substituem a validação dos cenários pendentes. O banco online foi consultado, não modificado. Não foram criados usuários fictícios, excluídas tarefas ou aplicadas alterações de permissões.
 
 ## Próximas ações objetivas
 
-1. No ambiente local, executar a suíte pgTAP e Playwright; registrar logs e totais reais.
+1. **Concluído:** suíte pgTAP (48/48, 5 arquivos) e Playwright Edge (16/16), conforme logs informados pelo instrutor.
 2. Testar operações permitidas e negadas com usuários de cada papel, incluindo usuário de outra Guilda.
 3. Testar exclusão, saída de Guilda e concorrência com registros descartáveis.
 4. Criar backup verificável e executar restauração em projeto isolado antes de considerar o plano de recuperação validado.
