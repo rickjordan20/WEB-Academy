@@ -33,10 +33,10 @@ grant execute on function public.transfer_guild_leadership(uuid,uuid) to authent
 -- Verifica liderança sem consultar diretamente guild_members sob RLS (evita recursão).
 create or replace function private.is_guild_leader(p_guild_id uuid)
 returns boolean language sql stable security definer set search_path=''
-as $ select exists(
+as $$ select exists(
  select 1 from public.guild_members gm
  where gm.guild_id=p_guild_id and gm.user_id=(select auth.uid()) and gm.role='leader'
-) $;
+) $$;
 grant execute on function private.is_guild_leader(uuid) to authenticated;
 
 -- Instructor and guild leader management policies.
