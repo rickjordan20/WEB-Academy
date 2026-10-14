@@ -17,7 +17,14 @@ const taskFromRow=t=>({...t,competencies:t.competencies||[],history:Array.isArra
 async function loadTaskContributions(){
  if(!officialGuild){guildTaskContributions=[];return}
  const {data,error}=await sb.from("guild_task_contributions").select("id,task_id,guild_id,author_id,summary,evidence_url,created_at").eq("guild_id",officialGuild.id).order("created_at",{ascending:false});
- if(error)throw error;
+ if(error){
+  if(error.code==="PGRST205"||error.code==="42P01"){
+   console.warn("Registro de contribuições ainda não foi habilitado neste banco. Aplique a migração guild_task_contributions antes de liberar os registros.");
+   guildTaskContributions=[];
+   return;
+  }
+  throw error;
+ }
  const rows=data||[];
  guildTaskContributions=rows.map(r=>({...r,author_name:officialMembers.find(m=>m.user_id===r.author_id)?.name||"Integrante"}));
 }
@@ -27,7 +34,11 @@ async function addTaskContribution(taskId,form){
  if(evidence_url&&!/^https?:\/\//i.test(evidence_url))throw new Error("Informe um link iniciado por http:// ou https://.");
  const task=sharedTasks.find(t=>t.id===taskId);if(!task)throw new Error("Tarefa não encontrada.");
  const {error}=await sb.from("guild_task_contributions").insert({task_id:taskId,guild_id:officialGuild.id,author_id:session.user.id,summary,evidence_url:evidence_url||null});
- if(error)throw error;await loadTaskContributions();render();
+ if(error){
+  if(error.code==="PGRST205"||error.code==="42P01")throw new Error("O registro de contribuições ainda não está habilitado neste ambiente. A migração do banco precisa ser aplicada primeiro.");
+  throw error;
+ }
+ await loadTaskContributions();render();
 }
 async function loadSharedTasks(){
  if(!officialGuild){sharedTasks=[];taskCollaboratorIds=new Set();taskCollaborators=new Map();return}
