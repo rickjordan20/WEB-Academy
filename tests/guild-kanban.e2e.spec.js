@@ -3,7 +3,7 @@ const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
 const source = readFileSync(join(__dirname, '../js/guild-page.js'), 'utf8');
-const URL = 'http://web-academy.test/guild.html';
+const TEST_PAGE_URL = 'http://web-academy.test/guild.html';
 const ids = { leader: 'u-leader', creator: 'u-creator', responsible: 'u-responsible', collaborator: 'u-collaborator', member: 'u-member' };
 const initialTasks = [
   { id: 'task-manual', guild_id: 'guild-1', title: 'Preparar cardápio', description: 'Organizar os pratos', phase: 1, status: 'todo', responsible: '', responsible_user_id: ids.responsible, competencies: [], evidence: '', history: [], created_by: ids.creator, source: 'manual', mission_id: null },
@@ -79,7 +79,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   return route.fulfill({status:404,body:'Not found'});
  });
  await page.addInitScript(bootstrap(role,user));
- await page.goto(URL);
+ await page.goto(TEST_PAGE_URL);
  await expect(page.getByRole('heading',{name:'Kanban da Guilda'})).toBeVisible();
 });
 test('[leader] cria tarefa pelo formulário',async({page})=>{
