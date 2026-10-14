@@ -18,8 +18,8 @@ async function permissions(page, { role = 'member', user = 'member', creator = '
     const officialGuild = { role };
     const session = { user: { id: user } };
     const taskCollaboratorIds = new Set(collaborator ? ['task-1'] : []);
-    const canManageTask = new Function('officialGuild', 'session', 't', 'return (' + manage + ')')(officialGuild, session);
-    const canContributeTask = new Function('canManageTask', 'session', 'taskCollaboratorIds', 't', 'return (' + contribute + ')')(canManageTask, session, taskCollaboratorIds);
+    const canManageTask = new Function('officialGuild', 'session', 't', 'return (t => ' + manage + ')')(officialGuild, session);
+    const canContributeTask = new Function('canManageTask', 'session', 'taskCollaboratorIds', 't', 'return (t => ' + contribute + ')')(canManageTask, session, taskCollaboratorIds);
     const t = { id: 'task-1', created_by: creator, responsible_user_id: responsible };
     return { manage: canManageTask(t), contribute: canContributeTask(t) };
   }, { manage, contribute, role, user, creator, responsible, collaborator });
