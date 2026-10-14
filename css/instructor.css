@@ -53,3 +53,14 @@
 
 /* Mantém o seletor da turma contido no rodapé da sidebar. */
 .sidebar-footer,.sidebar-footer .phase-note{min-width:0;max-width:100%;overflow:hidden}.sidebar-footer .phase-note{box-sizing:border-box}.sidebar-footer #activeClassSelect{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+
+/* Class editor dialog: responsive, no horizontal clipping */
+#classDialog{box-sizing:border-box;width:min(680px,calc(100vw - 32px));max-width:680px;max-height:calc(100dvh - 32px);padding:0;overflow:hidden}
+#classDialog .project-editor-card{box-sizing:border-box;width:100%;max-width:none;min-width:0;max-height:calc(100dvh - 32px);margin:0;overflow-y:auto;overflow-x:hidden;padding:1.35rem}
+#classDialog .project-editor-card *,#classDialog .section-heading,#classDialog .admin-label,#classDialog .modal-actions{box-sizing:border-box;min-width:0;max-width:100%}
+#classDialog .admin-input,#classDialog input,#classDialog select,#classDialog textarea{display:block;width:100%;max-width:100%;min-width:0}
+#classDialog .section-heading{align-items:flex-start;gap:1rem;flex-wrap:nowrap}
+#classDialog .section-heading>div{min-width:0;flex:1}
+#classDialog .icon-btn{flex:0 0 auto}
+#classDialog .modal-actions{display:flex;justify-content:flex-end;gap:.65rem;flex-wrap:wrap}
+@media(max-width:700px){#classDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}#classDialog .project-editor-card{max-height:calc(100dvh - 20px);padding:1rem}#classDialog .modal-actions{display:grid;grid-template-columns:1fr}#classDialog .modal-actions .btn{width:100%}}
