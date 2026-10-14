@@ -34,7 +34,7 @@ for insert to authenticated with check (
   and private.is_active_guild_member(guild_id, auth.uid())
   and exists (
     select 1 from public.guild_tasks t
-    where t.id = task_id and t.guild_id = guild_id
+    where t.id = guild_task_contributions.task_id and t.guild_id = guild_task_contributions.guild_id
   )
 );
 
