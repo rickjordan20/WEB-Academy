@@ -1,0 +1,23 @@
+-- WEB Academy: non-destructive local schema and RLS smoke tests.
+begin;
+select plan(18);
+select has_table('public','profiles','Profiles exists');
+select has_table('public','classes','Classes exists');
+select has_table('public','class_members','Class memberships exist');
+select has_table('public','guilds','Guilds exist');
+select has_table('public','guild_members','Guild memberships exist');
+select has_table('public','guild_tasks','Guild tasks exist');
+select has_table('public','student_states','Student states exist');
+select has_table('public','learning_projects','Learning projects exist');
+select has_table('public','project_requirements','Project requirements exist');
+select has_table('public','mission_curriculum_links','Mission curriculum links exist');
+select has_table('public','curriculum_indicators','Curriculum indicators exist');
+select has_function('private','is_class_instructor',array['uuid'],'Private instructor helper exists');
+select has_function('private','is_active_class_member',array['uuid'],'Private class member helper exists');
+select has_function('private','is_guild_leader',array['uuid'],'Private guild leader helper exists');
+select has_function('public','save_student_state_cas',array['jsonb','timestamp with time zone'],'CAS function exists');
+select ok((select relrowsecurity from pg_class where oid='public.guild_tasks'::regclass),'Guild tasks RLS enabled');
+select ok((select relrowsecurity from pg_class where oid='public.learning_projects'::regclass),'Learning projects RLS enabled');
+select ok((select relrowsecurity from pg_class where oid='public.mission_curriculum_links'::regclass),'Curriculum links RLS enabled');
+select * from finish();
+rollback;
