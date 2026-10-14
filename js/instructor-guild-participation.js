@@ -4,15 +4,15 @@ export async function renderGuildParticipation({sb,classId,container}){
  container.textContent="Carregando participação das Guildas...";
  try{
   const guildResult=await sb.from("guilds").select("id,name").eq("class_id",classId).order("name");
-  if(guildResult.error)throw guildResult.error;
+  if(guildResult.error)throw new Error("Consulta guilds: "+(guildResult.error.message||"falha"));
   const guilds=guildResult.data||[],ids=guilds.map(g=>g.id);
   if(!ids.length){container.innerHTML="<p class='muted'>Nenhuma Guilda cadastrada nesta turma.</p>";return}
   const [membersResult,tasksResult]=await Promise.all([
    sb.from("guild_members").select("guild_id,user_id,role").in("guild_id",ids),
    sb.from("guild_tasks").select("id,guild_id,title,status,created_by,responsible_user_id,evidence,updated_at,competencies").in("guild_id",ids)
   ]);
-  if(membersResult.error)throw membersResult.error;
-  if(tasksResult.error)throw tasksResult.error;
+  if(membersResult.error)throw new Error("Consulta guild_members: "+(membersResult.error.message||"falha"));
+  if(tasksResult.error)throw new Error("Consulta guild_tasks: "+(tasksResult.error.message||"falha")+(tasksResult.error.code?" ["+tasksResult.error.code+"]":""));
   const members=membersResult.data||[],tasks=tasksResult.data||[];
   const userIds=[...new Set(members.map(m=>m.user_id))];
   const taskIds=tasks.map(t=>t.id);
@@ -20,8 +20,8 @@ export async function renderGuildParticipation({sb,classId,container}){
    userIds.length?sb.from("profiles").select("id,full_name").in("id",userIds):Promise.resolve({data:[],error:null}),
    taskIds.length?sb.from("guild_task_collaborators").select("task_id,user_id").in("task_id",taskIds):Promise.resolve({data:[],error:null})
   ]);
-  if(profilesResult.error)throw profilesResult.error;
-  if(collabResult.error)throw collabResult.error;
+  if(profilesResult.error)throw new Error("Consulta profiles: "+(profilesResult.error.message||"falha"));
+  if(collabResult.error)throw new Error("Consulta guild_task_collaborators: "+(collabResult.error.message||"falha")+(collabResult.error.code?" ["+collabResult.error.code+"]":""));
   const profiles=new Map((profilesResult.data||[]).map(p=>[p.id,p.full_name]));
   const collabs=collabResult.data||[];
   const statuses={todo:"A fazer",doing:"Em missão",review:"Em revisão",done:"Concluído"};
@@ -40,5 +40,5 @@ export async function renderGuildParticipation({sb,classId,container}){
   }).join("");
   const note=document.createElement("p");note.className="muted";note.textContent="* Contagem de tarefas relacionadas ao estudante, não de ações individuais comprovadas. Evidência e conclusão são atributos da tarefa compartilhada; não demonstram, isoladamente, autoria ou competência. A menção é definida pelo instrutor.";
   container.prepend(note);
- }catch(error){console.error("Acompanhamento das Guildas:",error);container.textContent="Não foi possível consultar os registros. Verifique a permissão de leitura do instrutor e tente novamente."}
+ }catch(error){console.error("Acompanhamento das Guildas:",error);container.textContent="Não foi possível consultar os registros: "+(error.message||"erro desconhecido")+". Confira o esquema do Supabase conectado. Nenhum dado foi alterado."}
 }
