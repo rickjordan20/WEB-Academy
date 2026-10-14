@@ -58,9 +58,10 @@ create or replace function private.audit_guild_task_collaborator()
 returns trigger language plpgsql security definer set search_path = ''
 as $$
 declare
- v_task uuid := coalesce(new.task_id,old.task_id);
+ v_task uuid;
  v_guild uuid;
 begin
+ if tg_op='INSERT' then v_task := new.task_id; else v_task := old.task_id; end if;
  select guild_id into v_guild from public.guild_tasks where id=v_task;
  if v_guild is not null then
   insert into public.guild_task_activity(task_id,guild_id,actor_id,action,details)
