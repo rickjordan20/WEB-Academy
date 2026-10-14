@@ -5,16 +5,16 @@ create or replace function public.save_student_state_cas(
 ) returns table(saved boolean, cloud_state jsonb, cloud_updated_at timestamptz)
 language plpgsql security invoker set search_path = ''
 as $$
-declare v_uid uuid := auth.uid(); v_row public.student_states%rowtype;
+declare v_uid uuid := auth.uid(); v_row public.student_states%rowtype; v_inserted boolean := false;
 begin
  if v_uid is null then raise exception 'Authentication required'; end if;
  insert into public.student_states(user_id,state,updated_at)
  values(v_uid,p_state,clock_timestamp())
- on conflict(user_id) do nothing;
+ on conflict(user_id) do nothing\n returning true into v_inserted;
  select * into v_row from public.student_states where user_id=v_uid for update;
  if p_expected_updated_at is null then
    -- Initial insert succeeds only if its exact content was inserted above.
-   saved := (v_row.state = p_state);
+   saved := coalesce(v_inserted,false);
  elsif v_row.updated_at = p_expected_updated_at then
    update public.student_states set state=p_state,updated_at=clock_timestamp()
    where user_id=v_uid returning * into v_row;
