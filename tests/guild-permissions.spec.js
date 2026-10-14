@@ -1,10 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+const { test, expect } = require('@playwright/test');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 
 // Testes isolados no Chromium: nao acessam Supabase, contas ou Guildas reais.
 // As funcoes sao extraidas do codigo de producao para evitar reimplementar as regras.
-const source = readFileSync(fileURLToPath(new URL('../js/guild-page.js', import.meta.url)), 'utf8');
+const source = readFileSync(join(__dirname, '../js/guild-page.js'), 'utf8');
 function extract(name) {
   const line = source.split('\n').find(line => line.startsWith('const ' + name + '='));
   if (!line) throw new Error('Regra ausente no codigo de producao: ' + name);
