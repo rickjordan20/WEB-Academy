@@ -2,8 +2,8 @@ import {getState,cacheCloudState,setActiveUser} from "./storage.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 
 // Merge independently collected learning evidence; never discard either device's work.
-const unique=(a=[],b=[])=>[...new Set([...a,...b])];
-const records=(a=[],b=[])=>{const out=new Map();for(const item of [...a,...b])out.set(item?.id||JSON.stringify(item),item);return [...out.values()]};
+const unique=(a=[],b=[])=>[...new Set([...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])])];
+const records=(a=[],b=[])=>{const out=new Map();for(const item of [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])])out.set(item?.id||JSON.stringify(item),item);return [...out.values()]};
 export function mergeStudentStates(remote,local){
  if(!remote)return local;if(!local)return remote;
  const newer=Date.parse(local.meta?.updatedAt||0)>=Date.parse(remote.meta?.updatedAt||0);
@@ -51,7 +51,7 @@ export async function pushCloudState(){
   const merged=mergeStudentStates(data?.state,current);
   let candidate=merged,saved=false;
   for(let attempt=0;attempt<5;attempt++){
-   const expected=attempt===0?data?.updated_at:null;
+   const expected=attempt===0?(data?.updated_at||null):null;
    const result=await sb.rpc("save_student_state_cas",{p_state:candidate,p_expected_updated_at:expected});
    if(result.error)throw result.error;
    const row=Array.isArray(result.data)?result.data[0]:result.data;
