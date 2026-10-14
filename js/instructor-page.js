@@ -9,7 +9,7 @@ let students=[],guilds=[],memberships=[],managedClasses=[],classRow=null,selecte
 async function load(){
  const cr=await sb.from("classes").select("id,code,name,uc").eq("instructor_id",session.user.id).eq("code","2026.36.8").single();if(cr.error)throw cr.error;classRow=cr.data;
  const mr=await sb.from("class_members").select("user_id,status").eq("class_id",classRow.id).eq("status","active");if(mr.error)throw mr.error;const ids=(mr.data||[]).map(x=>x.user_id);
- const rr=await sb.from("classroom_roster_entries").select("id,full_name,google_email,academic_email,linked_user_id,status").eq("class_id",classRow.id).eq("status","active").order("full_name");if(rr.error)throw rr.error;const roster=rr.data||[];
+ let roster=[];const rr=await sb.from("classroom_roster_entries").select("id,full_name,google_email,academic_email,linked_user_id,status").eq("class_id",classRow.id).eq("status","active").order("full_name");if(rr.error){console.warn("Roster do Classroom indisponível; mantendo painel principal funcional.",rr.error)}else roster=rr.data||[];
  let profiles=[],states=[];if(ids.length){const pr=await sb.from("profiles").select("id,full_name,email").in("id",ids);if(pr.error)throw pr.error;profiles=pr.data||[];const sr=await sb.from("student_states").select("user_id,state,updated_at").in("user_id",ids);if(sr.error)throw sr.error;states=sr.data||[]}
  const gr=await sb.from("guilds").select("id,name,repository,created_by").eq("class_id",classRow.id).order("name");if(gr.error)throw gr.error;guilds=gr.data||[];
  memberships=[];const gids=guilds.map(g=>g.id);if(gids.length){const gmr=await sb.from("guild_members").select("guild_id,user_id,role").in("guild_id",gids);if(gmr.error)throw gmr.error;memberships=gmr.data||[]}
