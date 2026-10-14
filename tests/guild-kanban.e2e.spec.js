@@ -107,6 +107,7 @@ test('[creator] confirma exclusão e remove tarefa',async({page})=>{
  await expect(page.getByRole('heading',{name:'Preparar cardápio'})).toHaveCount(0);
 });
 test('[leader] altera colaboradores',async({page})=>{
+ await page.locator('details.task-collaborators').first().locator('summary').click();
  const checkbox=page.locator('[data-task-collaborator="task-manual"][data-user-id="u-member"]');
  await checkbox.check();
  await expect(checkbox).toBeChecked();
