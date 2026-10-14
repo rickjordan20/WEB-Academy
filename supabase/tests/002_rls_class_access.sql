@@ -6,10 +6,16 @@ values
  ('a0000000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','rls-instructor@test.invalid','',now(),now()),
  ('a0000000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','rls-student@test.invalid','',now(),now()),
  ('a0000000-0000-4000-8000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','rls-outsider@test.invalid','',now(),now());
-insert into public.profiles(id,full_name,role) values
- ('a0000000-0000-4000-8000-000000000001','RLS instructor','instructor'),
- ('a0000000-0000-4000-8000-000000000002','RLS student','student'),
- ('a0000000-0000-4000-8000-000000000003','RLS outsider','student');
+-- O cadastro em auth.users pode criar automaticamente o perfil.
+insert into public.profiles (id, full_name, role)
+values
+  ('a0000000-0000-4000-8000-000000000001', 'RLS instructor', 'instructor'),
+  ('a0000000-0000-4000-8000-000000000002', 'RLS student', 'student'),
+  ('a0000000-0000-4000-8000-000000000003', 'RLS outsider', 'student')
+on conflict (id) do update
+set
+  full_name = excluded.full_name,
+  role = excluded.role;
 insert into public.classes(id,code,name,uc,instructor_id)
 values ('b0000000-0000-4000-8000-000000000001','TEST-RLS-001','RLS test class','UC7','a0000000-0000-4000-8000-000000000001');
 insert into public.class_members(class_id,user_id,status)
