@@ -13,32 +13,30 @@ function extract(name) {
 const manage = extract('canManageTask');
 const contribute = extract('canContributeTask');
 
-async function permissions(page, { role = 'member', user = 'member', creator = 'creator', responsible = 'responsible', collaborator = false } = {}) {
-  return page.evaluate(({ manage, contribute, role, user, creator, responsible, collaborator }) => {
-    const officialGuild = { role };
-    const session = { user: { id: user } };
-    const taskCollaboratorIds = new Set(collaborator ? ['task-1'] : []);
-    const canManageTask = new Function('officialGuild', 'session', 't', 'return (t => ' + manage + ')')(officialGuild, session);
-    const canContributeTask = new Function('canManageTask', 'session', 'taskCollaboratorIds', 't', 'return (t => ' + contribute + ')')(canManageTask, session, taskCollaboratorIds);
-    const t = { id: 'task-1', created_by: creator, responsible_user_id: responsible };
-    return { manage: canManageTask(t), contribute: canContributeTask(t) };
-  }, { manage, contribute, role, user, creator, responsible, collaborator });
+function permissions({ role = 'member', user = 'member', creator = 'creator', responsible = 'responsible', collaborator = false } = {}) {
+  const officialGuild = { role };
+  const session = { user: { id: user } };
+  const taskCollaboratorIds = new Set(collaborator ? ['task-1'] : []);
+  const canManageTask = new Function('officialGuild', 'session', 'return (t => ' + manage + ')')(officialGuild, session);
+  const canContributeTask = new Function('canManageTask', 'session', 'taskCollaboratorIds', 'return (t => ' + contribute + ')')(canManageTask, session, taskCollaboratorIds);
+  const t = { id: 'task-1', created_by: creator, responsible_user_id: responsible };
+  return { manage: canManageTask(t), contribute: canContributeTask(t) };
 }
 
-test('lider gerencia e contribui', async ({ page }) => {
-  expect(await permissions(page, { role: 'leader' })).toEqual({ manage: true, contribute: true });
+test('lider gerencia e contribui', async () => {
+  expect(permissions({ role: 'leader' })).toEqual({ manage: true, contribute: true });
 });
-test('criador gerencia e contribui', async ({ page }) => {
-  expect(await permissions(page, { user: 'creator' })).toEqual({ manage: true, contribute: true });
+test('criador gerencia e contribui', async () => {
+  expect(permissions({ user: 'creator' })).toEqual({ manage: true, contribute: true });
 });
-test('responsavel contribui, mas nao gerencia', async ({ page }) => {
-  expect(await permissions(page, { user: 'responsible' })).toEqual({ manage: false, contribute: true });
+test('responsavel contribui, mas nao gerencia', async () => {
+  expect(permissions({ user: 'responsible' })).toEqual({ manage: false, contribute: true });
 });
-test('colaborador contribui, mas nao gerencia', async ({ page }) => {
-  expect(await permissions(page, { collaborator: true })).toEqual({ manage: false, contribute: true });
+test('colaborador contribui, mas nao gerencia', async () => {
+  expect(permissions({ collaborator: true })).toEqual({ manage: false, contribute: true });
 });
-test('integrante comum nao pode modificar tarefa', async ({ page }) => {
-  expect(await permissions(page)).toEqual({ manage: false, contribute: false });
+test('integrante comum nao pode modificar tarefa', async () => {
+  expect(permissions()).toEqual({ manage: false, contribute: false });
 });
 test('interface contem controles e bloqueios de permissao', async () => {
   for (const token of ['data-task-collaborator', 'data-edit-task', 'data-delete-task', 'canContributeTask(t)?"":"disabled"', 'canManageTask(t)&&t.source!=="mission"']) {
