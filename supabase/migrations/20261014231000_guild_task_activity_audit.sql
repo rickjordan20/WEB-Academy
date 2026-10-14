@@ -1,7 +1,7 @@
 -- Auditoria prospectiva, somente leitura para o instrutor; nao cria historico retroativo.
 create table if not exists public.guild_task_activity (
  id bigint generated always as identity primary key,
- task_id uuid not null references public.guild_tasks(id) on delete cascade,
+ task_id uuid not null,
  guild_id uuid not null references public.guilds(id) on delete cascade,
  actor_id uuid references public.profiles(id) on delete set null,
  action text not null check (action in ('created','status_changed','responsible_changed','evidence_changed','collaborator_added','collaborator_removed','deleted')),
