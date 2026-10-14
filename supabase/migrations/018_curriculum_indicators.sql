@@ -15,9 +15,9 @@ create table if not exists public.curriculum_indicators (
 );
 alter table public.curriculum_indicators enable row level security;
 create policy curriculum_indicators_class_select on public.curriculum_indicators for select to authenticated
-using(public.is_class_instructor(class_id) or public.is_active_class_member(class_id));
+using(private.is_class_instructor(class_id) or private.is_active_class_member(class_id));
 create policy curriculum_indicators_instructor_all on public.curriculum_indicators for all to authenticated
-using(public.is_class_instructor(class_id)) with check(public.is_class_instructor(class_id));
+using(private.is_class_instructor(class_id)) with check(private.is_class_instructor(class_id));
 grant select on public.curriculum_indicators to authenticated;
 grant insert,update,delete on public.curriculum_indicators to authenticated;
 create index if not exists curriculum_indicators_class_idx on public.curriculum_indicators(class_id);
