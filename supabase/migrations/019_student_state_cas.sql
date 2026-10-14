@@ -10,7 +10,8 @@ begin
  if v_uid is null then raise exception 'Authentication required'; end if;
  insert into public.student_states(user_id,state,updated_at)
  values(v_uid,p_state,clock_timestamp())
- on conflict(user_id) do nothing\n returning true into v_inserted;
+ on conflict(user_id) do nothing
+ returning true into v_inserted;
  select * into v_row from public.student_states where user_id=v_uid for update;
  if p_expected_updated_at is null then
    -- Initial insert succeeds only if its exact content was inserted above.
