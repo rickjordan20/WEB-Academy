@@ -5,7 +5,7 @@ const meResult=await sb.from("profiles").select("id,full_name,role").eq("id",ses
 if(meResult.error||meResult.data?.role!=="instructor"){location.replace("app.html");throw new Error("INSTRUCTOR_REQUIRED")}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-let students=[],guilds=[],memberships=[],classRow=null,selectedGuildId=null,realtimeChannel=null,realtimeTimer=null,isReloading=false,reloadQueued=false;
+let students=[],guilds=[],memberships=[],managedClasses=[],classRow=null,selectedGuildId=null,realtimeChannel=null,realtimeTimer=null,isReloading=false,reloadQueued=false;
 async function load(){
  const cr=await sb.from("classes").select("id,code,name,uc").eq("instructor_id",session.user.id).eq("code","2026.36.8").single();if(cr.error)throw cr.error;classRow=cr.data;
  const mr=await sb.from("class_members").select("user_id,status").eq("class_id",classRow.id).eq("status","active");if(mr.error)throw mr.error;const ids=(mr.data||[]).map(x=>x.user_id);
@@ -92,12 +92,17 @@ function openStudent(id,{keepOpen=false}={}){
  });
  if(!keepOpen&&!$("#studentDialog").open)$("#studentDialog").showModal();
 }
+async function renderClassManagement(){const r=await sb.from("classes").select("id,code,name,uc,classroom_course_id").eq("instructor_id",session.user.id).order("code");managedClasses=r.data||[];const list=$("#managedClassList"),sel=$("#manualStudentClass");if(list)list.innerHTML=managedClasses.map(c=>"<article class='overview-list-row'><span><b>"+esc(c.code)+"</b><small>"+esc(c.name)+" • "+esc(c.uc||"")+"</small></span><b>"+(c.classroom_course_id?"Classroom":"Manual")+"</b></article>").join("")||"<p class='muted'>Nenhuma turma cadastrada.</p>";if(sel)sel.innerHTML=managedClasses.map(c=>"<option value='"+c.id+"'>"+esc(c.code)+" — "+esc(c.name)+"</option>").join("")}
+$("#manualClassForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),fb=$("#manualClassFeedback");const {error}=await sb.rpc("create_managed_class",{p_code:String(fd.get("code")||"").trim(),p_name:String(fd.get("name")||"").trim(),p_uc:String(fd.get("uc")||"UC7").trim()});fb.textContent=error?(error.message||"Não foi possível criar a turma."):"Turma criada.";fb.className="feedback "+(error?"error":"success");if(!error){e.currentTarget.reset();await renderClassManagement()}};
+$("#manualStudentForm").onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.currentTarget),fb=$("#manualStudentFeedback");const {error}=await sb.rpc("add_manual_roster_student",{p_class_id:fd.get("class_id"),p_full_name:String(fd.get("full_name")||"").trim(),p_google_email:String(fd.get("google_email")||"").trim(),p_academic_email:String(fd.get("academic_email")||"").trim()||null});fb.textContent=error?(error.message||"Não foi possível adicionar o estudante."):"Estudante adicionado. Ao entrar com esse Google, a turma será reconhecida automaticamente.";fb.className="feedback "+(error?"error":"success");if(!error)e.currentTarget.reset()};
+$("#connectClassroomButton").onclick=()=>{const fb=$("#classroomFeedback");fb.textContent="Estrutura pronta. Falta autorizar os escopos da Google Classroom API no projeto Google Cloud para listar e importar suas turmas.";fb.className="feedback"};
+renderClassManagement();
 function setAdminView(view,{updateHash=true}={}){
- const valid=["overview","students","guilds","projects","missions","indicators"];if(!valid.includes(view))view="overview";
+ const valid=["overview","classes","students","guilds","projects","missions","indicators"];if(!valid.includes(view))view="overview";
  document.querySelectorAll(".admin-view").forEach(el=>el.hidden=true);
  const target=document.querySelector("#"+view+"View");if(target)target.hidden=false;
  document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.adminView===view));
- const titles={overview:["Gestão da turma","Área do Instrutor"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"],missions:["Planejamento pedagógico","Missões"],indicators:["Currículo da UC","Indicadores"]};
+ const titles={overview:["Gestão da turma","Área do Instrutor"],classes:["Administração acadêmica","Gestão de Turmas"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"],missions:["Planejamento pedagógico","Missões"],indicators:["Currículo da UC","Indicadores"]};
  const [eyebrow,title]=titles[view];document.querySelector(".topbar .eyebrow").textContent=eyebrow;document.querySelector(".topbar h1").textContent=title;
  if(updateHash)history.replaceState(null,"","#"+view);
 }
