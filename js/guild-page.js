@@ -18,9 +18,8 @@ async function loadTaskContributions(){
  if(!officialGuild){guildTaskContributions=[];return}
  const {data,error}=await sb.from("guild_task_contributions").select("id,task_id,guild_id,author_id,summary,evidence_url,created_at").eq("guild_id",officialGuild.id).order("created_at",{ascending:false});
  if(error)throw error;
- const rows=data||[],ids=[...new Set(rows.map(r=>r.author_id))];let profiles=[];
- if(ids.length){const result=await sb.from("profiles").select("id,full_name").in("id",ids);if(result.error)throw result.error;profiles=result.data||[]}
- guildTaskContributions=rows.map(r=>({...r,author_name:profiles.find(p=>p.id===r.author_id)?.full_name||"Integrante"}));
+ const rows=data||[];
+ guildTaskContributions=rows.map(r=>({...r,author_name:officialMembers.find(m=>m.user_id===r.author_id)?.name||"Integrante"}));
 }
 async function addTaskContribution(taskId,form){
  const fd=new FormData(form),summary=String(fd.get("summary")||"").trim(),evidence_url=String(fd.get("evidence_url")||"").trim();
