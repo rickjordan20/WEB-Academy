@@ -39,3 +39,8 @@
 #guildRoot .task-collaborators>label input[type=checkbox]{flex:0 0 18px;width:18px;height:18px;accent-color:var(--primary);margin:0}
 #guildRoot .task-collaborators>label:has(input:checked){border-color:var(--primary-2);background:rgba(109,93,252,.09)}
 @media(max-width:800px){#guildRoot .kanban{grid-template-columns:repeat(4,360px)}}
+
+
+#guildRoot .guild-team-hint{margin:.85rem .9rem .65rem!important;font-size:.79rem;line-height:1.55;color:var(--muted)}
+#guildRoot .task-collaborators>label.guild-team-member{display:flex!important;align-items:center;gap:.75rem}
+#guildRoot .task-collaborators>label.guild-team-member input{position:static;flex:0 0 18px}
