@@ -22,13 +22,16 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Abrir o projeto no VS Code e localizar o terminal.",
   "instructions": [
-   "Se precisar instalar, abra [Visual Studio Code](https://code.visualstudio.com/) e [Git](https://git-scm.com/downloads). Faça a instalação com o instrutor.",
-   "ONDE: no VS Code, menu Arquivo → Abrir Pasta. COMO: escolha Documentos, clique em Nova pasta, digite edutech, selecione-a e confirme em Selecionar Pasta.",
-   "ONDE: no menu do VS Code, Terminal → Novo Terminal. CONFIRA: o caminho antes do cursor termina em edutech. Se não, peça ajuda.",
-   "NO TERMINAL: digite git --version e pressione Enter. RESULTADO: aparece git version e números. Se houver erro, chame o instrutor."
+   "Se precisar instalar as ferramentas, acesse [Visual Studio Code](https://code.visualstudio.com/) e [Git](https://git-scm.com/downloads). Faça a instalação com o instrutor.",
+   "No VS Code, abra Arquivo → Abrir Pasta. Em Documentos, crie uma pasta chamada edutech e selecione-a.",
+   "No VS Code, abra Terminal → Novo Terminal. Confira se o caminho termina em edutech.",
+   "No terminal, execute o comando destacado abaixo para verificar a instalação do Git. Se aparecer um número de versão, está tudo certo."
   ],
   "outcome": "VS Code aberto, terminal na pasta correta e Git reconhecido.",
-  "tip": "Se o terminal não mostrar a pasta edutech ou o Git não for reconhecido, peça ajuda antes de continuar."
+  "tip": "Se o terminal não mostrar a pasta edutech ou o Git não for reconhecido, peça ajuda antes de continuar.",
+  "commands": [
+   "git --version"
+  ]
  },
  {
   "id": "p1-guided-02",
@@ -37,15 +40,16 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Criar arquivos e pastas antes de iniciar o versionamento.",
   "instructions": [
-   "ONDE: no VS Code, clique no Explorador (primeiro ícone à esquerda). Passe o mouse sobre edutech, clique em Novo Arquivo, digite index.html e pressione Enter.",
-   "NO EXPLORADOR: passe o mouse sobre edutech, clique em Nova Pasta e crie css, js e assets. Depois, dentro de assets, crie images.",
-   "NO EXPLORADOR: clique com o botão direito em css → Novo Arquivo → style.css. Faça o mesmo em js para app.js e em assets/images para .gitkeep.",
-   "NO EXPLORADOR: clique em index.html. No quadro de código abaixo, clique em Copiar exemplo, cole no editor com Ctrl+V e salve com Ctrl+S.",
-   "NO EXPLORADOR: abra css/style.css, digite /* Estilos do EduTech */ e salve. Depois abra js/app.js, digite // Interações do EduTech e salve. Confira a estrutura."
+   "No VS Code, abra o Explorador (primeiro ícone à esquerda) e crie index.html dentro da pasta edutech.",
+   "No Explorador, crie as pastas css, js e assets. Dentro de assets, crie images.",
+   "No Explorador, crie style.css dentro de css, app.js dentro de js e .gitkeep dentro de assets/images.",
+   "No Explorador, abra index.html. Copie o exemplo de HTML destacado abaixo, cole no arquivo e salve com Ctrl+S.",
+   "No VS Code, abra style.css, escreva /* Estilos do EduTech */ e salve. Em app.js, escreva // Interações do EduTech e salve."
   ],
   "outcome": "No Explorador: index.html, css/style.css, js/app.js e assets/images/.gitkeep.",
   "code": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>EduTech</title>\n</head>\n<body>\n  <h1>Meu EduTech</h1>\n</body>\n</html>",
-  "tip": "Hoje o foco é organizar arquivos. Não é necessário compreender todas as tags HTML nesta aula."
+  "tip": "Hoje o foco é organizar arquivos. Não é necessário compreender todas as tags HTML nesta aula.",
+  "commands": []
  },
  {
   "id": "p1-guided-03",
@@ -54,13 +58,18 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 10 min • faça com o instrutor",
   "goal": "Transformar a pasta do EduTech em um repositório local.",
   "instructions": [
-   "ONDE: abra Terminal → Novo Terminal no VS Code. Antes de digitar, confirme que o caminho termina em edutech.",
-   "NO TERMINAL: digite git init e pressione Enter. RESULTADO: aparece uma mensagem parecida com Initialized empty Git repository.",
-   "NO TERMINAL: digite git status e pressione Enter. PROCURE: Untracked files, que são arquivos ainda não registrados.",
-   "NO TERMINAL: execute git config --global user.name e depois git config --global user.email. Se algum resultado vier vazio, peça ao instrutor para configurar seu nome e e-mail antes do commit."
+   "No VS Code, abra o terminal e confirme que o caminho termina em edutech.",
+   "No terminal, execute os comandos destacados abaixo, um de cada vez. O primeiro inicia o repositório local e o segundo mostra os arquivos ainda não registrados.",
+   "No terminal, confira seu nome e e-mail usando os comandos de configuração destacados abaixo. Se algum resultado estiver vazio, peça ajuda ao instrutor antes do primeiro commit."
   ],
   "outcome": "O terminal reconhece um repositório Git e mostra o estado dos arquivos.",
-  "tip": "git init cria o repositório somente no computador. Ainda não envia nada para o GitHub."
+  "tip": "git init cria o repositório somente no computador. Ainda não envia nada para o GitHub.",
+  "commands": [
+   "git init",
+   "git status",
+   "git config --global user.name",
+   "git config --global user.email"
+  ]
  },
  {
   "id": "p1-guided-04",
@@ -69,14 +78,19 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 20 min • faça com o instrutor",
   "goal": "Criar um commit local antes de enviar ao GitHub.",
   "instructions": [
-   "NO TERMINAL: digite git status. CONFIRA: seus arquivos aparecem como Untracked files.",
-   "NO TERMINAL: digite git add . (com espaço antes do ponto) e pressione Enter. Isso prepara os arquivos, mas ainda não os publica.",
-   "NO TERMINAL: digite git status novamente. CONFIRA: aparece Changes to be committed.",
-   "NO TERMINAL: digite git commit -m \"Criar estrutura inicial do EduTech\" e pressione Enter. RESULTADO: mensagem informando os arquivos registrados.",
-   "NO TERMINAL: digite git log -1 --oneline. CONFIRA: aparece um código curto seguido da mensagem do commit."
+   "No terminal, execute os comandos destacados abaixo na ordem apresentada.",
+   "Após o primeiro status, observe os arquivos novos. Depois do add, confira se aparecem em Changes to be committed.",
+   "Após o commit, confira no log o código curto e a mensagem da versão registrada no computador."
   ],
   "outcome": "O Git mostra um commit com a mensagem escolhida.",
-  "tip": "Salvar o arquivo e criar um commit são ações diferentes. O commit registra uma versão no histórico do Git."
+  "tip": "Salvar o arquivo e criar um commit são ações diferentes. O commit registra uma versão no histórico do Git.",
+  "commands": [
+   "git status",
+   "git add .",
+   "git status",
+   "git commit -m \"Criar estrutura inicial do EduTech\"",
+   "git log -1 --oneline"
+  ]
  },
  {
   "id": "p1-guided-05",
@@ -85,10 +99,10 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Preparar um local online para receber o projeto.",
   "instructions": [
-   "Abra [Criar novo repositório no GitHub](https://github.com/new) e entre na sua conta.",
-   "NO GITHUB: na página New repository, localize Repository name, digite edutech (ou o nome indicado) e aguarde confirmar que está disponível.",
-   "NA MESMA PÁGINA: deixe Add a README file desativado, .gitignore em None e licença em None. Assim o repositório começa vazio.",
-   "NO GITHUB: clique em Create repository. Na página seguinte, copie a URL HTTPS do SEU repositório (parecida com https://github.com/seu-usuario/edutech.git)."
+   "No navegador, abra [Criar repositório no GitHub](https://github.com/new) e entre na sua conta.",
+   "No GitHub, em Repository name, digite edutech ou o nome combinado com o instrutor.",
+   "Na mesma página, deixe desmarcada a opção Add a README file; mantenha .gitignore e licença como None.",
+   "No GitHub, clique em Create repository e copie a URL HTTPS do seu repositório. Cada estudante tem um endereço diferente."
   ],
   "outcome": "Repositório remoto vazio criado e endereço HTTPS copiado.",
   "tip": "O repositório deve começar vazio para evitar conflitos no primeiro envio. Não marque a criação automática de README."
@@ -100,12 +114,16 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 10 min • faça com o instrutor",
   "goal": "Vincular o repositório local ao remoto.",
   "instructions": [
-   "NO TERMINAL do VS Code: digite git remote add origin, dê um espaço e cole a URL HTTPS do SEU repositório. Exemplo: git remote add origin https://github.com/seu-usuario/edutech.git. Troque seu-usuario pelo seu usuário real.",
-   "NO TERMINAL: digite git remote -v. CONFIRA: origin aparece com a URL correta nas linhas fetch e push.",
-   "Se o endereço estiver incorreto ou aparecer origin already exists, peça ajuda em vez de repetir o comando."
+   "No terminal do VS Code, copie o primeiro comando destacado abaixo e substitua a URL de exemplo pelo endereço HTTPS do seu repositório.",
+   "No terminal, execute o segundo comando e confira se origin aponta para o seu GitHub.",
+   "Se aparecer origin already exists ou o endereço estiver incorreto, peça ajuda antes de continuar."
   ],
   "outcome": "O terminal mostra o endereço remoto correto.",
-  "tip": "Cada estudante deve utilizar a URL do próprio repositório, nunca a URL de exemplo."
+  "tip": "Cada estudante deve utilizar a URL do próprio repositório, nunca a URL de exemplo.",
+  "commands": [
+   "git remote add origin https://github.com/seu-usuario/edutech.git",
+   "git remote -v"
+  ]
  },
  {
   "id": "p1-guided-07",
@@ -114,13 +132,16 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Enviar ao GitHub a versão que você registrou.",
   "instructions": [
-   "NO TERMINAL: digite git branch -M main e pressione Enter. Esse comando define main como nome da branch principal.",
-   "NO TERMINAL: digite git push -u origin main e pressione Enter. Aguarde terminar; se houver erro, mostre a mensagem ao instrutor.",
-   "Se aparecer uma tela de login, siga a orientação do instrutor. Nunca compartilhe senha ou token.",
-   "NO NAVEGADOR: abra o endereço do SEU repositório GitHub e atualize com F5. CONFIRA: index.html, css, js e assets aparecem e há um commit."
+   "No terminal, execute os dois comandos destacados abaixo, na ordem apresentada. O primeiro define main como branch principal; o segundo envia seu commit ao GitHub.",
+   "Se o GitHub solicitar login, siga as instruções no navegador com o instrutor. Nunca compartilhe senhas ou tokens.",
+   "No navegador, abra seu repositório do GitHub, atualize a página e confira os arquivos e o primeiro commit."
   ],
   "outcome": "O repositório online mostra os arquivos do EduTech e o commit.",
-  "tip": "Não compartilhe senhas nem tokens. Se a autenticação falhar, solicite apoio."
+  "tip": "Não compartilhe senhas nem tokens. Se a autenticação falhar, solicite apoio.",
+  "commands": [
+   "git branch -M main",
+   "git push -u origin main"
+  ]
  },
  {
   "id": "p1-guided-08",
@@ -129,14 +150,18 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 20 min • faça com o instrutor",
   "goal": "Repetir o fluxo para entender o trabalho cotidiano.",
   "instructions": [
-   "NO VS CODE: no Explorador, abra index.html. Dentro de <h1>, substitua Meu EduTech por Meu primeiro projeto EduTech. Salve com Ctrl+S.",
-   "NO TERMINAL: digite git status e confira que index.html aparece como modified.",
-   "NO TERMINAL: digite git add . e pressione Enter. Depois digite git commit -m \"Atualizar página inicial\" e pressione Enter.",
-   "NO TERMINAL: digite git push e pressione Enter. NO NAVEGADOR: atualize o GitHub com F5 e confira se aparece o segundo commit.",
-   "Lembre-se: init e remote são da preparação inicial; push envia versões, pull recebe mudanças e clone copia um repositório remoto."
+   "No VS Code, abra index.html. Substitua Meu EduTech por Meu primeiro projeto EduTech e salve com Ctrl+S.",
+   "No terminal, execute os comandos destacados abaixo na ordem apresentada. Observe a alteração no status, registre a segunda versão e envie-a ao GitHub.",
+   "No navegador, atualize seu repositório do GitHub e confira se a mensagem Atualizar página inicial aparece no histórico."
   ],
   "outcome": "O histórico no GitHub mostra pelo menos dois commits.",
-  "tip": "Não repita git init nem git remote add origin a cada alteração. Agora o fluxo é salvar, status, add, commit e push."
+  "tip": "Não repita git init nem git remote add origin a cada alteração. Agora o fluxo é salvar, status, add, commit e push.",
+  "commands": [
+   "git status",
+   "git add .",
+   "git commit -m \"Atualizar página inicial\"",
+   "git push"
+  ]
  },
  {
   "id": "p1-guided-support",
