@@ -171,6 +171,11 @@ studentProfileForm.addEventListener("submit",async e=>{
  }catch(err){profileFeedback.textContent="Não foi possível salvar: "+err.message;profileFeedback.className="feedback error"}
  finally{button.disabled=false}
 });
+if(cloudSession){
+ sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url,educational_email").eq("user_id",cloudSession.user.id).maybeSingle().then(({data,error})=>{
+  if(!error){studentProfileDetails=data||{};render()}
+ }).catch(err=>console.warn("Perfil complementar indisponível:",err));
+}
 $("#exportBackup").addEventListener("click", () => { try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); } });
 const picker = $("#backupFile");
 $("#importBackup").addEventListener("click", () => picker.click());
