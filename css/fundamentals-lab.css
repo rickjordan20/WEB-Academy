@@ -10,3 +10,5 @@
 .instruction-list li::marker{font-weight:700}
 .guided-link{color:var(--accent,#087c70);font-weight:700;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .guided-link:hover{text-decoration-thickness:2px}
+
+.guided-code-example{margin:16px 0;padding:15px;border:1px solid var(--line,#dce3e8);border-radius:12px}.guided-code-example strong{display:block;margin-bottom:10px}.guided-code-example pre{overflow-x:auto;white-space:pre;padding:14px;border-radius:9px;background:var(--surface,#f4f6f8)}
