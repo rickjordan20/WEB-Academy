@@ -1,0 +1,4 @@
+-- Correção da vinculação UC7: 28 missões regulares nas aulas presenciais; R1-R7 nas remotas assíncronas.
+update public.class_schedule set mission_id=null where uc='UC7' and mission_id is not null;
+with ordered as (select id,execution_mode,row_number() over(partition by class_id,execution_mode order by lesson_date,lesson_number) as position from public.class_schedule where uc='UC7')
+update public.class_schedule s set mission_id=case when o.execution_mode='Presencial' and o.position<=28 then ((o.position+1)/2)::text || case when o.position%2=1 then 'A' else 'B' end when o.execution_mode='Remota Assíncrona' and o.position<=7 then 'R'||o.position::text else null end from ordered o where s.id=o.id and o.execution_mode in ('Presencial','Remota Assíncrona');
