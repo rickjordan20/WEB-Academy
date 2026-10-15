@@ -1,9 +1,27 @@
 import {getSupabase,getSession} from "./supabase-client.js";
 const $=id=>document.getElementById(id);
-const sb=await getSupabase(),session=await getSession();
-if(!sb||!session){location.replace("auth.html");throw Error("AUTH_REQUIRED")}
-const {data:profile,error:profileError}=await sb.from("profiles").select("role").eq("id",session.user.id).single();
-if(profileError||!profile||!["instructor","student"].includes(profile.role)){location.replace("auth.html");throw Error("ACCESS_DENIED")}
+// Nunca encerrar ou redirecionar a sessão por uma falha temporária de carregamento.
+const sb=await getSupabase();
+let session=null,profile=null,accessError=null;
+try{
+ if(!sb)throw new Error("O Supabase não está configurado nesta página.");
+ const result=await sb.auth.getUser();
+ if(result.error)throw result.error;
+ if(!result.data?.user)throw new Error("Não foi encontrada uma sessão neste endereço.");
+ session={user:result.data.user};
+ const identity=await sb.from("profiles").select("role").eq("id",session.user.id).maybeSingle();
+ if(identity.error)throw identity.error;
+ profile=identity.data;
+ if(!profile||!["instructor","student"].includes(profile.role))throw new Error("Perfil não encontrado ou sem permissão.");
+}catch(error){accessError=error}
+if(accessError){
+ const notice=document.getElementById("scheduleFeedback");
+ notice.textContent="Não foi possível verificar seu acesso: "+accessError.message+" Sua conta não foi desconectada. ";
+ const retry=document.createElement("button");retry.type="button";retry.textContent="Tentar novamente";retry.addEventListener("click",()=>location.reload());notice.append(retry);
+ const back=document.createElement("a");back.href="instructor.html";back.textContent=" Voltar ao painel do instrutor";notice.append(back);
+ document.getElementById("scheduleRows").replaceChildren();
+ throw new Error("Schedule access unavailable: "+accessError.message);
+}
 const instructor=profile.role==="instructor";
 $("instructorBack").hidden=!instructor;$("studentBack").hidden=instructor;
 $("newScheduleLesson").hidden=!instructor;$("scheduleActionsHeading").hidden=!instructor;
