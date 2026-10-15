@@ -1,18 +1,22 @@
-// Production is the safe default. Local testing must be explicitly enabled with ?backend=local
-// on localhost/127.0.0.1 and requires an ignored js/supabase-config.local.js file.
+// A plataforma utiliza o Supabase de produção por padrão em todas as páginas.
+// O backend local só pode ser selecionado explicitamente por URL, na própria página.
+// Não persista a seleção entre navegações: isso evita sessões aparentemente perdidas
+// e erros de login Google quando o Supabase local não tem OAuth configurado.
 const params = new URLSearchParams(location.search);
 const localHost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const useLocal = localHost && params.get("backend") === "local";
 
-if (localHost && params.get("backend") === "local") {
-  sessionStorage.setItem("web-academy-supabase-target", "local");
-} else if (localHost && params.get("backend") === "production") {
+try {
+  // Limpa a preferência antiga que podia deixar o navegador preso ao backend local.
   sessionStorage.removeItem("web-academy-supabase-target");
-}
+} catch (_) {}
 
-const useLocal = localHost && sessionStorage.getItem("web-academy-supabase-target") === "local";
-const config = useLocal
-  ? await import("./supabase-config.local.js")
-  : await import("./supabase-config.production.js");
+let config;
+if (useLocal) {
+  config = await import("./supabase-config.local.js");
+} else {
+  config = await import("./supabase-config.production.js");
+}
 
 export const SUPABASE_URL = config.SUPABASE_URL;
 export const SUPABASE_PUBLISHABLE_KEY = config.SUPABASE_PUBLISHABLE_KEY;
