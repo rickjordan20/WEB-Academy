@@ -27,7 +27,8 @@ const phase1GuidedSteps=[
    "Abra Terminal → Novo Terminal. Confira se o caminho mostrado termina em edutech. Se não terminar, peça ajuda.",
    "Digite git --version e pressione Enter. Se aparecer um número, o Git está instalado."
   ],
-  "outcome": "VS Code aberto, terminal na pasta correta e Git reconhecido."
+  "outcome": "VS Code aberto, terminal na pasta correta e Git reconhecido.",
+  "tip": "Se o terminal não mostrar a pasta edutech ou o Git não for reconhecido, peça ajuda antes de continuar."
  },
  {
   "id": "p1-guided-02",
@@ -43,7 +44,8 @@ const phase1GuidedSteps=[
    "No style.css, escreva /* Estilos do EduTech */. No app.js, escreva // Interações do EduTech. Salve os arquivos com Ctrl+S."
   ],
   "outcome": "No Explorador: index.html, css/style.css, js/app.js e assets/images/.gitkeep.",
-  "code": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>EduTech</title>\n</head>\n<body>\n  <h1>Meu EduTech</h1>\n</body>\n</html>"
+  "code": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>EduTech</title>\n</head>\n<body>\n  <h1>Meu EduTech</h1>\n</body>\n</html>",
+  "tip": "Hoje o foco é organizar arquivos. Não é necessário compreender todas as tags HTML nesta aula."
  },
  {
   "id": "p1-guided-03",
@@ -57,7 +59,8 @@ const phase1GuidedSteps=[
    "Digite git status. Os arquivos novos devem aparecer como untracked files (ainda não registrados).",
    "Confira git config --global user.name e git config --global user.email. Se estiverem vazios, peça ao instrutor para ajudar a configurar seu nome e e-mail antes do commit."
   ],
-  "outcome": "O terminal reconhece um repositório Git e mostra o estado dos arquivos."
+  "outcome": "O terminal reconhece um repositório Git e mostra o estado dos arquivos.",
+  "tip": "git init cria o repositório somente no computador. Ainda não envia nada para o GitHub."
  },
  {
   "id": "p1-guided-04",
@@ -72,7 +75,8 @@ const phase1GuidedSteps=[
    "Digite git commit -m \"Criar estrutura inicial do EduTech\". Isso registra uma versão no computador.",
    "Digite git log -1 --oneline. Deve aparecer um código curto e a mensagem do commit."
   ],
-  "outcome": "O Git mostra um commit com a mensagem escolhida."
+  "outcome": "O Git mostra um commit com a mensagem escolhida.",
+  "tip": "Salvar o arquivo e criar um commit são ações diferentes. O commit registra uma versão no histórico do Git."
  },
  {
   "id": "p1-guided-05",
@@ -86,7 +90,8 @@ const phase1GuidedSteps=[
    "Não marque as opções para criar README, .gitignore ou licença. Precisamos de um repositório vazio.",
    "Clique em Create repository e copie a URL HTTPS mostrada na página. Cada estudante terá seu próprio endereço."
   ],
-  "outcome": "Repositório remoto vazio criado e endereço HTTPS copiado."
+  "outcome": "Repositório remoto vazio criado e endereço HTTPS copiado.",
+  "tip": "O repositório deve começar vazio para evitar conflitos no primeiro envio. Não marque a criação automática de README."
  },
  {
   "id": "p1-guided-06",
@@ -99,7 +104,8 @@ const phase1GuidedSteps=[
    "Digite git remote -v para conferir o endereço configurado.",
    "Se o endereço estiver incorreto ou aparecer origin already exists, peça ajuda em vez de repetir o comando."
   ],
-  "outcome": "O terminal mostra o endereço remoto correto."
+  "outcome": "O terminal mostra o endereço remoto correto.",
+  "tip": "Cada estudante deve utilizar a URL do próprio repositório, nunca a URL de exemplo."
  },
  {
   "id": "p1-guided-07",
@@ -113,7 +119,8 @@ const phase1GuidedSteps=[
    "Se aparecer uma tela de login, siga a orientação do instrutor. Nunca compartilhe senha ou token.",
    "Abra seu repositório no GitHub e confira se os arquivos e o primeiro commit aparecem."
   ],
-  "outcome": "O repositório online mostra os arquivos do EduTech e o commit."
+  "outcome": "O repositório online mostra os arquivos do EduTech e o commit.",
+  "tip": "Não compartilhe senhas nem tokens. Se a autenticação falhar, solicite apoio."
  },
  {
   "id": "p1-guided-08",
@@ -128,7 +135,8 @@ const phase1GuidedSteps=[
    "Digite git push. Atualize o GitHub e confira o segundo commit.",
    "Lembre-se: init e remote são da preparação inicial; push envia versões, pull recebe mudanças e clone copia um repositório remoto."
   ],
-  "outcome": "O histórico no GitHub mostra pelo menos dois commits."
+  "outcome": "O histórico no GitHub mostra pelo menos dois commits.",
+  "tip": "Não repita git init nem git remote add origin a cada alteração. Agora o fluxo é salvar, status, add, commit e push."
  },
  {
   "id": "p1-guided-support",
