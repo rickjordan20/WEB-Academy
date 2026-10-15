@@ -260,7 +260,7 @@ const phase1Steps=[
   "id": "f1-command-cards",
   "type": "command-deck",
   "title": "14 · Baralho Git: toque para revelar 🃏",
-  "summary": "Revisão rápida dos comandos apresentados • 5 min",
+  "summary": "Revisão rápida dos comandos apresentados • 4 min",
   "commands": [
    [
     "git init",
