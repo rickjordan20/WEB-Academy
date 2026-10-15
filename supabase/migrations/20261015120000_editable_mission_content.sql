@@ -1,0 +1,7 @@
+create table if not exists public.mission_content_overrides(class_id uuid not null references public.classes(id) on delete cascade,mission_id text not null,content jsonb not null default '{}'::jsonb,updated_by uuid references auth.users(id),updated_at timestamptz not null default now(),primary key(class_id,mission_id),constraint mission_content_object check(jsonb_typeof(content)='object'));
+alter table public.mission_content_overrides enable row level security;
+drop policy if exists mission_content_read on public.mission_content_overrides;
+create policy mission_content_read on public.mission_content_overrides for select to authenticated using(exists(select 1 from public.classes c where c.id=class_id and (c.instructor_id=(select auth.uid()) or exists(select 1 from public.class_members m where m.class_id=c.id and m.user_id=(select auth.uid()) and m.status='active'))));
+drop policy if exists mission_content_manage on public.mission_content_overrides;
+create policy mission_content_manage on public.mission_content_overrides for all to authenticated using(exists(select 1 from public.classes c where c.id=class_id and c.instructor_id=(select auth.uid()))) with check(exists(select 1 from public.classes c where c.id=class_id and c.instructor_id=(select auth.uid())));
+grant select,insert,update,delete on public.mission_content_overrides to authenticated;
