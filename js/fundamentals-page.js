@@ -1,3 +1,4 @@
+import {missionWindow,windowNotice} from "./mission-window.js";
 import "./cloud-bootstrap.js";
 import {getFundamental,startFundamental,fundamentalStatus,completeFundamentalStep,STATUS} from "./mission-engine.js";
 import {getState} from "./storage.js";
@@ -7,7 +8,7 @@ if(!state?.student?.name)location.replace("index.html");
 const unit=getFundamental(phase);
 if(!unit)root.innerHTML='<section class="card current-mission"><h1>Fundamentos não disponíveis</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else if(fundamentalStatus(phase)===STATUS.LOCKED)root.innerHTML='<section class="card current-mission"><h1>🔒 Fundamentos bloqueados</h1><p>Conclua a fase anterior para continuar.</p><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
-else{startFundamental(phase);render()}
+else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(`${phase}A`);if(access.state!=="open")root.replaceChildren(windowNotice(access));else{startFundamental(phase);render()}}
 function render(){const s=getState(),id=`F${phase}`,p=s.journey.fundamentalProgress?.[id]||{completedSteps:[]},done=p.completedSteps||[],total=unit.steps.length,pct=Math.round(done.length/total*100);
 root.innerHTML=`<section class="mission-header"><p class="eyebrow">Fase ${String(phase).padStart(2,"0")} • APRENDER</p><h1>Fundamentos — ${unit.title}</h1><p>${unit.objective}</p><div class="mission-meta"><span class="pill">1h30</span><span class="pill">📘 Dentro da Web Academy</span><span class="pill">${pct}% concluído</span></div><div class="progress-meta"><span>Progresso dos Fundamentos</span><b>${pct}%</b></div><div class="progress"><i style="width:${pct}%"></i></div></section><div class="mission-notice"><b>Primeiro, compreender.</b> Esta etapa acontece dentro da plataforma. Você não precisa abrir o VS Code para concluí-la. Leia, observe os exemplos, experimente quando houver laboratório e responda aos checkpoints.</div><section class="learning-list">${unit.steps.map(step=>renderStep(step,id,done.includes(step.id),{editableCompleted:true})).join("")}</section>`;
 unit.steps.forEach(step=>{const completed=done.includes(step.id);bindStep(step,id,render,(_,stepId)=>completeFundamentalStep(phase,stepId),{completed})});
