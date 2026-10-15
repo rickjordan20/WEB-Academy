@@ -1,3 +1,4 @@
+import {missionWindow,windowNotice} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
 import "./cloud-bootstrap.js";
 import {getMission,getFundamental,startMission,startFundamental,missionStatus,fundamentalStatus,completeFundamentalStep,STATUS} from "./mission-engine.js";
@@ -11,7 +12,7 @@ const state=getState();if(!state?.student?.name)location.replace("index.html");
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission)root.innerHTML='<section class="card current-mission"><h1>Missão ainda não disponível</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else if(missionStatus(id)===STATUS.LOCKED)root.innerHTML='<section class="card current-mission"><h1>🔒 Missão bloqueada</h1><p>Conclua a missão anterior para continuar sua Jornada.</p><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
-else{startMission(id);projectContext=await getMissionProjectContext(mission);render();refreshMissionSchedule()}
+else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(id);if(access.state!=="open"){root.replaceChildren(windowNotice(access));}else{startMission(id);projectContext=await getMissionProjectContext(mission);render();refreshMissionSchedule();}}
 function render(){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
  const guidedContent=mission.type==="training"?`
