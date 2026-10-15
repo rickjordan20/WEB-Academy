@@ -2,6 +2,7 @@
 const links=[
  ["app.html","⌂","Visão Geral",""],
  ["journey.html","🗺","Minha Jornada","14 fases"],
+ ["class-schedule.html","📅","Cronograma","Aulas"],
  ["missions.html","🎯","Missões","28 aulas"],
  ["edutech.html","🎓","EduTech","Projeto"],
  ["guild.html","⚔","Minha Guilda","Kanban"],
