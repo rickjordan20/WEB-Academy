@@ -114,6 +114,24 @@ $("scheduleForm").addEventListener("submit",async e=>{
  if(payload.uc!=="UC7"&&payload.mission_id){$("scheduleFormFeedback").textContent="As missões da Jornada Web pertencem à UC7.";return}
  if(!classes.some(c=>c.id===payload.class_id)){ $("scheduleFormFeedback").textContent="Turma inválida.";return}
  $("scheduleSave").disabled=true;$("scheduleFormFeedback").textContent="Salvando...";
+ const occupied=payload.mission_id?rows.find(r=>r.class_id===payload.class_id&&r.uc===payload.uc&&r.mission_id===payload.mission_id&&r.id!==editing):null;
+ if(occupied){
+  const current=rows.find(r=>r.id===editing);
+  if(!current||current.class_id!==payload.class_id||current.uc!==payload.uc||current.execution_mode!==payload.execution_mode||occupied.execution_mode!==payload.execution_mode){
+   $("scheduleSave").disabled=false;
+   $("scheduleFormFeedback").textContent="Para trocar missões, as duas aulas devem pertencer à mesma turma, UC e modalidade.";
+   return;
+  }
+  if(current.lesson_number!==payload.lesson_number||current.lesson_date!==payload.lesson_date){
+   $("scheduleSave").disabled=false;
+   $("scheduleFormFeedback").textContent="Para trocar missões, mantenha a data e o número da aula. Salve essas alterações separadamente.";
+   return;
+  }
+  const result=await sb.rpc("swap_class_schedule_missions",{p_source_id:current.id,p_target_id:occupied.id});
+  $("scheduleSave").disabled=false;
+  if(result.error){$("scheduleFormFeedback").textContent="Erro ao trocar missões: "+result.error.message;return}
+  $("scheduleDialog").close();await loadRows();feedback("Missões trocadas com sucesso. As datas e o progresso dos estudantes foram preservados.");return;
+ }
  const result=editing?await sb.from("class_schedule").update(payload).eq("id",editing):await sb.from("class_schedule").insert(payload);
  $("scheduleSave").disabled=false;
  if(result.error){$("scheduleFormFeedback").textContent="Erro ao salvar: "+result.error.message;return}
@@ -126,7 +144,31 @@ $("scheduleCancel").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleClass").addEventListener("change",()=>{updateUcOptions();render()});
 $("scheduleFormClass").addEventListener("change",refreshMissionOptions);
 $("scheduleForm").elements.namedItem("execution_mode").addEventListener("change",refreshMissionOptions);
-function refreshMissionOptions(){const form=$("scheduleForm"),select=form.elements.namedItem("mission_id"),classId=form.elements.namedItem("class_id").value,mode=form.elements.namedItem("execution_mode").value;const selected=select.value;const candidates=mode==="Remota Assíncrona"?EXTRA_MISSIONS:mode==="Presencial"?MISSIONS:[];select.replaceChildren(option("","Sem missão vinculada"),...candidates.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==editing)).map(m=>option(m.id,missionTitle(m.id))));if([...select.options].some(o=>o.value===selected))select.value=selected;}
+function refreshMissionOptions(){
+ const form=$("scheduleForm"),select=form.elements.namedItem("mission_id");
+ const classId=form.elements.namedItem("class_id").value,mode=form.elements.namedItem("execution_mode").value;
+ const uc=form.elements.namedItem("uc").value.trim().toUpperCase();
+ const selected=select.value;
+ const candidates=uc==="UC7"?(mode==="Remota Assíncrona"?EXTRA_MISSIONS:mode==="Presencial"?MISSIONS:[]):[];
+ select.replaceChildren(option("","Sem missão vinculada"));
+ for(const m of candidates){
+  const occupied=rows.find(r=>r.class_id===classId&&r.uc===uc&&r.mission_id===m.id&&r.id!==editing);
+  const label=missionTitle(m.id)+(occupied?" · Aula "+String(occupied.lesson_number).padStart(2,"0")+" ("+formatDate(occupied.lesson_date)+") — trocar":"");
+  const opt=option(m.id,label);
+  // Não permitir vincular a uma aula ocupada ao criar um registro novo.
+  if(occupied&&!editing)opt.disabled=true;
+  select.append(opt);
+ }
+ if([...select.options].some(o=>o.value===selected&&!o.disabled))select.value=selected;
+ updateMissionHint();
+}
+function updateMissionHint(){
+ const form=$("scheduleForm"),missionId=form.elements.namedItem("mission_id").value;
+ const target=rows.find(r=>r.mission_id===missionId&&r.class_id===form.elements.namedItem("class_id").value&&r.uc===form.elements.namedItem("uc").value.trim().toUpperCase()&&r.id!==editing);
+ $("scheduleMissionHint").textContent=target?"Ao salvar, a missão selecionada trocará de aula com a missão atual. A data e a modalidade das aulas não mudarão.":"São exibidas apenas as missões compatíveis com a modalidade. Missões já vinculadas podem ser trocadas ao editar uma aula.";
+}
+$("scheduleMission").addEventListener("change",updateMissionHint);
+$("scheduleForm").elements.namedItem("uc").addEventListener("change",refreshMissionOptions);
 $("scheduleUc").addEventListener("change",render);
 $("scheduleMode").addEventListener("change",render);
 try{await loadClasses();if(classes.length)await loadRows();else{feedback("Nenhuma turma disponível para esta conta.");$("scheduleRows").replaceChildren()}}catch(error){feedback("Não foi possível carregar o cronograma: "+error.message);$("scheduleRows").replaceChildren()}
