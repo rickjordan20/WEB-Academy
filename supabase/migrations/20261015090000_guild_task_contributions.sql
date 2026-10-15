@@ -41,6 +41,6 @@ for insert to authenticated with check (
 drop policy if exists guild_task_contributions_delete on public.guild_task_contributions;
 create policy guild_task_contributions_delete on public.guild_task_contributions
 for delete to authenticated using (
-  author_id = auth.uid()
+  (author_id = auth.uid() and private.is_active_guild_member(guild_id, auth.uid()))
   or private.can_manage_guild_task(task_id)
 );
