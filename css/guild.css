@@ -44,3 +44,47 @@
 #guildRoot .guild-team-hint{margin:.85rem .9rem .65rem!important;font-size:.79rem;line-height:1.55;color:var(--muted)}
 #guildRoot .task-collaborators>label.guild-team-member{display:flex!important;align-items:center;gap:.75rem}
 #guildRoot .task-collaborators>label.guild-team-member input{position:static;flex:0 0 18px}
+
+
+/* Quadro compacto e painel de detalhes da tarefa */
+#guildRoot .kanban{grid-template-columns:repeat(4,minmax(280px,1fr));gap:1rem}
+#guildRoot .kanban-column{min-width:280px}
+#guildRoot .task-card{display:flex;flex-direction:column;gap:.65rem}
+#guildRoot .task-card h4{margin:0;line-height:1.4}
+#guildRoot .task-card p{margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#guildRoot .guild-task-card-meta{display:flex;flex-wrap:wrap;gap:.4rem}
+#guildRoot .guild-task-card-meta span{font-size:.73rem;border:1px solid var(--line);border-radius:20px;padding:.25rem .55rem;color:var(--muted)}
+#guildRoot .guild-open-task{width:100%;min-height:40px}
+@media(max-width:800px){#guildRoot .kanban{grid-template-columns:repeat(4,280px)}#guildRoot .kanban-column{min-width:280px}}
+.guild-dialog-open{overflow:hidden}
+.guild-detail-backdrop{position:fixed;inset:0;z-index:9999;background:rgba(2,8,18,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1rem}
+.guild-detail-dialog{background:#101d2d;color:var(--text);border:1px solid var(--line);border-radius:18px;width:min(850px,100%);max-height:min(90vh,900px);display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.45);outline:none;overflow:hidden}
+.guild-detail-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding:1.3rem 1.5rem;border-bottom:1px solid var(--line)}
+.guild-detail-header h2{font-size:1.35rem;line-height:1.35;margin:.3rem 0 0;overflow-wrap:anywhere}
+.guild-detail-eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.guild-detail-close{flex:0 0 38px;height:38px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:10px;font-size:1.6rem;cursor:pointer}
+.guild-detail-content{padding:1.5rem;overflow-y:auto;overscroll-behavior:contain}
+.guild-detail-description{margin:0 0 1.4rem;white-space:pre-wrap;line-height:1.65;overflow-wrap:anywhere}
+.guild-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+.guild-detail-section{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:1.15rem;min-width:0}
+.guild-detail-section h3{font-size:1rem;margin:0 0 1rem}
+.guild-detail-section h3 span{color:var(--muted)}
+.guild-detail-section label{display:grid;gap:.4rem;margin:.8rem 0;font-size:.84rem;font-weight:700}
+.guild-detail-section select,.guild-detail-section input:not([type=checkbox]),.guild-detail-section textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:.75rem;border:1px solid var(--line);border-radius:10px;background:#091625;color:var(--text);font:inherit}
+.guild-detail-section :is(input,select,textarea):focus-visible,.guild-detail-close:focus-visible{outline:2px solid var(--primary-2);outline-offset:2px}
+.guild-detail-section :is(input,select):disabled{opacity:.65;cursor:not-allowed}
+.guild-detail-muted{font-size:.81rem;line-height:1.6;color:var(--muted)}
+.guild-detail-team{display:grid;gap:.5rem;max-height:240px;overflow-y:auto}
+.guild-detail-section label.guild-detail-person,.guild-detail-person{display:flex;align-items:center;gap:.7rem;margin:0;padding:.65rem .75rem;border:1px solid var(--line);border-radius:10px;font-size:.82rem;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.guild-detail-person:has(input:checked){border-color:var(--primary-2);background:rgba(109,93,252,.1)}
+.guild-detail-person input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;accent-color:var(--primary)}
+.guild-detail-contributions{margin-top:1.2rem}
+.guild-detail-contribution-list{display:grid;gap:.75rem;margin-bottom:1rem}
+.guild-detail-contribution{display:grid;gap:.3rem;border:1px solid var(--line);border-radius:10px;padding:.85rem}
+.guild-detail-contribution small{color:var(--muted)}
+.guild-detail-contribution p{margin:.3rem 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.guild-detail-contribution a{color:var(--accent)}
+.guild-detail-contribution-form{display:grid;gap:.6rem;border-top:1px solid var(--line);padding-top:1rem}
+.guild-detail-contribution-form textarea{resize:vertical;min-height:100px}
+.guild-detail-contribution-form .btn{justify-self:start;min-height:42px}
+@media(max-width:650px){.guild-detail-backdrop{padding:.5rem}.guild-detail-dialog{max-height:96dvh;border-radius:12px}.guild-detail-header,.guild-detail-content{padding:1rem}.guild-detail-grid{grid-template-columns:1fr}.guild-detail-contribution-form .btn{width:100%}}
