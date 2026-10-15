@@ -22,3 +22,30 @@
 .learning-section:nth-child(2){border-left:4px solid var(--accent,#16877b)}
 .learning-section:nth-child(3){border-left:4px solid #d4a247}
 @media(max-width:600px){.learning-section{padding:13px 14px}.learning-section-stack{gap:10px}}
+
+/* WEB Academy: linguagem visual consistente para quem está começando */
+.learning-step .learning-section-stack{gap:16px}
+.learning-step .learning-section{background:var(--surface,#fff);border:1px solid var(--line,#dce3e8);border-radius:14px;padding:18px 20px;box-shadow:0 2px 9px rgba(10,25,45,.035)}
+.learning-step .learning-section.section-concept{border-left:4px solid #367ec8}
+.learning-step .learning-section.section-example{border-left:4px solid #189979}
+.learning-step .learning-section.section-tip{border-left:4px solid #c68b25}
+.learning-step .learning-section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.learning-step .learning-section-head span{display:grid;place-items:center;flex:none;width:35px;height:35px;border-radius:10px;background:var(--surface-secondary,#eef3f7);font-size:1.12rem}
+.learning-step .learning-section-head h3{margin:0;font-size:1rem}
+.learning-step .learning-section li{line-height:1.65}
+.learning-step .learning-block-intro,.learning-step .guided-action-heading{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-weight:750}
+.learning-step .guided-goal{border-left:4px solid #367ec8;background:var(--surface-secondary,#f5f8fc)}
+.learning-step .guided-outcome{border-left:4px solid #189979;background:var(--surface-secondary,#f5faf8)}
+.learning-step .guided-code-example{position:relative;border-left:4px solid #189979}
+.learning-step .guided-code-example pre{white-space:pre;overflow-x:auto;font-size:.88rem;line-height:1.6;background:#111e2e;color:#f0f7ff}
+.learning-step .instruction-list{counter-reset:guided;list-style:none;padding:0;gap:10px}
+.learning-step .instruction-list>li{counter-increment:guided;position:relative;padding:15px 16px 15px 54px;background:var(--surface,#fff);border:1px solid var(--line,#dce3e8);border-radius:12px}
+.learning-step .instruction-list>li::before{content:counter(guided);position:absolute;left:13px;top:14px;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--surface-secondary,#e9f2f7);color:var(--text,#203044);font-size:.82rem;font-weight:800}
+.learning-step .learning-command{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:12px;padding:10px 12px;background:#132238;border-radius:9px}
+.learning-step .learning-command code{color:#eff8ff;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.88rem}
+.learning-step .learning-copy-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #c4d4e3;background:#fff;color:#152d46;border-radius:8px;padding:7px 11px;font-weight:700;font-size:.8rem;cursor:pointer;min-height:34px}
+.learning-step .learning-copy-btn:hover{background:#e9f3ff}
+.learning-step .learning-copy-btn:focus-visible{outline:3px solid var(--accent,#188c85);outline-offset:2px}
+.learning-step .guided-code-example>.learning-copy-btn{margin:0 0 10px}
+.learning-step .guided-link{display:inline-block;max-width:100%;line-height:1.5}
+@media(max-width:600px){.learning-step .learning-section{padding:14px}.learning-step .instruction-list>li{padding:12px 12px 12px 48px}.learning-step .instruction-list>li::before{left:10px;top:11px}}
