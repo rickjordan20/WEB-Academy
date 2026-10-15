@@ -6,7 +6,7 @@ const links=[
  ["missions.html","🎯","Missões","28 aulas"],
  ["edutech.html","🎓","EduTech","Projeto"],
  ["guild.html","⚔","Minha Guilda","Kanban"],
- ["extras.html","🧭","Missões Extras","7 missões"],
+ ["extras.html","🧭","Missões Remotas","7 missões"],
  ["milestones.html","🏁","Marcos Avaliativos","4"],
  ["competencies.html","⚡","Competências","I1–I6"],
  ["progress.html","📊","Meu Progresso",""],
