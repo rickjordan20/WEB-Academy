@@ -112,3 +112,6 @@
 .learning-step .guided-command-stack{display:grid;gap:10px;margin-top:12px}
 .learning-step .guided-command-stack .learning-command{margin:0}
 .learning-step .guided-command-stack code{overflow-wrap:anywhere;white-space:pre-wrap}
+
+/* Legendas simples para os comandos da prática guiada */
+.learning-command-details{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.learning-command-details code{overflow-wrap:anywhere}.learning-command-details small{font-size:.8rem;line-height:1.4;opacity:.82}.learning-command{align-items:center;gap:12px}.learning-copy-btn{flex-shrink:0}
