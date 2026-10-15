@@ -134,8 +134,8 @@ var studentProfileDetails=null;
 const studentProfileForm=$("#studentProfileForm");
 const profileFeedback=$("#studentProfileFeedback");
 
-const AVATAR_EMOJI={astronaut:"🧑‍🚀",developer:"🧑‍💻",robot:"🤖",explorer:"🧭",artist:"🎨"};
-let studentAvatarSignedUrl="",studentAvatarSignedPath="",avatarRefreshSequence=0;
+var AVATAR_EMOJI={astronaut:"🧑‍🚀",developer:"🧑‍💻",robot:"🤖",explorer:"🧭",artist:"🎨"};
+var studentAvatarSignedUrl="",studentAvatarSignedPath="",avatarRefreshSequence=0;
 function renderStudentAvatars(name){
  const preset=studentProfileDetails?.avatar_preset||"initials";
  const path=studentProfileDetails?.avatar_path||"";
