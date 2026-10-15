@@ -82,3 +82,5 @@
 .guided-moment-panel #missionStepHost,.guided-moment-panel #fundamentalStepHost{min-width:0}
 .guided-moment-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.81rem}
 @media(max-width:650px){.guided-moment-navigation{grid-template-columns:1fr}.guided-moment-tab{padding:13px}.guided-moment-intro{padding:17px}.guided-moment-footer .btn{width:100%}}
+
+.builder-student-frame{display:block;width:100%;min-height:780px;height:80vh;border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:auto}.builder-preview #builderPreviewBody{width:100%;min-width:0}
