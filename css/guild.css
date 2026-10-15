@@ -24,3 +24,18 @@
 #guildRoot .task-contribution-form .feedback:empty{display:none}
 @media(max-width:800px){#guildRoot .kanban{grid-template-columns:repeat(4,300px)}}
 @media(max-width:480px){#guildRoot .kanban{grid-template-columns:repeat(4,minmax(270px,calc(100vw - 70px)))}#guildRoot .kanban-column{padding:.7rem}#guildRoot .task-card{padding:.8rem}}
+
+
+/* Guilda — cartões com largura adequada e seleção de equipe */
+#guildRoot .kanban{grid-template-columns:repeat(4,minmax(360px,1fr));overflow-x:auto;align-items:start}
+#guildRoot .kanban-column{min-width:360px}
+#guildRoot .task-card>details.task-contribution-details,#guildRoot .task-card>details.task-collaborators{border-radius:12px;margin-top:1rem}
+#guildRoot .task-card>details>summary{font-size:.86rem;line-height:1.5;padding:.9rem}
+#guildRoot .task-contribution-form{padding:1rem;gap:1rem}
+#guildRoot .task-contribution-form textarea{min-height:112px;font-family:inherit}
+#guildRoot .task-contribution-form .btn{font-size:.87rem}
+#guildRoot .task-collaborators[open]{padding-bottom:.8rem}
+#guildRoot .task-collaborators>label{display:flex!important;align-items:center;gap:.75rem;margin:.5rem .85rem!important;padding:.75rem;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.025);font-size:.82rem;line-height:1.4;cursor:pointer}
+#guildRoot .task-collaborators>label input[type=checkbox]{flex:0 0 18px;width:18px;height:18px;accent-color:var(--primary);margin:0}
+#guildRoot .task-collaborators>label:has(input:checked){border-color:var(--primary-2);background:rgba(109,93,252,.09)}
+@media(max-width:800px){#guildRoot .kanban{grid-template-columns:repeat(4,360px)}}
