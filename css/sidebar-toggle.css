@@ -20,3 +20,7 @@
  .sidebar-expand-btn{display:flex}
 }
 @media(min-width:1001px){.sidebar-expand-btn{display:none}.sidebar-is-collapsed .sidebar-expand-btn{display:flex}}
+
+/* Ação de saída visível e separada das configurações sensíveis. */
+.sidebar-footer .student-logout-nav{width:100%;text-align:left;margin-top:.4rem;border-top:1px solid var(--line);padding-top:.85rem;color:var(--text)}
+.sidebar-footer .student-logout-nav:hover{color:var(--text);background:rgba(255,255,255,.06)}
