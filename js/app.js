@@ -282,6 +282,6 @@ $("#clearData").addEventListener("click", async () => {
  }catch(e){toast("Não foi possível limpar os dados: "+(e?.message||"erro desconhecido"))}
 });
 $("#logoutButton").addEventListener("click", async () => {if(sb)await sb.auth.signOut();setActiveUser(null);location.replace(sb?"auth.html":"index.html");});
-const sidebar=$("#sidebar");$("#menuButton")?.addEventListener("click",()=>sidebar.classList.toggle("open"));
+const sidebar=$("#sidebar");$("#menuButton")?.addEventListener("click",()=>$("#sidebarExpand")?.click());
 document.querySelectorAll(".nav-item[data-view], [data-demo]").forEach(btn=>{btn.addEventListener("click",()=>{const view=btn.dataset.view||btn.dataset.demo;if(view==="dashboard")return;toast("Esta área será ativada nas próximas fases de implantação.");sidebar.classList.remove("open")})});
 let toastTimer;function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600)}
