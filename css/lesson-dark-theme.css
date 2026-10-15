@@ -1,0 +1,38 @@
+/* Consistent dark lesson cards across Fundamentos, Prática Guiada and Relatório. */
+.mission-page .learning-section,
+.mission-page .learning-section.section-concept,
+.mission-page .learning-section.section-example,
+.mission-page .learning-section.section-tip{
+ background:#101f35!important;color:#e8f1ff!important;
+ border-color:#2b4263!important;box-shadow:none;
+}
+.mission-page .learning-section.section-concept{border-left-color:#968bff!important}
+.mission-page .learning-section.section-example{border-left-color:#32d8aa!important}
+.mission-page .learning-section.section-tip{border-left-color:#f1b85c!important}
+.mission-page .learning-section h3,
+.mission-page .learning-section li,
+.mission-page .learning-section p,
+.mission-page .learning-section strong,
+.mission-page .learning-section span:not(.learning-section-head>span){color:#e8f1ff!important}
+.mission-page .learning-section li{line-height:1.65}
+.mission-page .learning-section .learning-section-head>span{background:#213456;color:#c3bbff}
+.mission-page .learning-section.section-example .learning-section-head>span{background:#103b37;color:#69f0c5}
+.mission-page .learning-section.section-tip .learning-section-head>span{background:#403019;color:#ffce7d}
+.mission-page .learning-section code,
+.mission-page .learning-section li code{background:#1b3050;color:#c7dcff;border:1px solid #355078;border-radius:6px;padding:.1rem .35rem;overflow-wrap:anywhere}
+.mission-page .learning-section a{color:#70e8d0;text-decoration:underline;text-underline-offset:3px}
+.mission-page .learning-section a:hover{color:#adffeb}
+.mission-page .learning-section a:focus-visible{outline:2px solid #70e8d0;outline-offset:3px}
+.mission-page .visual-idea,
+.mission-page .guided-goal,
+.mission-page .guided-outcome,
+.mission-page .guided-code-example,
+.mission-page .concept-grid>div,
+.mission-page .visual-summary-grid>div,
+.mission-page .scenario-card,
+.mission-page .instruction-list li{
+ background:#12243d;color:#e8f1ff;border-color:#2c466a;
+}
+.mission-page .learning-step p,
+.mission-page .learning-step li{overflow-wrap:anywhere}
+@media(max-width:650px){.mission-page .learning-section{padding:.85rem!important}.mission-page .learning-section li{line-height:1.55}}
