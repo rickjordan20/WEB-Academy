@@ -52,7 +52,7 @@ const phase1Steps=[
   "id": "f1-kit",
   "type": "content",
   "title": "02 · Conheça as ferramentas antes de usá-las",
-  "summary": "Leitura orientada · 8 min",
+  "summary": "Leitura orientada · 7 min",
   "body": [
    "Imagine que você vai construir uma página para uma escola. Primeiro, precisa de um lugar para escrever os arquivos. Depois, precisa abrir a página e verificar como ficou. Também será útil guardar o histórico das alterações e compartilhar o projeto.",
    "Um EDITOR DE CÓDIGO é um programa para escrever e modificar arquivos de programação. O Visual Studio Code (VS Code) será nosso editor. Uma IDE é um ambiente de desenvolvimento que reúne várias ferramentas; o VS Code é um editor extensível com recursos de ambiente de desenvolvimento.",
