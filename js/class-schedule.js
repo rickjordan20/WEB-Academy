@@ -30,7 +30,7 @@ let classes=[],rows=[],editing=null;
 const hhmm=value=>value?String(value).slice(0,5):"";
 const classHours=id=>classes.find(c=>c.id===id);
 const effectiveHours=row=>{const c=classHours(row.class_id);return {start:hhmm(row.start_time_override)||hhmm(c?.lesson_start_time),end:hhmm(row.end_time_override)||hhmm(c?.lesson_end_time)}};
-function updateClassHoursPanel(){const c=classHours($("scheduleClass").value);const start=hhmm(c?.lesson_start_time),end=hhmm(c?.lesson_end_time);$("scheduleClassHoursSummary").textContent=start&&end?start+" – "+end:"A definir";$("scheduleClassHoursForm").hidden=!instructor||!c;if(c){const form=$("scheduleClassHoursForm");form.elements.namedItem("start_time").value=start;form.elements.namedItem("end_time").value=end;}}
+function updateClassHoursPanel(){const c=classHours($("scheduleClass").value),start=hhmm(c?.lesson_start_time),end=hhmm(c?.lesson_end_time);$("scheduleClassHoursSummary").textContent=start&&end?"Horário padrão da turma: "+start+" – "+end+" · definido na Gestão de Turmas":"Horário padrão não configurado. O instrutor deve defini-lo na Gestão de Turmas.";}
 
 const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);if(m)return `Missão ${String(m.number).padStart(2,"0")} — ${m.subtitle}`;const extra=EXTRA_MISSIONS.find(m=>m.id===id);return extra?`Missão Remota ${id.slice(1)} — ${extra.title}`:id||"Sem missão";};
 const days=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
@@ -158,7 +158,6 @@ $("scheduleClose").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleCancel").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleClass").addEventListener("change",()=>{updateUcOptions();updateClassHoursPanel();render()});
 $("scheduleFormClass").addEventListener("change",()=>{if(editing)return;const hours=effectiveHours({class_id:$("scheduleFormClass").value});const form=$("scheduleForm");form.elements.namedItem("start_time").value=hours.start;form.elements.namedItem("end_time").value=hours.end;});
-$("scheduleClassHoursForm").addEventListener("submit",async event=>{event.preventDefault();if(!instructor)return;const c=classHours($("scheduleClass").value),form=event.currentTarget,start=form.elements.namedItem("start_time").value,end=form.elements.namedItem("end_time").value;if(!c||!start||!end||start>=end){$("scheduleClassHoursFeedback").textContent="Informe um início anterior ao término.";return}const btn=$("scheduleClassHoursSave");btn.disabled=true;const {error}=await sb.rpc("update_class_lesson_hours",{p_class_id:c.id,p_start_time:start,p_end_time:end,p_timezone:"America/Sao_Paulo"});btn.disabled=false;if(error){$("scheduleClassHoursFeedback").textContent="Não foi possível salvar: "+error.message;return}c.lesson_start_time=start;c.lesson_end_time=end;updateClassHoursPanel();render();$("scheduleClassHoursFeedback").textContent="Horário da turma atualizado. Aulas sem horário personalizado acompanham automaticamente a alteração.";});
 $("scheduleFormClass").addEventListener("change",refreshMissionOptions);
 $("scheduleForm").elements.namedItem("execution_mode").addEventListener("change",refreshMissionOptions);
 function refreshMissionOptions(){
