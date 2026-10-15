@@ -1,3 +1,4 @@
+import {mountMissionSubmission} from './mission-submission.js';
 import {loadEditedMissionContent,applyEditedMissionContent} from "./mission-content.js";
 import {missionWindow,windowNotice} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
@@ -24,5 +25,6 @@ function render(){
  if(mission.type==="training"&&!fundDone)return;
  mission.steps.forEach(step=>{const completed=done.includes(step.id);bindStep(step,id,render,undefined,{completed})});
  if(done.length===total)root.insertAdjacentHTML("beforeend",`<section class="card current-mission mission-complete"><p class="eyebrow">Missão ${pad(mission.number)} concluída</p><h2>${mission.type==="training"?"Aula registrada! 🎉":"Desafio da Guilda concluído! 🎉"}</h2><p>Seu progresso e suas evidências foram salvos.</p><a class="btn btn-primary" href="journey.html">Continuar Jornada →</a></section>`);
+ if(done.length===total)mountMissionSubmission(id,root).catch(error=>console.warn('Entrega:',error));
 }
 function startWindowWatch(missionId){let checking=false;const check=async()=>{if(checking||document.hidden)return;checking=true;try{const access=await missionWindow(missionId);if(access.state!=="open"){root.replaceChildren(windowNotice(access));clearInterval(timer);document.removeEventListener("visibilitychange",check)}}finally{checking=false}};const timer=setInterval(check,60000);document.addEventListener("visibilitychange",check)}
