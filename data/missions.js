@@ -22,7 +22,7 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Abrir o projeto no VS Code e localizar o terminal.",
   "instructions": [
-   "Abra o site oficial do VS Code (https://code.visualstudio.com/) e o site oficial do Git (https://git-scm.com/downloads) se precisar instalar as ferramentas.",
+   "Se precisar instalar, abra [Visual Studio Code](https://code.visualstudio.com/) e [Git para Windows e outros sistemas](https://git-scm.com/downloads).",
    "Abra o VS Code e selecione Arquivo → Abrir Pasta. Crie ou escolha a pasta edutech.",
    "Abra Terminal → Novo Terminal e confirme que o terminal está dentro da pasta edutech.",
    "Digite git --version para conferir a instalação do Git."
@@ -80,7 +80,7 @@ const phase1GuidedSteps=[
   "summary": "Prática Guiada • 15 min • faça com o instrutor",
   "goal": "Preparar um local online para receber o projeto.",
   "instructions": [
-   "Acesse Criar novo repositório no GitHub (https://github.com/new) e entre na sua conta, se necessário.",
+   "Abra [Criar novo repositório no GitHub](https://github.com/new) e entre na sua conta, se necessário.",
    "Defina o nome do repositório conforme a orientação do instrutor (por exemplo, edutech).",
    "Para este fluxo, não marque a criação automática de README, .gitignore ou licença: o projeto já começou no computador.",
    "Crie o repositório e copie a URL HTTPS apresentada na página."
