@@ -1,0 +1,26 @@
+/* Guilda — layout legível dos cartões e das contribuições */
+#guildRoot .kanban{grid-template-columns:repeat(4,minmax(300px,1fr));gap:1rem;align-items:start;padding-bottom:1rem}
+#guildRoot .kanban-column{min-width:0;padding:1rem}
+#guildRoot .task-card{min-width:0;padding:1rem;overflow-wrap:anywhere}
+#guildRoot .task-card>details{margin-top:.85rem;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);overflow:hidden}
+#guildRoot .task-card>details>summary{cursor:pointer;padding:.8rem .85rem;font-size:.85rem;font-weight:800;line-height:1.45;list-style-position:inside}
+#guildRoot .task-card>details>summary:hover{background:rgba(255,255,255,.045)}
+#guildRoot .task-card>details[open]>summary{border-bottom:1px solid var(--line)}
+#guildRoot .task-contribution-list{display:grid;gap:.65rem;padding:.9rem .85rem 0}
+#guildRoot .task-contribution-list>.muted{margin:0;font-size:.82rem;line-height:1.5}
+#guildRoot .task-contribution{padding:.8rem;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.035);display:grid;gap:.35rem}
+#guildRoot .task-contribution b{font-size:.85rem}
+#guildRoot .task-contribution small{font-size:.72rem}
+#guildRoot .task-contribution p{margin:.2rem 0;font-size:.83rem;line-height:1.5;white-space:pre-wrap}
+#guildRoot .task-contribution a{color:var(--accent);font-size:.78rem;overflow-wrap:anywhere}
+#guildRoot .task-contribution-form{display:grid;gap:.85rem;padding:1rem .85rem}
+#guildRoot .task-contribution-form label{display:grid;gap:.45rem;margin:0;font-size:.8rem;line-height:1.4;font-weight:750;color:var(--text);min-width:0}
+#guildRoot .task-contribution-form textarea,#guildRoot .task-contribution-form input{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:.75rem .8rem;border:1px solid var(--line);border-radius:10px;background:#091625;color:var(--text);font:inherit;font-size:.85rem;line-height:1.45;outline:none}
+#guildRoot .task-contribution-form textarea{min-height:100px;resize:vertical}
+#guildRoot .task-contribution-form textarea::placeholder,#guildRoot .task-contribution-form input::placeholder{color:var(--muted);opacity:.8}
+#guildRoot .task-contribution-form textarea:focus,#guildRoot .task-contribution-form input:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(109,93,252,.13)}
+#guildRoot .task-contribution-form .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;white-space:normal;line-height:1.3;text-align:center;padding:.7rem .85rem;font-size:.82rem}
+#guildRoot .task-contribution-form .feedback{margin:0;font-size:.78rem;line-height:1.5}
+#guildRoot .task-contribution-form .feedback:empty{display:none}
+@media(max-width:800px){#guildRoot .kanban{grid-template-columns:repeat(4,300px)}}
+@media(max-width:480px){#guildRoot .kanban{grid-template-columns:repeat(4,minmax(270px,calc(100vw - 70px)))}#guildRoot .kanban-column{padding:.7rem}#guildRoot .task-card{padding:.8rem}}
