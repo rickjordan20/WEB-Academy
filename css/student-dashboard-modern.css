@@ -1,0 +1,64 @@
+/* WEB Academy — Student dashboard refresh. Scoped to the student home only. */
+body:has(#mainContent) .dashboard{--dash-stroke:rgba(150,178,217,.14);--dash-glow:rgba(109,93,252,.15);max-width:1510px;padding:clamp(1.2rem,2.3vw,2.5rem) clamp(1rem,2.4vw,2.5rem) 5rem;display:flex;flex-direction:column;gap:1.25rem}
+body:has(#mainContent) .dashboard>.hero,body:has(#mainContent) .dashboard .card{border:1px solid var(--dash-stroke);box-shadow:0 8px 26px rgba(0,0,0,.12)}
+body:has(#mainContent) .dashboard .card{transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+body:has(#mainContent) .dashboard a.card:hover{transform:translateY(-3px);border-color:rgba(139,127,255,.45);box-shadow:0 15px 32px rgba(0,0,0,.22)}
+body:has(#mainContent) .dashboard .hero{position:relative;isolation:isolate;min-height:240px;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:1rem;padding:clamp(1.6rem,3vw,2.7rem);background:radial-gradient(ellipse at 91% 24%,rgba(109,93,252,.2),transparent 45%),linear-gradient(125deg,#162942 0%,#102139 58%,#101b34 100%);border-color:rgba(139,127,255,.24)}
+body:has(#mainContent) .dashboard .hero::after{content:"";position:absolute;inset:auto -5% -85% 50%;height:300px;border-radius:50%;background:rgba(32,214,181,.055);filter:blur(60px);z-index:-1;pointer-events:none}
+body:has(#mainContent) .dashboard .hero h2{font-size:clamp(1.8rem,3vw,2.85rem);line-height:1.12;letter-spacing:-.035em;margin:.8rem 0;max-width:670px}
+body:has(#mainContent) .dashboard .hero p{font-size:.96rem;line-height:1.65;max-width:610px}
+body:has(#mainContent) .dashboard .hero-actions{margin-top:1.35rem}
+body:has(#mainContent) .dashboard .hero-orbit{min-height:190px}
+body:has(#mainContent) .dashboard .orbit-1{width:140px;height:140px}
+body:has(#mainContent) .dashboard .orbit-2{width:205px;height:205px}
+body:has(#mainContent) .dashboard .core{width:78px;height:78px}
+body:has(#mainContent) .dashboard .stats-grid{margin:0;gap:.85rem}
+body:has(#mainContent) .dashboard .stat-card{min-height:112px;padding:1.15rem 1.25rem;gap:1rem;align-items:center;background:linear-gradient(145deg,#13243a,#101d31)}
+body:has(#mainContent) .dashboard .stat-icon{display:grid;place-items:center;flex:0 0 48px;height:48px;border-radius:14px;background:rgba(109,93,252,.13);font-size:1.4rem}
+body:has(#mainContent) .dashboard .stat-card:nth-child(2) .stat-icon{background:rgba(32,214,181,.12)}
+body:has(#mainContent) .dashboard .stat-card:nth-child(3) .stat-icon{background:rgba(70,163,255,.12)}
+body:has(#mainContent) .dashboard .stat-card:nth-child(4) .stat-icon{background:rgba(255,189,89,.11)}
+body:has(#mainContent) .dashboard .stat-card strong{font-size:clamp(1.55rem,2.1vw,2.05rem);line-height:1.2;margin:.12rem 0;font-variant-numeric:tabular-nums}
+body:has(#mainContent) .dashboard .stat-card small{font-size:.78rem;font-weight:700;color:#c7d5e6}
+body:has(#mainContent) .dashboard .dashboard-grid{grid-template-columns:minmax(0,1.65fr) minmax(250px,.75fr);gap:1rem;margin:0}
+body:has(#mainContent) .dashboard .current-mission{display:flex;flex-direction:column;justify-content:center;min-height:240px;padding:1.65rem;background:linear-gradient(135deg,rgba(109,93,252,.09),transparent 65%),var(--surface)}
+body:has(#mainContent) .dashboard .current-mission .section-heading h2{font-size:clamp(1.25rem,1.8vw,1.6rem);letter-spacing:-.02em;line-height:1.25;margin-top:.3rem}
+body:has(#mainContent) .dashboard .current-mission>p{color:var(--muted);margin:.8rem 0 1.4rem;line-height:1.5}
+body:has(#mainContent) .dashboard .current-mission .btn{align-self:flex-start;margin-top:1.1rem}
+body:has(#mainContent) .dashboard .level-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;min-height:240px;background:radial-gradient(circle at 50% 35%,rgba(32,214,181,.09),transparent 52%),var(--surface)}
+body:has(#mainContent) .dashboard .level-card h2{font-size:1.3rem;margin:.3rem 0}
+body:has(#mainContent) .dashboard .level-card .progress{width:100%;margin-top:auto}
+body:has(#mainContent) .dashboard .level-badge{width:78px;height:78px;margin:.7rem auto;border-width:6px}
+body:has(#mainContent) .dashboard .student-dashboard-grid{margin:0;gap:1rem;grid-template-columns:repeat(2,minmax(0,1fr))}
+body:has(#mainContent) .dashboard .student-overview-panel{padding:1.5rem;min-height:205px}
+body:has(#mainContent) .dashboard .student-overview-panel h2{font-size:1.25rem;letter-spacing:-.015em}
+body:has(#mainContent) .dashboard .section-heading .btn{flex-shrink:0}
+body:has(#mainContent) .dashboard .student-mini-stats{gap:.6rem;margin:1.1rem 0}
+body:has(#mainContent) .dashboard .student-mini-stats>div{padding:.95rem .75rem;background:rgba(5,15,28,.38);border-color:var(--dash-stroke)}
+body:has(#mainContent) .dashboard .student-mini-stats b{font-size:1.3rem}
+body:has(#mainContent) .dashboard .student-competency-summary{gap:.5rem;margin:1.1rem 0}
+body:has(#mainContent) .dashboard .student-competency-summary>div{padding:.85rem .25rem;background:rgba(5,15,28,.38);border-color:var(--dash-stroke)}
+body:has(#mainContent) .dashboard .student-competency-summary strong{font-size:1.2rem}
+body:has(#mainContent) .dashboard .student-project-summary{gap:.8rem;margin-top:1.1rem}
+body:has(#mainContent) .dashboard .student-project-summary a{min-width:0;padding:1.05rem .85rem;background:rgba(5,15,28,.38);border-color:var(--dash-stroke);transition:background .2s,border-color .2s}
+body:has(#mainContent) .dashboard .student-project-summary a:hover{background:rgba(109,93,252,.1);border-color:rgba(139,127,255,.45)}
+body:has(#mainContent) .dashboard .student-project-summary a>div{min-width:0}
+body:has(#mainContent) .dashboard .student-project-summary small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+body:has(#mainContent) .dashboard>section:last-child{margin-top:.35rem}
+body:has(#mainContent) .dashboard>section:last-child>.section-heading{margin-bottom:1rem}
+body:has(#mainContent) .dashboard>section:last-child>.section-heading h2{font-size:1.55rem;letter-spacing:-.025em}
+body:has(#mainContent) .dashboard .area-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+body:has(#mainContent) .dashboard .area-card{display:flex;flex-direction:column;align-items:flex-start;min-height:188px;padding:1.35rem;background:linear-gradient(155deg,#15263c,#101e31)}
+body:has(#mainContent) .dashboard .area-card>span{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:rgba(109,93,252,.12);font-size:1.4rem}
+body:has(#mainContent) .dashboard .area-card:nth-child(2n)>span{background:rgba(32,214,181,.1)}
+body:has(#mainContent) .dashboard .area-card h3{font-size:1.06rem;margin:1rem 0 .35rem}
+body:has(#mainContent) .dashboard .area-card p{font-size:.82rem;line-height:1.5;min-height:0;margin:0 0 1rem}
+body:has(#mainContent) .dashboard .area-card b{margin-top:auto;font-size:.8rem}
+body:has(#mainContent) .dashboard .progress{height:8px;overflow:hidden;border-radius:99px}
+body:has(#mainContent) .dashboard .progress i{border-radius:99px}
+body:has(#mainContent) .dashboard .eyebrow{letter-spacing:.12em}
+@media(max-width:1180px){body:has(#mainContent) .dashboard .area-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body:has(#mainContent) .dashboard .student-competency-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:950px){body:has(#mainContent) .dashboard .hero{grid-template-columns:minmax(0,1fr)}body:has(#mainContent) .dashboard .hero-orbit{display:none}body:has(#mainContent) .dashboard .dashboard-grid,body:has(#mainContent) .dashboard .student-dashboard-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:680px){body:has(#mainContent) .dashboard{gap:1rem;padding:1rem 1rem 3rem}body:has(#mainContent) .dashboard .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}body:has(#mainContent) .dashboard .stat-card{min-height:96px;padding:.9rem;gap:.6rem}body:has(#mainContent) .dashboard .stat-icon{flex-basis:38px;height:38px;font-size:1.1rem}body:has(#mainContent) .dashboard .area-grid{grid-template-columns:minmax(0,1fr)}body:has(#mainContent) .dashboard .area-card{min-height:155px}body:has(#mainContent) .dashboard .student-mini-stats{grid-template-columns:repeat(2,minmax(0,1fr))}body:has(#mainContent) .dashboard .student-project-summary{grid-template-columns:minmax(0,1fr)}body:has(#mainContent) .dashboard .hero h2{font-size:1.9rem}}
+@media(max-width:380px){body:has(#mainContent) .dashboard .stat-card{flex-direction:column;align-items:flex-start}body:has(#mainContent) .dashboard .stat-card strong{font-size:1.55rem}}
+@media(prefers-reduced-motion:reduce){body:has(#mainContent) .dashboard .card{transition:none}body:has(#mainContent) .dashboard a.card:hover{transform:none}}
