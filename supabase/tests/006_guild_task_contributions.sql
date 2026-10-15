@@ -14,7 +14,8 @@ values
  ('f0000000-0000-4000-8000-000000000001','Contribution test instructor','instructor'::public.app_role),
  ('f0000000-0000-4000-8000-000000000002','Contribution test leader','student'::public.app_role),
  ('f0000000-0000-4000-8000-000000000003','Contribution test member','student'::public.app_role),
- ('f0000000-0000-4000-8000-000000000004','Contribution test outsider','student'::public.app_role);
+ ('f0000000-0000-4000-8000-000000000004','Contribution test outsider','student'::public.app_role)
+on conflict(id) do nothing;
 
 insert into public.classes(id,code,name,uc,instructor_id)
 values('f1000000-0000-4000-8000-000000000001','TEST-GUILD-CONTRIB-006','Contribution RLS test','UC7','f0000000-0000-4000-8000-000000000001');
