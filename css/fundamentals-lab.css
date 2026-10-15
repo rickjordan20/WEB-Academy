@@ -49,3 +49,6 @@
 .learning-step .guided-code-example>.learning-copy-btn{margin:0 0 10px}
 .learning-step .guided-link{display:inline-block;max-width:100%;line-height:1.5}
 @media(max-width:600px){.learning-step .learning-section{padding:14px}.learning-step .instruction-list>li{padding:12px 12px 12px 48px}.learning-step .instruction-list>li::before{left:10px;top:11px}}
+
+.learning-step .guided-tip{padding:14px 16px;border:1px solid var(--line,#dce3e8);border-left:4px solid #c68b25;border-radius:12px;margin:14px 0;background:var(--surface-secondary,#fff9ed)}
+.learning-step .guided-tip strong{display:block;margin-bottom:6px}.learning-step .guided-tip p{margin:0;line-height:1.55}
