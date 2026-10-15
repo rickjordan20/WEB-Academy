@@ -76,7 +76,8 @@ function startStudentRealtime(){
 window.addEventListener("beforeunload",()=>{if(studentRealtimeChannel)sb?.removeChannel(studentRealtimeChannel);if(guildRealtimeChannel)sb?.removeChannel(guildRealtimeChannel)});
 
 function render() {
-  const first = state.student.name.split(/\s+/)[0];
+  const displayName=studentProfileDetails?.display_name?.trim()||state.student.name;
+  const first = displayName.split(/\s+/)[0];
   $("#welcomeTitle").textContent = `Olá, ${first}!`;
   $("#xpValue").textContent = state.gamification?.xp ?? 0;
   $("#levelValue").textContent = state.gamification?.level ?? 1;
@@ -97,9 +98,10 @@ function render() {
   const nextId=unlocked.find(id=>!completed.includes(id))||"1A";
   const phase=Number.parseInt(nextId,10)||1,number=(phase-1)*2+(nextId.endsWith("B")?2:1);
   const nextButton=$("#nextMissionButton");if(nextButton){nextButton.href=`mission.html?id=${nextId}`;nextButton.textContent=completed.length?`Continuar Missão ${String(number).padStart(2,"0")} →`:"Iniciar Missão 01 →";}
-  $("#profileButton").textContent = initials(state.student.name);
+  $("#profileButton").textContent = initials(displayName);
   $("#profileAvatar").textContent = initials(state.student.name);
-  $("#profileName").textContent = state.student.name;
+  $("#profileName").textContent = displayName;
+  $("#profileOfficialName").textContent=studentProfileDetails?.display_name?.trim()?"Nome cadastrado: "+state.student.name:"";
   $("#profileEmail").textContent = state.student.email || "E-mail não informado";
   renderStudentOverview();
 }
@@ -129,18 +131,19 @@ function showBackupRestoreStatus(info){
 }
 try{const saved=localStorage.getItem(BACKUP_RESTORE_KEY);if(saved)showBackupRestoreStatus(JSON.parse(saved))}catch{};
 $("#openSettings").addEventListener("click", () => settings.showModal());
-let studentProfileDetails=null;
+var studentProfileDetails=null;
 const studentProfileForm=$("#studentProfileForm");
 const profileFeedback=$("#studentProfileFeedback");
 async function openStudentProfile(){
  profile.showModal();
- profileFeedback.textContent="";
+ profileFeedback.textContent="";profileFeedback.className="feedback";
  if(!cloudSession){studentProfileForm.querySelector('button[type="submit"]').disabled=true;profileFeedback.textContent="Faça login para editar seus dados.";return}
  try{
-  const {data,error}=await sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url").eq("user_id",cloudSession.user.id).maybeSingle();
+  const {data,error}=await sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url,educational_email").eq("user_id",cloudSession.user.id).maybeSingle();
   if(error)throw error;
   studentProfileDetails=data||{};
-  for(const field of ["display_name","bio","learning_goal","github_url","portfolio_url","linkedin_url"])studentProfileForm.elements.namedItem(field).value=studentProfileDetails[field]||"";
+  render();
+  for(const field of ["display_name","bio","learning_goal","github_url","portfolio_url","linkedin_url","educational_email"])studentProfileForm.elements.namedItem(field).value=studentProfileDetails[field]||"";
   $("#profileLoginEmail").textContent=cloudSession.user.email||"Não informado";
   studentProfileForm.querySelector('button[type="submit"]').disabled=false;
  }catch(err){profileFeedback.textContent="Não foi possível carregar os dados: "+err.message;profileFeedback.className="feedback error";studentProfileForm.querySelector('button[type="submit"]').disabled=true}
@@ -153,6 +156,7 @@ studentProfileForm.addEventListener("submit",async e=>{
  if(!cloudSession)return;
  const button=$("#saveStudentProfile"),data=Object.fromEntries(new FormData(studentProfileForm));
  for(const field of Object.keys(data))data[field]=String(data[field]||"").trim();
+ if(data.educational_email&&!/^[a-z0-9._%+\-]+@edu\.df\.senac\.br$/i.test(data.educational_email)){profileFeedback.textContent="Informe um e-mail educacional válido terminado em @edu.df.senac.br.";profileFeedback.className="feedback error";return}
  for(const field of ["github_url","portfolio_url","linkedin_url"]){
   if(data[field]&&!/^https:\/\//i.test(data[field])){profileFeedback.textContent="Os links devem começar com https://";profileFeedback.className="feedback error";return}
  }
@@ -161,6 +165,7 @@ studentProfileForm.addEventListener("submit",async e=>{
   const {error}=await sb.from("student_profile_details").upsert({user_id:cloudSession.user.id,...data,updated_at:new Date().toISOString()},{onConflict:"user_id"});
   if(error)throw error;
   studentProfileDetails=data;
+  render();
   profileFeedback.textContent="Perfil atualizado com sucesso.";profileFeedback.className="feedback success";
   toast("Informações do perfil salvas.");
  }catch(err){profileFeedback.textContent="Não foi possível salvar: "+err.message;profileFeedback.className="feedback error"}
