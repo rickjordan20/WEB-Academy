@@ -18,7 +18,7 @@ const nav=links.map(([url,icon,label,meta])=>`<a class="wa-nav-link${url===activ
 const root=document.createElement("div");
 root.id="waStudentNavigation";
 root.innerHTML=`<aside class="wa-student-sidebar" id="waStudentSidebar" aria-label="Menu da Web Academy">
- <a class="wa-nav-brand" href="app.html"><span class="wa-nav-brand-mark">&lt;/&gt;</span><span><b>UC7 Web Academy</b><small>SENAC · DF</small></span></a>
+ <a class="wa-nav-brand" href="app.html"><span class="wa-nav-brand-mark" aria-hidden="true">&lt;/&gt;</span><span><b>UC7 Web Academy</b><small>SENAC · DF</small></span></a>
  <button type="button" class="wa-nav-collapse" id="waNavCollapse" aria-label="Recolher menu">☰ <span>Recolher menu</span></button>
  <nav class="wa-nav-links" aria-label="Navegação do estudante">${nav}</nav>
  <div class="wa-nav-footer"><a class="wa-nav-link" href="report.html"><span class="wa-nav-icon">📄</span><span class="wa-nav-name">Relatório</span></a><a class="wa-nav-link" href="validation.html"><span class="wa-nav-icon">🩺</span><span class="wa-nav-name">Diagnóstico</span></a><a class="wa-nav-link" href="app.html?panel=profile"><span class="wa-nav-icon">👤</span><span class="wa-nav-name">Meu perfil</span></a><a class="wa-nav-link" href="app.html?panel=settings"><span class="wa-nav-icon">⚙</span><span class="wa-nav-name">Configurações</span></a><button class="wa-nav-link wa-nav-signout" type="button" id="waNavSignOut"><span class="wa-nav-icon">↪</span><span class="wa-nav-name">Sair da conta</span></button></div>
