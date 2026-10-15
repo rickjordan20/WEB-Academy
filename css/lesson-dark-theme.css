@@ -36,3 +36,5 @@
 .mission-page .learning-step p,
 .mission-page .learning-step li{overflow-wrap:anywhere}
 @media(max-width:650px){.mission-page .learning-section{padding:.85rem!important}.mission-page .learning-section li{line-height:1.55}}
+
+.fundamentals-next-action{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:1rem 0;padding:1rem 1.25rem;background:#10283d;border:1px solid #2e6e80;border-radius:16px;color:#e8f1ff}.fundamentals-next-action strong{display:block;margin-top:.25rem}.fundamentals-next-focus{outline:3px solid #45e2bd;outline-offset:4px;transition:outline-color .4s ease}@media(max-width:600px){.fundamentals-next-action{flex-direction:column;align-items:stretch}.fundamentals-next-action .btn{width:100%;text-align:center}}
