@@ -38,279 +38,334 @@ const genericSteps=(phase,title,axis)=>{const b=FOUNDATION_BLUEPRINT[phase];retu
 const phase1Steps=[
  {
   "id": "f1-welcome",
-  "type": "content",
-  "title": "01 · O que vamos aprender nesta aula?",
-  "summary": "Boas-vindas e objetivos · 8 min",
-  "body": [
-   "Bem-vindo à UC7! Ao longo das aulas, você vai aprender a criar aplicações web: começaremos pelo ambiente de trabalho, depois estudaremos HTML, CSS e JavaScript e, mais adiante, integração, testes e publicação.",
-   "Você usará a WEB Academy para estudar os fundamentos, resolver pequenos desafios e registrar suas atividades. No EduTech, desenvolverá seu projeto individual com o instrutor. No Projeto Restaurante, trabalhará em equipe nas missões B.",
-   "A Missão 1A tem três momentos: 1h30 de Fundamentos (entender), 2h de Prática Guiada no EduTech (fazer junto) e 30 minutos de Relatório Individual (registrar o que aprendeu).",
-   "Hoje você não precisa saber programar nem decorar comandos. Ao final, deverá reconhecer as ferramentas, organizar a pasta do projeto e entender por que usamos Git e GitHub."
+  "type": "visual-summary",
+  "title": "01 · Sua jornada começa aqui! 🚀",
+  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "idea": "Hoje: descobrir → experimentar → construir junto → registrar.",
+  "items": [
+   "UC7 → vamos aprender a desenvolver aplicações web, começando do zero",
+   "WEB Academy → aprender com desafios curtos e feedback",
+   "EduTech → projeto individual com o instrutor",
+   "Projeto Restaurante → projeto em equipe nas missões B",
+   "Missão 1A → Fundamentos (1h30) + EduTech (2h) + Relatório (30min)"
   ]
  },
  {
   "id": "f1-kit",
-  "type": "content",
-  "title": "02 · Conheça as ferramentas antes de usá-las",
-  "summary": "Leitura orientada · 7 min",
-  "body": [
-   "Imagine que você vai construir uma página para uma escola. Primeiro, precisa de um lugar para escrever os arquivos. Depois, precisa abrir a página e verificar como ficou. Também será útil guardar o histórico das alterações e compartilhar o projeto.",
-   "Um EDITOR DE CÓDIGO é um programa para escrever e modificar arquivos de programação. O Visual Studio Code (VS Code) será nosso editor. Uma IDE é um ambiente de desenvolvimento que reúne várias ferramentas; o VS Code é um editor extensível com recursos de ambiente de desenvolvimento.",
-   "O NAVEGADOR, como Chrome, Edge ou Firefox, interpreta e exibe páginas web. O TERMINAL permite executar comandos digitados. O GIT acompanha versões do projeto no computador. O GITHUB é um serviço online onde podemos hospedar repositórios Git.",
-   "Essas ferramentas têm funções diferentes. Escrever um arquivo no VS Code não o publica automaticamente na internet, e salvar um arquivo não cria um commit no Git."
+  "type": "visual-summary",
+  "title": "02 · Conheça seu kit de desenvolvedor 🧰",
+  "summary": "Veja o exemplo e descubra a ideia • 6 min",
+  "idea": "Cada ferramenta tem uma missão diferente.",
+  "items": [
+   "VS Code (editor) → escrever e editar arquivos",
+   "IDE → ambiente que reúne ferramentas de desenvolvimento; o VS Code é um editor extensível",
+   "Navegador (Chrome/Edge) → abrir e testar páginas",
+   "Terminal → digitar comandos no computador",
+   "Git → registrar versões do projeto",
+   "GitHub → hospedar e compartilhar repositórios Git online"
   ]
  },
  {
   "id": "f1-tools",
   "type": "match-cards",
-  "title": "03 · Pratique: qual ferramenta faz cada tarefa?",
-  "summary": "Associação · 4 min. Todas as respostas foram apresentadas na leitura anterior.",
+  "title": "03 · Quem faz o quê? 🎯",
+  "summary": "Desafio de associação: use o que acabou de aprender • 4 min",
   "pairs": [
    [
-    "Escrever e editar os arquivos do projeto",
-    "VS Code (editor)"
+    "Escrever um arquivo",
+    "VS Code"
    ],
    [
-    "Abrir a página e conferir como aparece",
+    "Ver uma página funcionando",
     "Navegador"
    ],
    [
-    "Digitar comandos para trabalhar com pastas e Git",
+    "Digitar um comando",
     "Terminal"
    ],
    [
-    "Guardar o histórico de versões no computador",
+    "Registrar uma versão",
     "Git"
    ],
    [
-    "Hospedar o repositório em um serviço online",
+    "Hospedar o repositório na internet",
     "GitHub"
    ]
   ]
  },
  {
   "id": "f1-files",
-  "type": "content",
-  "title": "04 · O que são arquivos, pastas e caminhos?",
-  "summary": "Leitura e exemplo · 8 min",
-  "body": [
-   "Um projeto é formado por ARQUIVOS organizados em PASTAS. A pasta principal, também chamada de pasta raiz, guarda a estrutura do projeto. Cada arquivo tem um nome e, geralmente, uma extensão que ajuda a identificar seu tipo.",
-   "No EduTech, usaremos a pasta edutech/ como raiz. Dentro dela, index.html será o arquivo inicial da página; css/style.css guardará estilos; js/app.js guardará comportamentos; e assets/images/ poderá guardar imagens.",
-   "O caminho css/style.css significa: entre na pasta css e encontre o arquivo style.css. A barra separa níveis da estrutura. Nesta aula, você só precisa reconhecer essa organização; HTML, CSS e JavaScript serão ensinados progressivamente nas próximas aulas.",
-   "Organizar os arquivos desde o começo facilita encontrá-los, trabalhar com outras pessoas e registrar mudanças no Git."
+  "type": "visual-summary",
+  "title": "04 · Monte o mapa do EduTech 📁",
+  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "idea": "Uma pasta principal reúne os arquivos. Cada arquivo tem seu lugar.",
+  "items": [
+   "📁 edutech/ → pasta principal (raiz)",
+   "📄 edutech/index.html → conteúdo da página",
+   "🎨 edutech/css/style.css → estilos (aprenderemos CSS depois)",
+   "⚙️ edutech/js/app.js → interações (aprenderemos JS depois)",
+   "🖼️ edutech/assets/images/logo.png → imagem",
+   "O caminho css/style.css significa: pasta css → arquivo style.css"
   ]
  },
  {
   "id": "f1-organize",
   "type": "match-cards",
-  "title": "05 · Pratique: onde guardar cada arquivo?",
-  "summary": "Associação · 4 min. Consulte o exemplo anterior se precisar.",
+  "title": "05 · Organize os arquivos! 🧩",
+  "summary": "Desafio de associação: use o que acabou de aprender • 4 min",
   "pairs": [
    [
     "index.html",
-    "Na pasta raiz edutech/"
+    "Raiz edutech/"
    ],
    [
     "style.css",
-    "Na pasta css/"
+    "Pasta css/"
    ],
    [
     "app.js",
-    "Na pasta js/"
+    "Pasta js/"
    ],
    [
     "logo.png",
-    "Na pasta assets/images/"
+    "Pasta assets/images/"
    ]
   ]
  },
  {
   "id": "f1-vscode",
-  "type": "content",
-  "title": "06 · Como trabalhar no VS Code?",
-  "summary": "Leitura orientada · 6 min",
-  "body": [
-   "O VS Code não guarda o projeto dentro dele: ele abre e modifica arquivos que estão salvos no computador. Ao abrir a pasta edutech/, você poderá visualizar sua estrutura no painel Explorer (Explorador).",
-   "No Explorer, criamos pastas e arquivos. Na área do editor, escrevemos e salvamos o conteúdo. O terminal integrado permite executar comandos sem sair do VS Code. O painel Source Control mostra informações do controle de versão quando o Git está disponível.",
-   "Atenção: VS Code e Git são programas diferentes. O VS Code pode oferecer uma interface para o Git, mas o Git precisa estar instalado e configurado para funcionar."
+  "type": "visual-summary",
+  "title": "06 · Explore o VS Code 🟦",
+  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "idea": "O projeto fica no computador. O VS Code abre sua pasta.",
+  "items": [
+   "Explorer → ver e criar arquivos e pastas",
+   "Editor → escrever e salvar o conteúdo",
+   "Terminal integrado → executar comandos sem sair do VS Code",
+   "Source Control → acompanhar alterações com o Git instalado",
+   "Importante: abrir uma pasta no VS Code não cria um repositório Git"
   ]
  },
  {
   "id": "f1-terminal",
-  "type": "content",
-  "title": "07 · O que é terminal e pasta atual?",
-  "summary": "Explicação com exemplos · 7 min",
-  "body": [
-   "O terminal recebe comandos de texto. No Windows, podemos usar PowerShell ou Prompt de Comando (CMD), inclusive dentro do VS Code. Um comando age sobre o local em que o terminal está trabalhando, chamado DIRETÓRIO ATUAL.",
-   "Exemplo: se o terminal está na pasta C:\\\\Projetos\\\\edutech, o comando dir (no CMD e no PowerShell) lista o conteúdo dessa pasta. O comando cd permite mudar de pasta. O comando mkdir cria uma pasta.",
-   "Se o comando code estiver disponível no sistema, code . abre no VS Code a pasta atual. O ponto (.) representa exatamente a pasta em que você está. Se não funcionar, use a opção Arquivo > Abrir Pasta no VS Code.",
-   "Você não precisa executar esses comandos sozinho agora: na Prática Guiada faremos isso com o instrutor."
+  "type": "visual-summary",
+  "title": "07 · Você está em qual pasta? ⌨️",
+  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "idea": "O terminal executa comandos na pasta atual.",
+  "items": [
+   "Exemplo: C:\\Projetos\\edutech → você está dentro de edutech",
+   "dir → listar arquivos (CMD/PowerShell)",
+   "cd → mudar de pasta",
+   "mkdir → criar uma pasta",
+   "code . → abrir a pasta atual no VS Code, se o comando estiver configurado",
+   "O ponto (.) significa 'esta pasta'"
   ]
  },
  {
   "id": "f1-code-dot",
   "type": "quiz",
-  "title": "08 · Confira: o que significa code .?",
-  "summary": "Questão de interpretação · 3 min. A explicação está na etapa anterior.",
-  "question": "O terminal está na pasta C:\\\\Projetos\\\\edutech e você digita code . O que o ponto representa?",
+  "title": "08 · Decifre o comando ⚡",
+  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "question": "Você está em C:\\Projetos\\edutech e digita code . O que será aberto?",
   "options": [
-   "A pasta atual, edutech, que será aberta no VS Code",
-   "Uma ordem para criar automaticamente uma conta no GitHub",
-   "Uma instrução para publicar o site na internet"
+   "A pasta atual edutech no VS Code",
+   "Um novo repositório no GitHub",
+   "Uma página publicada na internet"
   ],
   "answer": 0,
-  "feedback": "O ponto (.) significa diretório atual. Se code não estiver configurado, a pasta também pode ser aberta pelo menu do VS Code."
+  "feedback": "O ponto significa a pasta atual. Também é possível usar Arquivo > Abrir Pasta."
  },
  {
   "id": "f1-repos",
-  "type": "content",
-  "title": "09 · Por que precisamos controlar versões?",
-  "summary": "Conceitos de Git e GitHub · 9 min",
-  "body": [
-   "Imagine que você alterou o EduTech e, no dia seguinte, percebeu que a versão anterior funcionava melhor. Se guardar apenas o arquivo atual, será difícil entender o que mudou. O controle de versão ajuda a registrar a evolução do projeto.",
-   "GIT é o sistema que acompanha alterações e cria registros do histórico. Um REPOSITÓRIO LOCAL é a pasta do projeto com o histórico Git no seu computador. Uma pasta comum ainda não é necessariamente um repositório Git.",
-   "GITHUB é um serviço online que hospeda repositórios Git. Chamamos de REPOSITÓRIO REMOTO o repositório acessível nesse serviço. Podemos trabalhar localmente mesmo sem publicar nada no GitHub.",
-   "Salvar um arquivo (por exemplo, Ctrl+S) grava seu conteúdo. Fazer um COMMIT registra uma versão no histórico do Git. Fazer um PUSH envia commits locais para o remoto. São ações diferentes."
+  "type": "visual-summary",
+  "title": "09 · Salvar não é versionar! 📸",
+  "summary": "Veja o exemplo e descubra a ideia • 6 min",
+  "idea": "Imagine que você quer recuperar uma versão anterior do EduTech.",
+  "items": [
+   "Ctrl+S → salva o arquivo atual",
+   "Git → acompanha mudanças e registra versões no histórico",
+   "Repositório local → pasta do projeto com histórico Git no computador",
+   "Commit → registro de uma versão local",
+   "GitHub → pode guardar uma cópia remota do repositório",
+   "Repositório remoto → repositório acessível no serviço online"
   ]
  },
  {
   "id": "f1-gitgithub",
   "type": "quiz",
-  "title": "10 · Confira: Git é a mesma coisa que GitHub?",
-  "summary": "Questão de compreensão · 3 min. Revise a etapa 09 se necessário.",
-  "question": "Qual alternativa explica corretamente a diferença entre Git e GitHub?",
+  "title": "10 · Git ou GitHub? ⚡",
+  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "question": "Qual frase está correta?",
   "options": [
-   "Git registra versões; GitHub pode hospedar repositórios Git na internet",
-   "GitHub é obrigatório para salvar qualquer arquivo no computador",
-   "Git e GitHub são dois nomes para o navegador"
+   "Git registra versões; GitHub hospeda repositórios online",
+   "GitHub é obrigatório para salvar arquivos",
+   "Git e GitHub são navegadores"
   ],
   "answer": 0,
-  "feedback": "Git funciona no computador e controla versões. GitHub hospeda repositórios remotos e facilita compartilhamento e colaboração."
+  "feedback": "Git funciona localmente; GitHub é um serviço de hospedagem de repositórios Git."
  },
  {
   "id": "f1-version",
-  "type": "content",
-  "title": "11 · Entenda o caminho de uma alteração",
-  "summary": "Do arquivo ao histórico · 8 min",
-  "body": [
-   "Veja uma situação real: você cria index.html no EduTech. Primeiro salva o arquivo. O Git pode identificar que existe um arquivo novo ou modificado, mas ainda não foi criado um registro de versão.",
-   "O comando git status mostra o estado das alterações. O comando git add . prepara os arquivos da pasta para o próximo registro (área de preparação, ou staging). O comando git commit -m \"Criar estrutura inicial\" registra essa versão no histórico local.",
-   "Depois, git push envia os commits ao repositório remoto que já foi configurado. Em resumo: ALTERAR E SALVAR → CONFERIR (status) → PREPARAR (add) → REGISTRAR (commit) → ENVIAR (push).",
-   "Uma boa mensagem de commit descreve o que mudou, como \"Criar estrutura inicial do EduTech\". Mensagens vagas, como \"coisas\", dificultam compreender o histórico."
+  "type": "visual-summary",
+  "title": "11 · Uma mudança, cinco movimentos 🔄",
+  "summary": "Veja o exemplo e descubra a ideia • 7 min",
+  "idea": "Exemplo: você criou index.html e quer publicar o commit.",
+  "items": [
+   "1. Salvar → gravar o arquivo",
+   "2. git status → ver o que mudou",
+   "3. git add . → preparar arquivos para o próximo registro",
+   "4. git commit -m \"Criar estrutura\" → registrar versão local",
+   "5. git push → enviar commits ao remoto já conectado",
+   "Salvar ≠ commit ≠ push: cada ação tem uma finalidade"
   ]
+ },
+ {
+  "id": "f1-flow-quiz",
+  "type": "sequence",
+  "title": "12 · Coloque o fluxo na ordem! 🔀",
+  "summary": "Reorganize as ações do exemplo anterior • 5 min",
+  "prompt": "Qual é a sequência para registrar e enviar uma alteração?",
+  "items": [
+   "git push",
+   "Salvar arquivo",
+   "git commit",
+   "git status",
+   "git add"
+  ],
+  "expected": [
+   "Salvar arquivo",
+   "git status",
+   "git add",
+   "git commit",
+   "git push"
+  ],
+  "feedback": "Primeiro salvar, depois conferir, preparar, registrar e enviar."
  },
  {
   "id": "f1-commands",
-  "type": "command-deck",
-  "title": "12 · Consulte os comandos Git e suas funções",
-  "summary": "Cartões de revisão · 5 min. Leia os conceitos antes de avançar.",
-  "commands": [
-   [
-    "git init",
-    "Transforma a pasta em um repositório Git local"
-   ],
-   [
-    "git status",
-    "Mostra arquivos novos, alterados e preparados"
-   ],
-   [
-    "git add .",
-    "Prepara alterações para o próximo commit"
-   ],
-   [
-    "git commit -m \"mensagem\"",
-    "Registra uma versão local com uma descrição"
-   ],
-   [
-    "git remote add origin URL",
-    "Conecta o repositório local ao endereço do remoto"
-   ],
-   [
-    "git push",
-    "Envia commits locais ao remoto"
-   ],
-   [
-    "git pull",
-    "Busca e integra atualizações do remoto ao repositório local"
-   ],
-   [
-    "git clone URL",
-    "Copia um repositório remoto para o computador"
-   ],
-   [
-    "git branch -M main",
-    "Define/renomeia a branch atual como main"
-   ]
+  "type": "visual-summary",
+  "title": "13 · Primeira vez ou projeto já existente? 🧭",
+  "summary": "Veja o exemplo e descubra a ideia • 7 min",
+  "idea": "Nem todo comando precisa ser repetido em todas as aulas.",
+  "items": [
+   "git init → iniciar o Git numa pasta ainda sem repositório",
+   "git remote add origin URL → ligar o repositório local ao remoto",
+   "main → nome da branch principal; origin → apelido convencional do remoto",
+   "git clone URL → copiar um repositório remoto que ainda não está no computador",
+   "git pull → receber e integrar mudanças do remoto em um repositório local existente",
+   "git push → enviar seus commits locais ao remoto"
   ]
  },
  {
-  "id": "f1-first",
-  "type": "content",
-  "title": "13 · Primeira configuração ou trabalho do dia a dia?",
-  "summary": "Entenda antes de escolher comandos · 6 min",
-  "body": [
-   "Na primeira aula, vamos criar a pasta do EduTech, executar git init, criar um repositório vazio no GitHub, conectá-lo como origin e enviar nosso primeiro commit. origin é o nome convencional da conexão com o remoto; main é o nome que usaremos para a branch principal.",
-   "Depois que o projeto já estiver configurado, a rotina costuma ser: receber mudanças do remoto quando necessário (git pull), editar e testar, conferir (git status), preparar (git add), registrar (git commit) e enviar (git push).",
-   "Se o projeto já existe no GitHub, mas ainda não está no computador, usamos git clone para obter uma cópia local. Não precisamos repetir git init ou criar outro repositório remoto a cada aula.",
-   "O comando git pull deve ser usado em um repositório local já conectado ao remoto. A integração pode exigir resolver conflitos quando houver alterações diferentes no mesmo conteúdo."
+  "id": "f1-command-cards",
+  "type": "command-deck",
+  "title": "14 · Baralho Git: toque para revelar 🃏",
+  "summary": "Revisão rápida dos comandos apresentados • 5 min",
+  "commands": [
+   [
+    "git init",
+    "Iniciar o repositório local"
+   ],
+   [
+    "git status",
+    "Conferir alterações"
+   ],
+   [
+    "git add .",
+    "Preparar alterações"
+   ],
+   [
+    "git commit",
+    "Registrar versão local"
+   ],
+   [
+    "git push",
+    "Enviar commits ao remoto"
+   ],
+   [
+    "git pull",
+    "Receber e integrar alterações remotas"
+   ],
+   [
+    "git clone",
+    "Copiar um repositório remoto"
+   ],
+   [
+    "git remote add origin",
+    "Vincular o endereço do remoto"
+   ]
   ]
  },
  {
   "id": "f1-direction",
   "type": "choice-scenario",
-  "title": "14 · Agora escolha: push, pull ou clone?",
-  "summary": "Situações práticas · 4 min. As três operações foram explicadas na etapa anterior.",
+  "title": "15 · Qual comando resolve? 🎮",
+  "summary": "Escolha a melhor solução com base nos exemplos anteriores • 5 min",
   "scenarios": [
    [
-    "Você criou commits no computador e quer enviá-los ao GitHub.",
+    "Tenho commits locais e quero enviá-los ao GitHub.",
     [
-     "git push",
-     "git pull",
-     "git clone"
+     "push",
+     "pull",
+     "clone"
     ],
     0
    ],
    [
-    "Você já tem o projeto no computador e quer receber atualizações do GitHub.",
+    "Meu projeto já está no computador e quero receber mudanças do GitHub.",
     [
-     "git clone",
-     "git pull",
-     "git init"
+     "clone",
+     "pull",
+     "init"
     ],
     1
    ],
    [
-    "O projeto está no GitHub, mas você ainda não o tem neste computador.",
+    "O projeto está no GitHub, mas não neste computador.",
     [
-     "git clone",
-     "git push",
-     "git commit"
+     "clone",
+     "push",
+     "commit"
     ],
     0
    ]
   ]
  },
  {
+  "id": "f1-commit-intro",
+  "type": "visual-summary",
+  "title": "16 · Um bom commit conta o que mudou 💬",
+  "summary": "Veja o exemplo e descubra a ideia • 4 min",
+  "idea": "A mensagem deve ajudar você a entender o histórico depois.",
+  "items": [
+   "Ruim: \"coisas\" → não explica nada",
+   "Melhor: \"Criar estrutura inicial do EduTech\" → explica o que foi feito",
+   "Ruim: \"teste\" → não indica qual mudança",
+   "Melhor: \"Corrigir link do menu\" → informa a correção",
+   "Você verá o comando completo com o instrutor: git commit -m \"mensagem\""
+  ]
+ },
+ {
   "id": "f1-commit",
   "type": "choice-scenario",
-  "title": "15 · Qual mensagem de commit ajuda mais?",
-  "summary": "Aplicação do que foi ensinado · 3 min",
+  "title": "17 · Escolha a melhor mensagem ✨",
+  "summary": "Escolha a melhor solução com base nos exemplos anteriores • 4 min",
   "scenarios": [
    [
     "Você criou a estrutura inicial do EduTech.",
     [
-     "alterações",
+     "coisas",
      "Criar estrutura inicial do EduTech",
-     "coisas"
+     "alterações"
     ],
     1
    ],
    [
-    "Você corrigiu um link que não abria.",
+    "Você corrigiu um link do menu.",
     [
-     "corrigir link de navegação",
+     "Corrigir link do menu",
      "teste",
-     "mais um commit"
+     "mais um"
     ],
     0
    ]
@@ -319,26 +374,30 @@ const phase1Steps=[
  {
   "id": "f1-final",
   "type": "quiz",
-  "title": "16 · Verificação final dos Fundamentos",
-  "summary": "Síntese da aprendizagem · 3 min",
-  "question": "Qual sequência representa corretamente a preparação de uma mudança para o GitHub?",
+  "title": "18 · Checkpoint: você está pronto? 🏁",
+  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "question": "Qual é a sequência correta para registrar e enviar uma alteração?",
   "options": [
-   "Salvar → git status → git add → git commit → git push",
-   "git push → criar arquivo → git clone → salvar",
-   "Abrir o navegador → git pull → apagar a pasta"
+   "Salvar → status → add → commit → push",
+   "Push → criar arquivo → clone",
+   "Abrir navegador → pull → apagar pasta"
   ],
   "answer": 0,
-  "feedback": "Isso mesmo: primeiro salvamos e conferimos, depois preparamos, registramos localmente e enviamos os commits ao remoto configurado."
+  "feedback": "Você já conhece o fluxo. Agora vai executá-lo com o instrutor!"
  },
  {
   "id": "f1-handoff",
-  "type": "content",
-  "title": "17 · Próximo passo: fazer junto com o instrutor",
-  "summary": "Transição para a Prática Guiada · 2 min",
-  "body": [
-   "Você já conheceu os conceitos que serão usados na prática. Não é necessário ter memorizado tudo: volte às explicações sempre que precisar.",
-   "Agora você vai abrir o VS Code, criar a pasta e os arquivos iniciais do EduTech, inicializar o Git, criar e conectar o repositório do GitHub, fazer commits e sincronizar as alterações.",
-   "Durante a prática, pergunte quando algo não funcionar. No relatório final, registre o que conseguiu realizar, suas dificuldades e uma evidência do repositório ou commit."
+  "type": "visual-summary",
+  "title": "19 · Agora é mão na massa! 🛠️",
+  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "idea": "Na Prática Guiada, o instrutor mostrará cada passo no EduTech.",
+  "items": [
+   "Abrir a pasta no VS Code e criar a estrutura inicial",
+   "Iniciar Git e observar git status",
+   "Criar repositório no GitHub e conectar ao local",
+   "Fazer commit e primeiro push",
+   "Alterar um arquivo e repetir o fluxo",
+   "No final: registrar o link do repositório, o que aprendeu e as dificuldades"
   ]
  }
 ];
