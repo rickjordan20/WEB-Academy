@@ -20,7 +20,7 @@ function preview(){
  const frame=document.createElement("iframe");
  frame.className="builder-student-frame";
  frame.title="Prévia do ambiente do estudante";
- frame.setAttribute("sandbox","allow-scripts");
+ frame.setAttribute("sandbox","allow-scripts allow-same-origin");
  const doc={title:d.title,subtitle:d.subtitle,fundamental:d.fundamental||null,steps:d.steps};
  const payload=JSON.stringify(doc).replace(/</g,"\\u003c");
  frame.srcdoc=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${location.href}"><link rel="stylesheet" href="css/variables.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/dashboard.css"><link rel="stylesheet" href="css/journey.css"><link rel="stylesheet" href="css/responsive.css"><link rel="stylesheet" href="css/fundamentals-lab.css"><style>body{margin:0;padding:20px;background:var(--bg)}.mission-container{max-width:1060px;margin:auto}.builder-preview-navigation{display:flex;gap:10px;margin:15px 0 25px;flex-wrap:wrap}.builder-preview-navigation button[aria-selected=true]{outline:2px solid var(--accent)}.builder-preview-message{padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:20px}.learning-step[hidden]{display:none}</style></head><body><main class="mission-container" id="studentRoot"></main><script type="module">
