@@ -1,7 +1,7 @@
 // Execute com: node --test tests/cloud-sync.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mergeStudentStates} from '../js/cloud-sync.js';
+import {mergeStudentStates} from '../js/cloud-state-merge.js';
 
 const state=(updatedAt,overrides={})=>({
  meta:{updatedAt},
