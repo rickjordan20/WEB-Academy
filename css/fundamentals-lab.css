@@ -107,3 +107,8 @@
 .learning-step .guided-outcome .guided-link {
   color:#075b8f;
 }
+
+/* Comandos separados do texto: leitura e cópia facilitadas. */
+.learning-step .guided-command-stack{display:grid;gap:10px;margin-top:12px}
+.learning-step .guided-command-stack .learning-command{margin:0}
+.learning-step .guided-command-stack code{overflow-wrap:anywhere;white-space:pre-wrap}
