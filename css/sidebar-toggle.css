@@ -24,3 +24,7 @@
 /* Ação de saída visível e separada das configurações sensíveis. */
 .sidebar-footer .student-logout-nav{width:100%;text-align:left;margin-top:.4rem;border-top:1px solid var(--line);padding-top:.85rem;color:var(--text)}
 .sidebar-footer .student-logout-nav:hover{color:var(--text);background:rgba(255,255,255,.06)}
+
+/* Oculta apenas a barra de rolagem visual, preservando scroll com mouse, touch e teclado. */
+.sidebar{scrollbar-width:none;-ms-overflow-style:none}
+.sidebar::-webkit-scrollbar{display:none;width:0;height:0}
