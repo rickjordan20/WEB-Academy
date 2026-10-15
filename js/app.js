@@ -98,8 +98,7 @@ function render() {
   const nextId=unlocked.find(id=>!completed.includes(id))||"1A";
   const phase=Number.parseInt(nextId,10)||1,number=(phase-1)*2+(nextId.endsWith("B")?2:1);
   const nextButton=$("#nextMissionButton");if(nextButton){nextButton.href=`mission.html?id=${nextId}`;nextButton.textContent=completed.length?`Continuar Missão ${String(number).padStart(2,"0")} →`:"Iniciar Missão 01 →";}
-  $("#profileButton").textContent = initials(displayName);
-  $("#profileAvatar").textContent = initials(state.student.name);
+  renderStudentAvatars(displayName);
   $("#profileName").textContent = displayName;
   $("#profileOfficialName").textContent=studentProfileDetails?.display_name?.trim()?"Nome cadastrado: "+state.student.name:"";
   $("#profileEmail").textContent = state.student.email || "E-mail não informado";
@@ -134,15 +133,78 @@ $("#openSettings").addEventListener("click", () => settings.showModal());
 var studentProfileDetails=null;
 const studentProfileForm=$("#studentProfileForm");
 const profileFeedback=$("#studentProfileFeedback");
+
+const AVATAR_EMOJI={astronaut:"🧑‍🚀",developer:"🧑‍💻",robot:"🤖",explorer:"🧭",artist:"🎨"};
+let studentAvatarSignedUrl="",studentAvatarSignedPath="",avatarRefreshSequence=0;
+function renderStudentAvatars(name){
+ const preset=studentProfileDetails?.avatar_preset||"initials";
+ const path=studentProfileDetails?.avatar_path||"";
+ const value=preset==="photo"&&path&&studentAvatarSignedPath===path&&studentAvatarSignedUrl?studentAvatarSignedUrl:null;
+ for(const id of ["#profileButton","#profileAvatar"]){
+  const el=$(id);if(!el)continue;
+  el.replaceChildren();
+  if(value){const img=document.createElement("img");img.src=value;img.alt="Foto do perfil";img.className="student-avatar-image";el.append(img)}
+  else el.textContent=AVATAR_EMOJI[preset]||initials(name);
+ }
+ document.querySelectorAll("[data-avatar-preset]").forEach(btn=>{
+  btn.classList.toggle("selected",(preset==="photo"?"":preset)===btn.dataset.avatarPreset);
+  btn.setAttribute("aria-pressed",String(preset===btn.dataset.avatarPreset));
+  if(btn.dataset.avatarPreset==="initials")btn.textContent=initials(name);
+ });
+}
+async function refreshStudentAvatar(){
+ const path=studentProfileDetails?.avatar_preset==="photo"?studentProfileDetails.avatar_path:"";
+ const seq=++avatarRefreshSequence;
+ if(!path){studentAvatarSignedPath="";studentAvatarSignedUrl="";render();return}
+ const {data,error}=await sb.storage.from("student-avatars").createSignedUrl(path,3600);
+ if(seq!==avatarRefreshSequence)return;
+ if(error)throw error;
+ studentAvatarSignedPath=path;
+ studentAvatarSignedUrl=data.signedUrl;
+ render();
+}
+async function saveAvatarSelection(preset,path){
+ const {error}=await sb.from("student_profile_details").upsert({user_id:cloudSession.user.id,avatar_preset:preset,avatar_path:path||studentProfileDetails?.avatar_path||"",updated_at:new Date().toISOString()},{onConflict:"user_id"});
+ if(error)throw error;
+ studentProfileDetails={...(studentProfileDetails||{}),avatar_preset:preset,avatar_path:path||studentProfileDetails?.avatar_path||""};
+ await refreshStudentAvatar();
+}
+const avatarFeedback=$("#studentAvatarFeedback");
+document.querySelectorAll("[data-avatar-preset]").forEach(btn=>btn.addEventListener("click",async()=>{
+ if(!cloudSession)return;
+ const preset=btn.dataset.avatarPreset;
+ document.querySelectorAll("[data-avatar-preset]").forEach(el=>el.disabled=true);
+ avatarFeedback.textContent="Salvando avatar...";avatarFeedback.className="feedback";
+ try{await saveAvatarSelection(preset);avatarFeedback.textContent="Avatar atualizado.";toast("Avatar atualizado.")}
+ catch(err){avatarFeedback.textContent="Erro ao salvar avatar: "+err.message;avatarFeedback.className="feedback error"}
+ finally{document.querySelectorAll("[data-avatar-preset]").forEach(el=>el.disabled=false)}
+}));
+$("#studentAvatarFile").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];if(!file||!cloudSession)return;
+ e.target.value="";
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>2097152){avatarFeedback.textContent="Selecione JPG, PNG ou WebP de até 2 MB.";avatarFeedback.className="feedback error";return}
+ avatarFeedback.textContent="Enviando foto...";avatarFeedback.className="feedback";
+ const ext={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];
+ const path=cloudSession.user.id+"/profile-"+Date.now()+"."+ext;
+ try{
+  const {error}=await sb.storage.from("student-avatars").upload(path,file,{contentType:file.type,upsert:false});
+  if(error)throw error;
+  try{await saveAvatarSelection("photo",path)}
+  catch(saveError){await sb.storage.from("student-avatars").remove([path]);throw saveError}
+  avatarFeedback.textContent="Foto atualizada com sucesso.";toast("Foto de perfil atualizada.");
+ }catch(err){avatarFeedback.textContent="Não foi possível enviar a foto: "+err.message;avatarFeedback.className="feedback error"}
+});
+
 async function openStudentProfile(){
  profile.showModal();
  profileFeedback.textContent="";profileFeedback.className="feedback";
  if(!cloudSession){studentProfileForm.querySelector('button[type="submit"]').disabled=true;profileFeedback.textContent="Faça login para editar seus dados.";return}
  try{
-  const {data,error}=await sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url,educational_email").eq("user_id",cloudSession.user.id).maybeSingle();
+  const {data,error}=await sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url,educational_email,avatar_preset,avatar_path").eq("user_id",cloudSession.user.id).maybeSingle();
   if(error)throw error;
   studentProfileDetails=data||{};
   render();
+  await refreshStudentAvatar();
   for(const field of ["display_name","bio","learning_goal","github_url","portfolio_url","linkedin_url","educational_email"])studentProfileForm.elements.namedItem(field).value=studentProfileDetails[field]||"";
   $("#profileLoginEmail").textContent=cloudSession.user.email||"Não informado";
   studentProfileForm.querySelector('button[type="submit"]').disabled=false;
@@ -164,7 +226,7 @@ studentProfileForm.addEventListener("submit",async e=>{
  try{
   const {error}=await sb.from("student_profile_details").upsert({user_id:cloudSession.user.id,...data,updated_at:new Date().toISOString()},{onConflict:"user_id"});
   if(error)throw error;
-  studentProfileDetails=data;
+  studentProfileDetails={...(studentProfileDetails||{}),...data};
   render();
   profileFeedback.textContent="Perfil atualizado com sucesso.";profileFeedback.className="feedback success";
   toast("Informações do perfil salvas.");
@@ -173,7 +235,7 @@ studentProfileForm.addEventListener("submit",async e=>{
 });
 if(cloudSession){
  sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url,educational_email").eq("user_id",cloudSession.user.id).maybeSingle().then(({data,error})=>{
-  if(!error){studentProfileDetails=data||{};render()}
+  if(!error){studentProfileDetails=data||{};render();refreshStudentAvatar().catch(err=>console.warn("Foto do perfil indisponível:",err))}
  }).catch(err=>console.warn("Perfil complementar indisponível:",err));
 }
 $("#exportBackup").addEventListener("click", () => { try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); } });
