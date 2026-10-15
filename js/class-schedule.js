@@ -1,4 +1,4 @@
-import {MISSIONS} from "../data/missions.js";
+import {MISSIONS,EXTRA_MISSIONS} from "../data/missions.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 const $=id=>document.getElementById(id);
 // Nunca encerrar ou redirecionar a sessão por uma falha temporária de carregamento.
@@ -27,7 +27,7 @@ const instructor=profile.role==="instructor";
 $("instructorBack").hidden=!instructor;$("studentBack").hidden=instructor;
 $("newScheduleLesson").hidden=!instructor;$("scheduleActionsHeading").hidden=!instructor;
 let classes=[],rows=[],editing=null;
-const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);return m?`Missão ${String(m.number).padStart(2,"0")} — ${m.subtitle}`:id||"Sem missão";};
+const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);if(m)return `Missão ${String(m.number).padStart(2,"0")} — ${m.subtitle}`;const extra=EXTRA_MISSIONS.find(m=>m.id===id);return extra?`Missão Remota ${id.slice(1)} — ${extra.title}`:id||"Sem missão";};
 const days=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 const formatDate=d=>{const [y,m,day]=d.split("-").map(Number);return String(day).padStart(2,"0")+"/"+String(m).padStart(2,"0")+"/"+y};
 const weekday=d=>{const [y,m,day]=d.split("-").map(Number);const date=new Date(Date.UTC(y,m-1,day,12));const label=days[date.getUTCDay()];return label.charAt(0).toUpperCase()+label.slice(1)};
@@ -71,7 +71,7 @@ function render(){
    const td=document.createElement("td");td.textContent=value;td.className=cls;tr.append(td);
   }
   const td=document.createElement("td"),pill=document.createElement("span");pill.className="schedule-mode"+(row.execution_mode==="Presencial"?"":" remote");pill.textContent=row.execution_mode;td.append(pill);tr.append(td);
-  const missionCell=document.createElement("td");if(row.mission_id){const link=document.createElement("a");link.href="mission.html?id="+encodeURIComponent(row.mission_id);link.textContent=missionTitle(row.mission_id);link.className="schedule-mission-link";missionCell.append(link)}else{missionCell.textContent="—"}tr.append(missionCell);
+  const missionCell=document.createElement("td");if(row.mission_id){const link=document.createElement("a");link.href=row.mission_id.startsWith("R")?"extras.html#"+encodeURIComponent(row.mission_id):"mission.html?id="+encodeURIComponent(row.mission_id);link.textContent=missionTitle(row.mission_id);link.className="schedule-mission-link";missionCell.append(link)}else{missionCell.textContent="—"}tr.append(missionCell);
   if(instructor){const actions=document.createElement("td"),wrap=document.createElement("div");wrap.className="schedule-row-actions";
    const edit=document.createElement("button");edit.type="button";edit.textContent="Editar";edit.addEventListener("click",()=>openForm(row));
    const del=document.createElement("button");del.type="button";del.className="delete";del.textContent="Excluir";del.addEventListener("click",()=>removeLesson(row));
@@ -110,6 +110,7 @@ $("scheduleForm").addEventListener("submit",async e=>{
  e.preventDefault();if(!instructor)return;
  const form=e.currentTarget;
  const payload={class_id:form.elements.namedItem("class_id").value,uc:form.elements.namedItem("uc").value.trim().toUpperCase(),lesson_number:Number(form.elements.namedItem("lesson_number").value),lesson_date:form.elements.namedItem("lesson_date").value,execution_mode:form.elements.namedItem("execution_mode").value,mission_id:form.elements.namedItem("mission_id").value||null};
+ if(payload.mission_id&&((payload.execution_mode==="Presencial"&&payload.mission_id.startsWith("R"))||(payload.execution_mode==="Remota Assíncrona"&&!payload.mission_id.startsWith("R")))){ $("scheduleFormFeedback").textContent="A modalidade deve corresponder ao tipo de missão.";return}
  if(payload.uc!=="UC7"&&payload.mission_id){$("scheduleFormFeedback").textContent="As missões da Jornada Web pertencem à UC7.";return}
  if(!classes.some(c=>c.id===payload.class_id)){ $("scheduleFormFeedback").textContent="Turma inválida.";return}
  $("scheduleSave").disabled=true;$("scheduleFormFeedback").textContent="Salvando...";
@@ -123,8 +124,9 @@ $("newScheduleLesson").addEventListener("click",()=>openForm());
 $("scheduleClose").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleCancel").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleClass").addEventListener("change",()=>{updateUcOptions();render()});
-$("scheduleFormClass").addEventListener("change",()=>{if(!editing)refreshMissionOptions()});
-function refreshMissionOptions(){const form=$("scheduleForm"),select=form.elements.namedItem("mission_id"),classId=form.elements.namedItem("class_id").value;const selected=select.value;select.replaceChildren(option("","Sem missão vinculada"),...MISSIONS.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==editing)).map(m=>option(m.id,missionTitle(m.id))));if([...select.options].some(o=>o.value===selected))select.value=selected;}
+$("scheduleFormClass").addEventListener("change",refreshMissionOptions);
+$("scheduleForm").elements.namedItem("execution_mode").addEventListener("change",refreshMissionOptions);
+function refreshMissionOptions(){const form=$("scheduleForm"),select=form.elements.namedItem("mission_id"),classId=form.elements.namedItem("class_id").value,mode=form.elements.namedItem("execution_mode").value;const selected=select.value;const candidates=mode==="Remota Assíncrona"?EXTRA_MISSIONS:mode==="Presencial"?MISSIONS:[];select.replaceChildren(option("","Sem missão vinculada"),...candidates.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==editing)).map(m=>option(m.id,missionTitle(m.id))));if([...select.options].some(o=>o.value===selected))select.value=selected;}
 $("scheduleUc").addEventListener("change",render);
 $("scheduleMode").addEventListener("change",render);
 try{await loadClasses();if(classes.length)await loadRows();else{feedback("Nenhuma turma disponível para esta conta.");$("scheduleRows").replaceChildren()}}catch(error){feedback("Não foi possível carregar o cronograma: "+error.message);$("scheduleRows").replaceChildren()}
