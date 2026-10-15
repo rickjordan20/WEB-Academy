@@ -24,29 +24,26 @@ function preview(){
  const doc={title:d.title,subtitle:d.subtitle,fundamental:d.fundamental||null,steps:d.steps};
  const payload=JSON.stringify(doc).replace(/</g,"\\u003c");
  frame.srcdoc=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${location.href}"><link rel="stylesheet" href="css/variables.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/dashboard.css"><link rel="stylesheet" href="css/journey.css"><link rel="stylesheet" href="css/responsive.css"><link rel="stylesheet" href="css/fundamentals-lab.css"><style>body{margin:0;padding:20px;background:var(--bg)}.mission-container{max-width:1060px;margin:auto}.builder-preview-navigation{display:flex;gap:10px;margin:15px 0 25px;flex-wrap:wrap}.builder-preview-navigation button[aria-selected=true]{outline:2px solid var(--accent)}.builder-preview-message{padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:20px}.learning-step[hidden]{display:none}.mission-container{min-height:calc(100vh - 40px);display:flex;flex-direction:column;padding-bottom:0}.builder-preview-navigation[data-pager]{position:sticky;bottom:0;z-index:20;background:var(--bg);border-top:1px solid var(--line);padding:14px 12px;margin:20px -12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -8px 20px rgba(0,0,0,.13)}.builder-preview-navigation[data-pager] span{font-size:.85rem;text-align:center}.learning-list{flex:1;min-height:0}@media(max-width:540px){.builder-preview-navigation[data-pager] button{padding:10px 12px}.builder-preview-navigation[data-pager] span{font-size:.75rem}}</style></head><body><main class="mission-container" id="studentRoot"></main><script type="module">
-import {renderStep} from "./js/step-renderer.js";
+import {renderStep,bindStep} from "./js/step-renderer.js";
 const data=${payload};
 const root=document.querySelector("#studentRoot");
 let moment=data.fundamental?"fundamentals":"practice",current=0;
+const stores={fundamentals:{answers:new Map(),attempts:new Map(),done:new Set()},practice:{answers:new Map(),attempts:new Map(),done:new Set()}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function draw(){
  const unit=moment==="fundamentals"?data.fundamental:data;
  const steps=unit.steps||[];
  current=Math.max(0,Math.min(current,steps.length-1));
- root.innerHTML='<section class="mission-header"><p class="eyebrow">WEB ACADEMY • VISÃO DO ESTUDANTE</p><h1>'+esc(moment==="fundamentals"?"Fundamentos — "+unit.title:data.title)+'</h1><p>'+esc(moment==="fundamentals"?unit.objective:data.subtitle)+'</p><div class="mission-meta"><span class="pill">'+(moment==="fundamentals"?"1h30 • Fundamentos":"2h • Prática Guiada")+'</span><span class="pill">Prévia do instrutor</span></div></section><div class="builder-preview-navigation">'+(data.fundamental?'<button class="btn btn-secondary" data-moment="fundamentals" aria-selected="'+(moment==="fundamentals")+'">01 Fundamentos</button><button class="btn btn-secondary" data-moment="practice" aria-selected="'+(moment==="practice")+'">02 Prática Guiada</button>':'')+'</div><p class="builder-preview-message">Prévia interativa sem salvar respostas nem alterar o progresso de estudantes. Os bloqueios reais e a disponibilidade dependem do acesso do aluno.</p><section class="learning-list">'+(steps.length?renderStep(steps[current],"PREVIEW",false,{preview:true}):'<p>Nenhuma atividade cadastrada.</p>')+'</section><div class="builder-preview-navigation" data-pager><button class="btn btn-secondary" data-previous '+(current===0?'disabled':'')+'>← Anterior</button><span>Atividade '+(steps.length?current+1:0)+' de '+steps.length+'</span><button class="btn btn-primary" data-next '+(current>=steps.length-1?'disabled':'')+'>Próxima →</button></div>';
+ root.innerHTML='<section class="mission-header"><p class="eyebrow">WEB ACADEMY • VISÃO DO ESTUDANTE</p><h1>'+esc(moment==="fundamentals"?"Fundamentos — "+unit.title:data.title)+'</h1><p>'+esc(moment==="fundamentals"?unit.objective:data.subtitle)+'</p><div class="mission-meta"><span class="pill">'+(moment==="fundamentals"?"1h30 • Fundamentos":"2h • Prática Guiada")+'</span><span class="pill">Prévia do instrutor</span></div></section><div class="builder-preview-navigation">'+(data.fundamental?'<button class="btn btn-secondary" data-moment="fundamentals" aria-selected="'+(moment==="fundamentals")+'">01 Fundamentos</button><button class="btn btn-secondary" data-moment="practice" aria-selected="'+(moment==="practice")+'">02 Prática Guiada</button>':'')+'</div><p class="builder-preview-message">Modo de teste: respostas, correções e conclusões funcionam nesta prévia, mas ficam apenas na memória temporária. Não afeta estudantes. Bloqueios de acesso e disponibilidade dependem da conta do aluno.</p><section class="learning-list">'+(steps.length?renderStep(steps[current],"PREVIEW",stores[moment].done.has(steps[current].id),{previewStore:stores[moment]}):'<p>Nenhuma atividade cadastrada.</p>')+'</section><div class="builder-preview-navigation" data-pager><button class="btn btn-secondary" data-previous '+(current===0?'disabled':'')+'>← Anterior</button><span>Atividade '+(steps.length?current+1:0)+' de '+steps.length+'</span><button class="btn btn-primary" data-next '+(current>=steps.length-1?'disabled':'')+'>Próxima →</button></div>';
  root.querySelectorAll("[data-moment]").forEach(button=>button.onclick=()=>{moment=button.dataset.moment;current=0;draw()});
  const previous=root.querySelector("[data-previous]"),next=root.querySelector("[data-next]");
  if(previous)previous.onclick=()=>{current--;draw()};
  if(next)next.onclick=()=>{current++;draw()};
  const step=steps[current];if(!step)return;
+ const store=stores[moment];
+ bindStep(step,"PREVIEW",()=>draw(),(_,stepId)=>{store.done.add(stepId);return true},{completed:store.done.has(step.id),previewStore:store});
  const card=root.querySelector("[data-step-card]");
- card.querySelector("[data-complete-step]").onclick=()=>{card.querySelector(".save-state").textContent="Prévia: a conclusão real exige acesso do estudante."};
- card.querySelectorAll("[data-reveal-card]").forEach(button=>button.onclick=()=>button.classList.toggle("revealed"));
- if(step.type==="editor"){
-  const html=card.querySelector("[data-editor]"),css=card.querySelector("[data-css-editor]"),js=card.querySelector("[data-js-editor]"),frame=card.querySelector("[data-preview]");
-  const run=()=>{const doc=new DOMParser().parseFromString(html.value,"text/html");const style=doc.createElement("style");style.textContent=css?.value||"";doc.head.append(style);const script=doc.createElement("script");script.textContent=js?.value||"";doc.body.append(script);frame.srcdoc=doc.documentElement.outerHTML};
-  card.querySelector("[data-run]").onclick=run;run()
- }
+ if(store.done.has(step.id))card.querySelector("[data-complete-step]").disabled=true;
 }
 draw();
 <\/script></body></html>`;
