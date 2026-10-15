@@ -33,6 +33,34 @@ No terminal do VS Code, com a branch de homologação selecionada:
 node --test tests/*.test.mjs
 ```
 
-**Evidência informada pelo instrutor (15/10/2026):** os cinco testes iniciais de `tests/mission-engine.test.mjs` passaram (5/5, nenhuma falha). Os quatro novos testes de `tests/cloud-sync.test.mjs` ainda aguardam execução.
+**Evidência informada pelo instrutor (15/10/2026):** as duas suítes passaram: motor de missões 5/5 e merge de sincronização 4/4. Total: 9/9, nenhuma falha.
 
 **Importante:** testes locais de merge não validam autenticação, políticas RLS, função RPC `save_student_state_cas` nem sincronização real com Supabase. Esses itens exigem teste integrado com duas sessões autenticadas. A verificação de cronograma e publicação também depende de ambiente e contas autorizadas.
+
+## Roteiro de homologação funcional no navegador (pendente)
+
+**Preparação:** usar conta de instrutor e conta de estudante de teste, matrícula ativa na turma correta, missão de teste e dois navegadores/perfis separados. Registrar captura, horário, turma, missão e resultado de cada cenário. Não alterar registros reais de estudantes.
+
+| ID | Cenário | Ação | Resultado esperado | Status |
+| --- | --- | --- | --- | --- |
+| HF01 | Matrícula ativa | Entrar como estudante e selecionar a turma correta | Conteúdo e cronograma da turma selecionada | Pendente |
+| HF02 | Antes da liberação | Abrir URL direta de missão futura | Aviso de indisponibilidade, sem iniciar missão | Pendente |
+| HF03 | Durante a janela | Abrir missão liberada | Missão acessível conforme pré-requisitos | Pendente |
+| HF04 | Após o prazo | Abrir URL direta de missão encerrada | Bloqueio com mensagem de prazo | Pendente |
+| HF05 | Fundamentos | Tentar acessar prática sem concluir fundamentos | Prática não disponível | Pendente |
+| HF06 | Fundamentos concluídos | Resolver etapas em sequência, recarregar | Conclusão persistida e prática liberada | Pendente |
+| HF07 | Prática guiada | Executar passos com VS Code, salvar respostas | Ordem, links, comandos e dados preservados | Pendente |
+| HF08 | Relatório individual | Preencher, concluir e reabrir | Respostas/evidências disponíveis sem perda | Pendente |
+| HF09 | Missão da Guilda | Acessar missão B após conclusão de A | Acesso apenas quando permitido; sem XP duplicado | Pendente |
+| HF10 | Edição do instrutor | Editar, pré-visualizar e publicar conteúdo de teste | Alteração aparece para estudante da mesma turma | Pendente |
+| HF11 | Permissão do aluno | Tentar acessar edição/publicação | Operações negadas no cliente e no Supabase | Pendente |
+| HF12 | Sincronização real | Alterar progresso no navegador A, entrar no B | Dados atualizados após sincronização | Pendente |
+| HF13 | Conflito entre sessões | Criar evidências distintas em A e B | Nenhuma evidência descartada; sem XP duplicado | Pendente |
+| HF14 | Responsividade | Abrir no celular e desktop | Etapas, formulários, links e botões utilizáveis | Pendente |
+
+### Critérios de aprovação
+
+- Todos os cenários críticos HF01–HF13 devem passar; HF14 precisa passar nos dispositivos-alvo.
+- Qualquer erro de autorização, perda de dados ou liberação antecipada impede a homologação.
+- Testes unitários aprovados não comprovam RLS, RPC, autenticação ou experiência completa do usuário.
+- Somente registrar **Aprovado** após executar o cenário e guardar evidência; sem acesso ao navegador autenticado e às contas de teste, os cenários permanecem **Pendentes**.
