@@ -20,6 +20,8 @@ state=ensureGamification(state);
 if(!state?.student?.name){location.replace(sb?"auth.html":"index.html");throw new Error("STATE_REDIRECT")}
 
 const $ = (s) => document.querySelector(s);
+var AVATAR_EMOJI={astronaut:"🧑‍🚀",developer:"🧑‍💻",robot:"🤖",explorer:"🧭",artist:"🎨"};
+var studentAvatarSignedUrl="",studentAvatarSignedPath="",avatarRefreshSequence=0;
 const initials = (name="U") => name.trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
 
 const evidenceCount=v=>Array.isArray(v)?v.length:(v&&typeof v==="object"?Object.keys(v).length:(v?1:0));
@@ -134,8 +136,6 @@ var studentProfileDetails=null;
 const studentProfileForm=$("#studentProfileForm");
 const profileFeedback=$("#studentProfileFeedback");
 
-var AVATAR_EMOJI={astronaut:"🧑‍🚀",developer:"🧑‍💻",robot:"🤖",explorer:"🧭",artist:"🎨"};
-var studentAvatarSignedUrl="",studentAvatarSignedPath="",avatarRefreshSequence=0;
 function renderStudentAvatars(name){
  const preset=studentProfileDetails?.avatar_preset||"initials";
  const path=studentProfileDetails?.avatar_path||"";
