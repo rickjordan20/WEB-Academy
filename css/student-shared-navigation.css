@@ -1,0 +1,39 @@
+/* Navegação consistente nas páginas internas, sem alterar o dashboard ou a área do instrutor. */
+body.wa-has-student-nav{--wa-nav-width:270px;padding-left:var(--wa-nav-width)}
+#waStudentNavigation .wa-student-sidebar{position:fixed;inset:0 auto 0 0;width:var(--wa-nav-width);z-index:90;display:flex;flex-direction:column;gap:.6rem;padding:1rem .85rem;background:#07111f;border-right:1px solid rgba(255,255,255,.1);overflow-x:hidden;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+#waStudentNavigation .wa-student-sidebar::-webkit-scrollbar{display:none}
+#waStudentNavigation .wa-nav-brand{display:flex;align-items:center;gap:.65rem;padding:.4rem .45rem .8rem;text-decoration:none;color:#f5f8fc;border-bottom:1px solid rgba(255,255,255,.1)}
+#waStudentNavigation .wa-nav-brand-mark{display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:11px;background:rgba(32,214,181,.11);color:#20d6b5;font-weight:800}
+#waStudentNavigation .wa-nav-brand b,#waStudentNavigation .wa-nav-brand small{display:block}#waStudentNavigation .wa-nav-brand b{font-size:.88rem}#waStudentNavigation .wa-nav-brand small{color:#20d6b5;font-size:.68rem;letter-spacing:.09em;margin-top:.15rem}
+#waStudentNavigation .wa-nav-collapse,#waStudentNavigation .wa-nav-expand{min-height:40px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:#122034;color:#f5f8fc;cursor:pointer;font:inherit}
+#waStudentNavigation .wa-nav-collapse{display:flex;align-items:center;justify-content:center;gap:.55rem;width:100%;font-size:.8rem}
+#waStudentNavigation .wa-nav-links,#waStudentNavigation .wa-nav-footer{display:grid;gap:.24rem}
+#waStudentNavigation .wa-nav-links{margin:.35rem 0 .75rem}
+#waStudentNavigation .wa-nav-footer{margin-top:auto;border-top:1px solid rgba(255,255,255,.1);padding-top:.7rem}
+#waStudentNavigation .wa-nav-link{display:flex;align-items:center;gap:.65rem;width:100%;min-height:42px;padding:.65rem .75rem;border:0;border-radius:11px;background:transparent;color:#9fb0c5;text-decoration:none;text-align:left;font:inherit;font-size:.86rem;cursor:pointer;box-sizing:border-box}
+#waStudentNavigation .wa-nav-icon{width:20px;flex:none;text-align:center}
+#waStudentNavigation .wa-nav-name{flex:1;min-width:0}
+#waStudentNavigation .wa-nav-link small{font-size:.65rem;color:#8393a8}
+#waStudentNavigation .wa-nav-link:hover,#waStudentNavigation .wa-nav-link.active{color:#fff;background:rgba(109,93,252,.16)}
+#waStudentNavigation .wa-nav-link.active{box-shadow:inset 3px 0 #8b7fff}
+#waStudentNavigation .wa-nav-signout{border-top:1px solid rgba(255,255,255,.1);border-radius:0;margin-top:.35rem}
+#waStudentNavigation .wa-nav-link:focus-visible,#waStudentNavigation button:focus-visible{outline:2px solid #8b7fff;outline-offset:2px}
+#waStudentNavigation .wa-nav-expand{display:none;position:fixed;top:12px;left:12px;z-index:92;width:42px;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+#waStudentNavigation .wa-nav-overlay{display:none}
+body.wa-nav-collapsed{padding-left:0}
+body.wa-nav-collapsed #waStudentNavigation .wa-student-sidebar{visibility:hidden;pointer-events:none}
+body.wa-nav-collapsed #waStudentNavigation .wa-nav-expand{display:block}
+body.wa-has-student-nav .journey-topbar{padding-left:clamp(1rem,3vw,2rem)}
+body.wa-has-student-nav .journey-topbar>.logo{display:none}
+body.wa-has-student-nav .journey-topbar{justify-content:flex-end}
+@media(max-width:1000px){
+ body.wa-has-student-nav,body.wa-nav-collapsed{padding-left:0}
+ #waStudentNavigation .wa-student-sidebar{transform:translateX(-105%);transition:transform .2s ease;visibility:visible!important;pointer-events:auto!important;box-shadow:12px 0 30px rgba(0,0,0,.2)}
+ #waStudentNavigation .wa-nav-expand{display:block;top:12px;left:12px}
+ body.wa-nav-open #waStudentNavigation .wa-student-sidebar{transform:translateX(0)}
+ body.wa-nav-open #waStudentNavigation .wa-nav-expand{left:calc(var(--wa-nav-width) + 8px)}
+ body.wa-nav-open #waStudentNavigation .wa-nav-overlay{display:block;position:fixed;inset:0;z-index:89;background:rgba(0,0,0,.58)}
+ body.wa-has-student-nav .journey-topbar{padding-left:65px}
+}
+@media print{body.wa-has-student-nav{padding-left:0!important}#waStudentNavigation{display:none!important}body.wa-has-student-nav .journey-topbar>.logo{display:flex}}
+@media(prefers-reduced-motion:reduce){#waStudentNavigation .wa-student-sidebar{transition:none}}
