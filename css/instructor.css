@@ -90,3 +90,14 @@
 .class-hours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:.6rem 0}
 .class-hours-grid input[type=time]{color-scheme:dark;min-width:0;width:100%}
 @media(max-width:520px){.class-hours-grid{grid-template-columns:1fr}}
+
+
+/* Editor pedagógico visual */
+.visual-steps-editor{display:grid;gap:14px;margin:12px 0 20px;min-width:0}
+.visual-steps-toolbar,.visual-step-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.visual-step-card{border:1px solid var(--border-color,#d5dce6);border-radius:12px;padding:14px;min-width:0;background:var(--surface,#fff)}
+.visual-step-head{margin-bottom:12px}.visual-step-head>div{display:flex;flex-wrap:wrap;gap:5px}
+.visual-step-head button{border:1px solid #cbd5e1;background:transparent;border-radius:6px;padding:5px 9px;cursor:pointer;color:inherit}
+.visual-step-head button:disabled{opacity:.35;cursor:not-allowed}
+.visual-step-fields{display:grid;gap:10px;min-width:0}.visual-step-fields textarea,.visual-step-fields input,.visual-step-fields select{width:100%;box-sizing:border-box}
+.visual-step-fields small{opacity:.7}.remote-step-list{grid-column:1/-1;width:100%;min-width:0}
