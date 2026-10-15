@@ -1,0 +1,22 @@
+
+/* Sidebar retrátil — estudante e instrutor */
+.app-shell{transition:grid-template-columns .2s ease}
+.sidebar{min-width:0;overflow-y:auto;overflow-x:hidden}
+.sidebar-collapse-btn,.sidebar-expand-btn{display:flex;align-items:center;justify-content:center;gap:.65rem;min-height:38px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);color:var(--text);cursor:pointer;font:inherit;font-size:.84rem}
+.sidebar-collapse-btn{width:100%;margin:.7rem 0 0}
+.sidebar-expand-btn{flex:0 0 38px;width:38px;margin-right:.85rem}
+.sidebar-collapse-btn:hover,.sidebar-expand-btn:hover{background:rgba(109,93,252,.16);border-color:var(--primary-2)}
+.sidebar-collapse-btn:focus-visible,.sidebar-expand-btn:focus-visible{outline:2px solid var(--primary-2);outline-offset:2px}
+.app-shell.sidebar-is-collapsed{grid-template-columns:0 minmax(0,1fr)}
+.app-shell.sidebar-is-collapsed>.sidebar{visibility:hidden;padding:0;border:0;pointer-events:none}
+.app-shell.sidebar-is-collapsed .content-shell{min-width:0}
+.sidebar .nav-item{white-space:normal;line-height:1.35}
+.sidebar .nav-item em{white-space:nowrap}
+.sidebar .nav-list{margin-top:1rem}
+@media(max-width:1000px){
+ .app-shell,.app-shell.sidebar-is-collapsed{grid-template-columns:minmax(0,1fr)}
+ .app-shell>.sidebar{visibility:visible;pointer-events:auto;overflow-y:auto;padding:1.2rem;border-right:1px solid var(--line)}
+ .sidebar-collapse-btn{margin:.4rem 0}
+ .sidebar-expand-btn{display:flex}
+}
+@media(min-width:1001px){.sidebar-expand-btn{display:none}.sidebar-is-collapsed .sidebar-expand-btn{display:flex}}
