@@ -1,3 +1,4 @@
+import {MISSIONS} from "../data/missions.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 const $=id=>document.getElementById(id);
 // Nunca encerrar ou redirecionar a sessão por uma falha temporária de carregamento.
@@ -26,6 +27,7 @@ const instructor=profile.role==="instructor";
 $("instructorBack").hidden=!instructor;$("studentBack").hidden=instructor;
 $("newScheduleLesson").hidden=!instructor;$("scheduleActionsHeading").hidden=!instructor;
 let classes=[],rows=[],editing=null;
+const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);return m?`Missão ${String(m.number).padStart(2,"0")} — ${m.subtitle}`:id||"Sem missão";};
 const days=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 const formatDate=d=>{const [y,m,day]=d.split("-").map(Number);return String(day).padStart(2,"0")+"/"+String(m).padStart(2,"0")+"/"+y};
 const weekday=d=>{const [y,m,day]=d.split("-").map(Number);const date=new Date(Date.UTC(y,m-1,day,12));const label=days[date.getUTCDay()];return label.charAt(0).toUpperCase()+label.slice(1)};
@@ -62,13 +64,14 @@ function render(){
  $("schedulePeriod").textContent=base.length?formatDate(base[0].lesson_date)+" – "+formatDate(base[base.length-1].lesson_date):"—";
  $("scheduleCount").textContent=shown.length+" aula(s) exibida(s)";
  const tbody=$("scheduleRows");tbody.replaceChildren();
- if(!shown.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=instructor?6:5;td.textContent="Nenhuma aula encontrada para os filtros selecionados.";tr.append(td);tbody.append(tr);return}
+ if(!shown.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=instructor?7:6;td.textContent="Nenhuma aula encontrada para os filtros selecionados.";tr.append(td);tbody.append(tr);return}
  for(const row of shown){
   const tr=document.createElement("tr");
   for(const [value,cls] of [[String(row.lesson_number).padStart(2,"0"),"schedule-number"],[formatDate(row.lesson_date),""],[weekday(row.lesson_date),""],[row.uc,""]]){
    const td=document.createElement("td");td.textContent=value;td.className=cls;tr.append(td);
   }
   const td=document.createElement("td"),pill=document.createElement("span");pill.className="schedule-mode"+(row.execution_mode==="Presencial"?"":" remote");pill.textContent=row.execution_mode;td.append(pill);tr.append(td);
+  const missionCell=document.createElement("td");if(row.mission_id){const link=document.createElement("a");link.href="mission.html?id="+encodeURIComponent(row.mission_id);link.textContent=missionTitle(row.mission_id);link.className="schedule-mission-link";missionCell.append(link)}else{missionCell.textContent="—"}tr.append(missionCell);
   if(instructor){const actions=document.createElement("td"),wrap=document.createElement("div");wrap.className="schedule-row-actions";
    const edit=document.createElement("button");edit.type="button";edit.textContent="Editar";edit.addEventListener("click",()=>openForm(row));
    const del=document.createElement("button");del.type="button";del.className="delete";del.textContent="Excluir";del.addEventListener("click",()=>removeLesson(row));
@@ -78,7 +81,7 @@ function render(){
 }
 async function loadRows(){
  feedback("");
- const {data,error}=await sb.from("class_schedule").select("id,class_id,uc,lesson_number,lesson_date,execution_mode").in("class_id",classes.map(c=>c.id)).order("lesson_date").order("lesson_number");
+ const {data,error}=await sb.from("class_schedule").select("id,class_id,uc,lesson_number,lesson_date,execution_mode,mission_id").in("class_id",classes.map(c=>c.id)).order("lesson_date").order("lesson_number");
  if(error)throw error;
  rows=data||[];updateUcOptions();render();
 }
@@ -92,11 +95,15 @@ function openForm(row=null){
  form.elements.namedItem("lesson_number").value=row?.lesson_number||"";
  form.elements.namedItem("lesson_date").value=row?.lesson_date||"";
  form.elements.namedItem("execution_mode").value=row?.execution_mode||"Presencial";
+ const missionSelect=form.elements.namedItem("mission_id");
+ const classId=form.elements.namedItem("class_id").value;
+ missionSelect.replaceChildren(option("","Sem missão vinculada"),...MISSIONS.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==row?.id)).map(m=>option(m.id,missionTitle(m.id))));
+ missionSelect.value=row?.mission_id||"";
  $("scheduleFormFeedback").textContent="";
  $("scheduleDialog").showModal();
 }
 async function removeLesson(row){
- if(!instructor||!confirm("Excluir a aula "+String(row.lesson_number).padStart(2,"0")+" de "+formatDate(row.lesson_date)+"?"))return;
+ if(!instructor||!confirm("Excluir a aula "+String(row.lesson_number).padStart(2,"0")+" de "+formatDate(row.lesson_date)+"? A missão e o progresso dos estudantes não serão excluídos."))return;
  const {error}=await sb.from("class_schedule").delete().eq("id",row.id);
  if(error){feedback("Não foi possível excluir: "+error.message);return}
  await loadRows();
@@ -104,7 +111,8 @@ async function removeLesson(row){
 $("scheduleForm").addEventListener("submit",async e=>{
  e.preventDefault();if(!instructor)return;
  const form=e.currentTarget;
- const payload={class_id:form.elements.namedItem("class_id").value,uc:form.elements.namedItem("uc").value.trim().toUpperCase(),lesson_number:Number(form.elements.namedItem("lesson_number").value),lesson_date:form.elements.namedItem("lesson_date").value,execution_mode:form.elements.namedItem("execution_mode").value};
+ const payload={class_id:form.elements.namedItem("class_id").value,uc:form.elements.namedItem("uc").value.trim().toUpperCase(),lesson_number:Number(form.elements.namedItem("lesson_number").value),lesson_date:form.elements.namedItem("lesson_date").value,execution_mode:form.elements.namedItem("execution_mode").value,mission_id:form.elements.namedItem("mission_id").value||null};
+ if(payload.uc!=="UC7"&&payload.mission_id){$("scheduleFormFeedback").textContent="As missões da Jornada Web pertencem à UC7.";return}
  if(!classes.some(c=>c.id===payload.class_id)){ $("scheduleFormFeedback").textContent="Turma inválida.";return}
  $("scheduleSave").disabled=true;$("scheduleFormFeedback").textContent="Salvando...";
  const result=editing?await sb.from("class_schedule").update(payload).eq("id",editing):await sb.from("class_schedule").insert(payload);
