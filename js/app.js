@@ -6,6 +6,13 @@ import {pullCloudState,pushCloudState} from "./cloud-sync.js";
 const sb=await getSupabase();
 const cloudSession=sb?await getSession():null;
 if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw new Error("AUTH_REDIRECT")}
+if(cloudSession){
+ const {data:role}=await sb.from("profiles").select("role").eq("id",cloudSession.user.id).maybeSingle();
+ if(role?.role==="instructor"){location.replace("instructor.html");throw new Error("INSTRUCTOR_REDIRECT")}
+ const {data:membership,error:membershipError}=await sb.from("class_members").select("class_id").eq("user_id",cloudSession.user.id).eq("status","active").limit(1);
+ if(membershipError)throw membershipError;
+ if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
+}
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
 
 let state=getState();
