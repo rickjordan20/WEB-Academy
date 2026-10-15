@@ -5,3 +5,11 @@ body.schedule-page{background:#081421;color:#f2f6ff;min-height:100vh} .schedule-
 .schedule-form select[name="mission_id"]{width:100%}
 
 .schedule-help{margin:-.4rem 0 .2rem;color:#aebed7;font-size:.8rem;line-height:1.55}
+
+/* Horários padrão da turma e horários personalizados das aulas */
+.schedule-class-hours{margin-block:1rem}
+.schedule-class-hours .schedule-panel-title{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.schedule-hours-form{display:flex;align-items:end;gap:1rem;flex-wrap:wrap;margin-block:1rem}
+.schedule-hours-form label{display:grid;gap:.45rem;flex:1 1 145px;min-width:130px;color:#dce8f7;font-weight:600}
+.schedule-hours-form input[type=time]{width:100%;min-height:42px;padding:.65rem;border:1px solid #344761;border-radius:9px;background:#0b1b2d;color:#fff;color-scheme:dark}
+.schedule-hours-form button{min-height:42px}
