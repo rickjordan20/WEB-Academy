@@ -16,7 +16,8 @@ const linkedText=value=>{
  }
  return html+esc(raw.slice(last));
 };
-const renderCommand=command=>`<div class="learning-command"><code>${esc(command)}</code><button type="button" class="learning-copy-btn" data-copy-command="${esc(command)}" aria-label="Copiar comando">Copiar</button></div>`;
+const explainCommand=c=>{c=String(c);if(c==="git status")return"Veja os arquivos alterados";if(c==="git init")return"Inicie o Git nesta pasta";if(c==="git add .")return"Prepare os arquivos para o commit";if(c.startsWith("git commit"))return"Registre uma versão no computador";if(c.startsWith("git push"))return"Envie as versões ao GitHub";if(c.startsWith("git remote add"))return"Conecte ao repositório do GitHub";if(c==="git remote -v")return"Confira o endereço conectado";if(c.startsWith("git branch"))return"Defina a branch principal";if(c.startsWith("git config"))return"Confira seu nome ou e-mail";if(c.startsWith("git log"))return"Veja o histórico";return"Execute no terminal"};
+const renderCommand=command=>`<div class="learning-command"><div class="learning-command-details"><code>${esc(command)}</code><small>${esc(explainCommand(command))}</small></div><button type="button" class="learning-copy-btn" data-copy-command="${esc(command)}" aria-label="Copiar comando">Copiar</button></div>`;
 const guidedInstruction=value=>{const raw=String(value??"");const match=raw.match(/^(?:Digite|Execute) (git (?:--version|init|status|add \.|commit -m "[^"]+"|log -1 --oneline|config --global (?:user\.name|user\.email)(?: "[^"]+")?|remote (?:add origin [^ ]+|-v)|branch -M main|push(?: -u origin main)?|pull))(?=[., ]|$)/i);if(!match)return linkedText(raw);return linkedText(raw)+renderCommand(match[1])};
 export function renderStep(step,missionId,done,options={}){
  const saved=options.previewStore?options.previewStore.answers.get(step.id):options.preview===true?null:readAnswer(missionId,step.id); const editable=options.editableCompleted===true;
