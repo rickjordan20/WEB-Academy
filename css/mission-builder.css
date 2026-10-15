@@ -61,3 +61,24 @@
 @media(max-width:800px){.builder-header{align-items:flex-start}.builder-actions{width:100%}.builder-tabs{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.builder-tabs button{padding:11px 8px}.builder-shell .visual-step-fields{grid-template-columns:1fr}.builder-preview-bar{flex-direction:column;align-items:flex-start}}
 @media(max-width:520px){.builder-shell{padding:18px 12px 60px}.builder-actions .btn{flex:1 1 42%}.builder-actions .builder-status{width:100%;justify-content:center}.builder-shell .visual-step-head{align-items:flex-start}.builder-shell .visual-step-actions{width:100%;justify-content:flex-start}.builder-section{padding:18px}.builder-shell .visual-step-fields{padding:16px}}
 @media(prefers-reduced-motion:reduce){.builder-tabs button{transition:none}}
+
+
+/* Separação pedagógica das aulas A: Fundamentos e Prática Guiada */
+.guided-moment-navigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:8px 0 6px}
+.guided-moment-tab{display:flex;align-items:center;gap:14px;text-align:left;background:var(--bg-soft);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:17px 18px;cursor:pointer;min-width:0;font:inherit;transition:border-color .15s,background .15s}
+.guided-moment-tab:hover{border-color:var(--primary-2)}
+.guided-moment-tab.active{border-color:var(--primary-2);background:rgba(109,93,252,.12);box-shadow:inset 0 0 0 1px rgba(109,93,252,.2)}
+.guided-moment-tab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.guided-moment-index,.guided-moment-icon{display:grid;place-items:center;flex:0 0 40px;height:40px;border-radius:11px;background:var(--surface-2);color:var(--accent);font-size:.82rem;font-weight:800}
+.guided-moment-tab.active .guided-moment-index{background:var(--primary);color:#fff}
+.guided-moment-label{display:grid;gap:5px;min-width:0}
+.guided-moment-label strong{font-size:.97rem}
+.guided-moment-label small{color:var(--muted);font-size:.79rem;line-height:1.35}
+.guided-moment-panel{display:grid;gap:22px;min-width:0}
+.guided-moment-intro{display:flex;align-items:flex-start;gap:15px;padding:22px;background:var(--bg-soft);border:1px solid var(--line);border-radius:13px}
+.guided-moment-intro h3{margin:0 0 6px!important;font-size:1.15rem!important}
+.guided-moment-intro p{color:var(--muted);line-height:1.55;font-size:.87rem;margin:0}
+.guided-moment-panel #builderFundamental{display:grid;gap:17px;padding:0;border:0}
+.guided-moment-panel #missionStepHost,.guided-moment-panel #fundamentalStepHost{min-width:0}
+.guided-moment-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.81rem}
+@media(max-width:650px){.guided-moment-navigation{grid-template-columns:1fr}.guided-moment-tab{padding:13px}.guided-moment-intro{padding:17px}.guided-moment-footer .btn{width:100%}}
