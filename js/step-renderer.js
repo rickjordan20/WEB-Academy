@@ -1,7 +1,7 @@
 import { completeStep,saveAnswer,getAnswer,recordCodeAttempt,getCodeAttempts } from "./mission-engine.js";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 export function renderStep(step,missionId,done,options={}){
- const saved=getAnswer(missionId,step.id); const editable=options.editableCompleted===true;
+ const saved=options.preview===true?null:getAnswer(missionId,step.id); const editable=options.editableCompleted===true;
  const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
  let body="";
  if(step.type==="content")body=`${(step.body||[]).map(p=>`<p>${esc(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
