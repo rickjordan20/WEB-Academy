@@ -95,10 +95,8 @@ function openForm(row=null){
  form.elements.namedItem("lesson_number").value=row?.lesson_number||"";
  form.elements.namedItem("lesson_date").value=row?.lesson_date||"";
  form.elements.namedItem("execution_mode").value=row?.execution_mode||"Presencial";
- const missionSelect=form.elements.namedItem("mission_id");
- const classId=form.elements.namedItem("class_id").value;
- missionSelect.replaceChildren(option("","Sem missão vinculada"),...MISSIONS.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==row?.id)).map(m=>option(m.id,missionTitle(m.id))));
- missionSelect.value=row?.mission_id||"";
+ refreshMissionOptions();
+ form.elements.namedItem("mission_id").value=row?.mission_id||"";
  $("scheduleFormFeedback").textContent="";
  $("scheduleDialog").showModal();
 }
@@ -125,6 +123,8 @@ $("newScheduleLesson").addEventListener("click",()=>openForm());
 $("scheduleClose").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleCancel").addEventListener("click",()=>$("scheduleDialog").close());
 $("scheduleClass").addEventListener("change",()=>{updateUcOptions();render()});
+$("scheduleFormClass").addEventListener("change",()=>{if(!editing)refreshMissionOptions()});
+function refreshMissionOptions(){const form=$("scheduleForm"),select=form.elements.namedItem("mission_id"),classId=form.elements.namedItem("class_id").value;const selected=select.value;select.replaceChildren(option("","Sem missão vinculada"),...MISSIONS.filter(m=>!rows.some(r=>r.class_id===classId&&r.uc==="UC7"&&r.mission_id===m.id&&r.id!==editing)).map(m=>option(m.id,missionTitle(m.id))));if([...select.options].some(o=>o.value===selected))select.value=selected;}
 $("scheduleUc").addEventListener("change",render);
 $("scheduleMode").addEventListener("change",render);
 try{await loadClasses();if(classes.length)await loadRows();else{feedback("Nenhuma turma disponível para esta conta.");$("scheduleRows").replaceChildren()}}catch(error){feedback("Não foi possível carregar o cronograma: "+error.message);$("scheduleRows").replaceChildren()}
