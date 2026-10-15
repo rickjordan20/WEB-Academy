@@ -51,8 +51,8 @@ export function bindStep(step,missionId,onChange,complete=completeStep,options={
   if(button.disabled)return;
   button.disabled=true;
   try{
-   const checks=[["HTML",ed.value,step.requiredHtml],["CSS",css.value,step.requiredCss],["JavaScript",js.value,step.requiredJs]];
-   const missing=checks.flatMap(([lang,code,rules])=>String(rules||"").split("\n").map(x=>x.trim()).filter(Boolean).filter(x=>!code.includes(x)).map(x=>lang+": "+x));
+   const checks=[["HTML",ed.value,step.requiredHtml,step.labModeHtml],["CSS",css.value,step.requiredCss,step.labModeCss],["JavaScript",js.value,step.requiredJs,step.labModeJs]];
+   const missing=checks.flatMap(([lang,code,rules,mode])=>String(mode==="off"?"":rules||"").split("\n").map(x=>x.trim()).filter(Boolean).filter(x=>!code.includes(x)).map(x=>lang+": "+x));
    const behavior=parseBehaviorChecks(step.behaviorChecks);
    const outcomes=await evaluateCodeLab(preview,behavior);
    const failures=outcomes.filter(x=>!x.passed);
