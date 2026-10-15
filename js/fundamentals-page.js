@@ -1,3 +1,4 @@
+import {loadEditedMissionContent} from "./mission-content.js";
 import {missionWindow,windowNotice} from "./mission-window.js";
 import "./cloud-bootstrap.js";
 import {getFundamental,startFundamental,fundamentalStatus,completeFundamentalStep,STATUS} from "./mission-engine.js";
@@ -5,7 +6,7 @@ import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 const phase=Number(new URLSearchParams(location.search).get("phase")),root=document.querySelector("#fundamentalsRoot"),state=getState();
 if(!state?.student?.name)location.replace("index.html");
-const unit=getFundamental(phase);
+const unit=getFundamental(phase);if(unit){try{const content=await loadEditedMissionContent(`${phase}A`);if(content?.fundamental){if(typeof content.fundamental.title==="string")unit.title=content.fundamental.title;if(typeof content.fundamental.objective==="string")unit.objective=content.fundamental.objective;if(Array.isArray(content.fundamental.steps)&&content.fundamental.steps.length)unit.steps=content.fundamental.steps}}catch(error){root.textContent="Falha ao carregar os Fundamentos. Atualize a página.";throw error}}
 if(!unit)root.innerHTML='<section class="card current-mission"><h1>Fundamentos não disponíveis</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else if(fundamentalStatus(phase)===STATUS.LOCKED)root.innerHTML='<section class="card current-mission"><h1>🔒 Fundamentos bloqueados</h1><p>Conclua a fase anterior para continuar.</p><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(`${phase}A`);if(access.state!=="open")root.replaceChildren(windowNotice(access));else{startFundamental(phase);render();startWindowWatch(`${phase}A`)}}
