@@ -85,3 +85,8 @@
 .join-request-card small{color:var(--muted)}
 .join-request-actions{display:flex;gap:.5rem;flex-wrap:wrap;flex-shrink:0}
 @media(max-width:620px){.join-request-card{flex-direction:column;align-items:stretch}.join-request-actions .btn{flex:1}}
+
+/* Horário padrão no cadastro e na edição de turmas */
+.class-hours-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:.6rem 0}
+.class-hours-grid input[type=time]{color-scheme:dark;min-width:0;width:100%}
+@media(max-width:520px){.class-hours-grid{grid-template-columns:1fr}}
