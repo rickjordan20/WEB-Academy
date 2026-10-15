@@ -5,7 +5,7 @@ const ARRAY_FIELDS={content:["body"],guided:["instructions"],reflection:["prompt
 const TEXT_FIELDS={content:["code"],quiz:["question","feedback"],checkpoint:["question","feedback"],editor:["starter"],"complete-code":["prefix","placeholder","expected"],"visual-summary":["idea"],sequence:["prompt"],"terminal-sim":["prompt","prefix","hint","answer"]};
 const uid=()=>("step-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7));
 export function mountStepEditor(form){
- const source=form.elements.content_steps;
+ const source=form.querySelector('[name="content_steps"],[name="fundamental_steps"]');
  source.hidden=true;
  const host=document.createElement("div");host.className="visual-steps-editor";source.after(host);
  let steps=[];
