@@ -1,3 +1,4 @@
+import {parseBehaviorChecks,evaluateCodeLab} from "./code-lab-checks.js";
 import { completeStep,saveAnswer as persistAnswer,getAnswer as readAnswer,recordCodeAttempt as persistCodeAttempt,getCodeAttempts as readCodeAttempts } from "./mission-engine.js";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 export function renderStep(step,missionId,done,options={}){
@@ -45,12 +46,25 @@ export function bindStep(step,missionId,onChange,complete=completeStep,options={
  };
  card.querySelector("[data-run]").onclick=run;
  [ed,css,js].forEach(field=>field.addEventListener("input",persist));
- card.querySelector("[data-complete-step]").onclick=()=>{
-  const checks=[["HTML",ed.value,step.requiredHtml],["CSS",css.value,step.requiredCss],["JavaScript",js.value,step.requiredJs]];
-  const missing=checks.flatMap(([lang,code,rules])=>String(rules||"").split("\n").map(x=>x.trim()).filter(Boolean).filter(x=>!code.includes(x)).map(x=>lang+": "+x));
-  recordCodeAttempt(missionId,step.id,{passed:missing.length===0,reason:missing.join(" • ")});count();
-  if(missing.length){feedback.textContent="Revise os trechos solicitados: "+missing.join(" • ");feedback.className="feedback error";return}
-  persist();feedback.textContent="Critérios atendidos!";feedback.className="feedback success";if(!completed)finish()
+ card.querySelector("[data-complete-step]").onclick=async()=>{
+  const button=card.querySelector("[data-complete-step]");
+  if(button.disabled)return;
+  button.disabled=true;
+  try{
+   const checks=[["HTML",ed.value,step.requiredHtml],["CSS",css.value,step.requiredCss],["JavaScript",js.value,step.requiredJs]];
+   const missing=checks.flatMap(([lang,code,rules])=>String(rules||"").split("\n").map(x=>x.trim()).filter(Boolean).filter(x=>!code.includes(x)).map(x=>lang+": "+x));
+   const behavior=parseBehaviorChecks(step.behaviorChecks);
+   const outcomes=await evaluateCodeLab(preview,behavior);
+   const failures=outcomes.filter(x=>!x.passed);
+   recordCodeAttempt(missionId,step.id,{passed:!missing.length&&!failures.length,checks:outcomes,reason:[...missing,...failures.map(x=>x.label+" — "+x.reason)].join(" • ")});count();
+   if(missing.length||failures.length){
+    feedback.textContent="Revise: "+[...missing,...failures.map(x=>x.label+" — "+x.reason)].join(" • ");
+    feedback.className="feedback error";return
+   }
+   persist();feedback.textContent="Todos os critérios atendidos!";feedback.className="feedback success";
+   if(!completed)finish()
+  }catch(error){console.error(error);feedback.textContent="Não foi possível verificar o resultado. Tente novamente.";feedback.className="feedback error"}
+  finally{if(!completed)button.disabled=false}
  };
  count();run();return
 }
