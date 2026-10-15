@@ -68,3 +68,13 @@
 .guided-link{color:var(--accent,#20d6b5);text-decoration:underline;text-underline-offset:3px;font-weight:750;overflow-wrap:anywhere}
 .guided-link:focus-visible{outline:3px solid currentColor;outline-offset:3px}
 @media(max-width:650px){.learning-section{padding:.85rem}.instruction-list{padding-left:1.4rem}.instruction-list li{padding:.6rem}}
+
+/* Cores discretas com função didática: teoria, exemplo, alerta */
+.learning-section.section-concept{border-left:4px solid #8b7fff}
+.learning-section.section-example{border-left:4px solid #20d6b5}
+.learning-section.section-tip{border-left:4px solid #f0b95d}
+.learning-section.section-concept .learning-section-head>span{background:rgba(139,127,255,.13)}
+.learning-section.section-example .learning-section-head>span{background:rgba(32,214,181,.12)}
+.learning-section.section-tip .learning-section-head>span{background:rgba(240,185,93,.12)}
+.guided-action-heading{display:flex;align-items:center;gap:.55rem;font-weight:850;margin:1.25rem 0 .5rem}
+.guided-action-heading>span{font-size:1.3rem}
