@@ -1,3 +1,4 @@
+import {loadEditedMissionContent,applyEditedMissionContent} from "./mission-content.js";
 import {missionWindow,windowNotice} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
 import "./cloud-bootstrap.js";
@@ -9,7 +10,7 @@ let projectContext=null,scheduledLesson=null;
 async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active").limit(1);const classId=members?.[0]?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,class_id").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data;if(scheduledLesson){const {data:classData}=await sb.from("classes").select("lesson_start_time,lesson_end_time").eq("id",classId).maybeSingle();scheduledLesson.start=String(scheduledLesson.start_time_override||classData?.lesson_start_time||"").slice(0,5);scheduledLesson.end=String(scheduledLesson.end_time_override||classData?.lesson_end_time||"").slice(0,5)} if(mission&&missionStatus(id)!==STATUS.LOCKED)render()}catch(error){console.warn("Cronograma da missão:",error)}}
 const params=new URLSearchParams(location.search),id=params.get("id"),root=document.querySelector("#missionRoot");
 const state=getState();if(!state?.student?.name)location.replace("index.html");
-const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
+try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission)root.innerHTML='<section class="card current-mission"><h1>Missão ainda não disponível</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else if(missionStatus(id)===STATUS.LOCKED)root.innerHTML='<section class="card current-mission"><h1>🔒 Missão bloqueada</h1><p>Conclua a missão anterior para continuar sua Jornada.</p><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(id);if(access.state!=="open"){root.replaceChildren(windowNotice(access));}else{startMission(id);projectContext=await getMissionProjectContext(mission);render();refreshMissionSchedule();startWindowWatch(id);}}
