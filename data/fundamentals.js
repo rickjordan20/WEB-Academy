@@ -37,11 +37,20 @@ const genericSteps=(phase,title,axis)=>{const b=FOUNDATION_BLUEPRINT[phase];retu
 ]};
 const phase1Steps=[
  {
+  "id": "f1-block-1",
+  "type": "content",
+  "title": "BLOCO 1 · Ferramentas e projetos",
+  "summary": "Comece por aqui: neste bloco você aprende antes de responder.",
+  "body": [
+   "Objetivo: reconhecer a WEB Academy, o EduTech e as ferramentas que usaremos."
+  ]
+ },
+ {
   "id": "f1-welcome",
   "type": "visual-summary",
-  "title": "01 · Sua jornada começa aqui! 🚀",
-  "summary": "Veja o exemplo e descubra a ideia • 5 min",
-  "idea": "Hoje: descobrir → experimentar → construir junto → registrar.",
+  "title": "Boas-vindas · O que vamos fazer hoje?",
+  "summary": "Conheça a aula antes de começar • 4 min",
+  "idea": "Hoje você vai entender as ferramentas e o Git antes de usá-los com o instrutor.",
   "items": [
    "UC7 → vamos aprender a desenvolver aplicações web, começando do zero",
    "WEB Academy → aprender com desafios curtos e feedback",
@@ -53,23 +62,23 @@ const phase1Steps=[
  {
   "id": "f1-kit",
   "type": "visual-summary",
-  "title": "02 · Conheça seu kit de desenvolvedor 🧰",
-  "summary": "Veja o exemplo e descubra a ideia • 6 min",
+  "title": "Conheça as ferramentas de desenvolvimento",
+  "summary": "Observe a função de cada ferramenta • 6 min",
   "idea": "Cada ferramenta tem uma missão diferente.",
   "items": [
-   "VS Code (editor) → escrever e editar arquivos",
-   "IDE → ambiente que reúne ferramentas de desenvolvimento; o VS Code é um editor extensível",
-   "Navegador (Chrome/Edge) → abrir e testar páginas",
+   "VS Code → editor: escrever e editar arquivos",
+   "IDE → ambiente com ferramentas de desenvolvimento; VS Code é um editor extensível",
+   "Navegador → abrir e testar páginas",
    "Terminal → digitar comandos no computador",
-   "Git → registrar versões do projeto",
-   "GitHub → hospedar e compartilhar repositórios Git online"
+   "Git → registrar versões no computador",
+   "GitHub → hospedar e compartilhar repositórios na internet"
   ]
  },
  {
   "id": "f1-tools",
   "type": "match-cards",
-  "title": "03 · Quem faz o quê? 🎯",
-  "summary": "Desafio de associação: use o que acabou de aprender • 4 min",
+  "title": "Desafio: escolha a ferramenta certa",
+  "summary": "Associe usando o quadro anterior • 4 min",
   "pairs": [
    [
     "Escrever um arquivo",
@@ -94,10 +103,19 @@ const phase1Steps=[
   ]
  },
  {
+  "id": "f1-block-2",
+  "type": "content",
+  "title": "BLOCO 2 · Pastas, arquivos e VS Code",
+  "summary": "Comece por aqui: neste bloco você aprende antes de responder.",
+  "body": [
+   "Objetivo: entender onde ficam os arquivos e como trabalhar com a pasta do projeto."
+  ]
+ },
+ {
   "id": "f1-files",
   "type": "visual-summary",
-  "title": "04 · Monte o mapa do EduTech 📁",
-  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "title": "Veja como uma pasta de projeto é organizada",
+  "summary": "Observe o exemplo do EduTech • 5 min",
   "idea": "Uma pasta principal reúne os arquivos. Cada arquivo tem seu lugar.",
   "items": [
    "📁 edutech/ → pasta principal (raiz)",
@@ -111,8 +129,8 @@ const phase1Steps=[
  {
   "id": "f1-organize",
   "type": "match-cards",
-  "title": "05 · Organize os arquivos! 🧩",
-  "summary": "Desafio de associação: use o que acabou de aprender • 4 min",
+  "title": "Desafio: cada arquivo no seu lugar",
+  "summary": "Associe usando o exemplo anterior • 4 min",
   "pairs": [
    [
     "index.html",
@@ -135,8 +153,8 @@ const phase1Steps=[
  {
   "id": "f1-vscode",
   "type": "visual-summary",
-  "title": "06 · Explore o VS Code 🟦",
-  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "title": "Conheça as partes do VS Code",
+  "summary": "Veja onde cada tarefa acontece • 5 min",
   "idea": "O projeto fica no computador. O VS Code abre sua pasta.",
   "items": [
    "Explorer → ver e criar arquivos e pastas",
@@ -149,8 +167,8 @@ const phase1Steps=[
  {
   "id": "f1-terminal",
   "type": "visual-summary",
-  "title": "07 · Você está em qual pasta? ⌨️",
-  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "title": "Entenda o terminal e a pasta atual",
+  "summary": "Aprenda o significado dos comandos antes de responder • 5 min",
   "idea": "O terminal executa comandos na pasta atual.",
   "items": [
    "Exemplo: C:\\Projetos\\edutech → você está dentro de edutech",
@@ -164,8 +182,8 @@ const phase1Steps=[
  {
   "id": "f1-code-dot",
   "type": "quiz",
-  "title": "08 · Decifre o comando ⚡",
-  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "title": "Desafio: o que significa o ponto?",
+  "summary": "A resposta está na explicação anterior • 3 min",
   "question": "Você está em C:\\Projetos\\edutech e digita code . O que será aberto?",
   "options": [
    "A pasta atual edutech no VS Code",
@@ -176,10 +194,19 @@ const phase1Steps=[
   "feedback": "O ponto significa a pasta atual. Também é possível usar Arquivo > Abrir Pasta."
  },
  {
+  "id": "f1-block-3",
+  "type": "content",
+  "title": "BLOCO 3 · Git e GitHub: entendendo versões",
+  "summary": "Comece por aqui: neste bloco você aprende antes de responder.",
+  "body": [
+   "Objetivo: distinguir salvar, criar uma versão local e usar um repositório remoto."
+  ]
+ },
+ {
   "id": "f1-repos",
   "type": "visual-summary",
-  "title": "09 · Salvar não é versionar! 📸",
-  "summary": "Veja o exemplo e descubra a ideia • 6 min",
+  "title": "Git, GitHub e repositórios: qual a diferença?",
+  "summary": "Veja os conceitos com um exemplo do EduTech • 6 min",
   "idea": "Imagine que você quer recuperar uma versão anterior do EduTech.",
   "items": [
    "Ctrl+S → salva o arquivo atual",
@@ -193,8 +220,8 @@ const phase1Steps=[
  {
   "id": "f1-gitgithub",
   "type": "quiz",
-  "title": "10 · Git ou GitHub? ⚡",
-  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "title": "Desafio: Git ou GitHub?",
+  "summary": "Responda usando a explicação anterior • 3 min",
   "question": "Qual frase está correta?",
   "options": [
    "Git registra versões; GitHub hospeda repositórios online",
@@ -207,8 +234,8 @@ const phase1Steps=[
  {
   "id": "f1-version",
   "type": "visual-summary",
-  "title": "11 · Uma mudança, cinco movimentos 🔄",
-  "summary": "Veja o exemplo e descubra a ideia • 7 min",
+  "title": "Como uma alteração vira uma versão?",
+  "summary": "Acompanhe o caminho completo • 7 min",
   "idea": "Exemplo: você criou index.html e quer publicar o commit.",
   "items": [
    "1. Salvar → gravar o arquivo",
@@ -222,8 +249,8 @@ const phase1Steps=[
  {
   "id": "f1-flow-quiz",
   "type": "sequence",
-  "title": "12 · Coloque o fluxo na ordem! 🔀",
-  "summary": "Reorganize as ações do exemplo anterior • 5 min",
+  "title": "Desafio: organize os passos do versionamento",
+  "summary": "Ordene os passos ensinados acima • 5 min",
   "prompt": "Qual é a sequência para registrar e enviar uma alteração?",
   "items": [
    "git push",
@@ -242,10 +269,19 @@ const phase1Steps=[
   "feedback": "Primeiro salvar, depois conferir, preparar, registrar e enviar."
  },
  {
+  "id": "f1-block-4",
+  "type": "content",
+  "title": "BLOCO 4 · Comandos e situações do dia a dia",
+  "summary": "Comece por aqui: neste bloco você aprende antes de responder.",
+  "body": [
+   "Objetivo: compreender os comandos antes de escolher qual usar."
+  ]
+ },
+ {
   "id": "f1-commands",
   "type": "visual-summary",
-  "title": "13 · Primeira vez ou projeto já existente? 🧭",
-  "summary": "Veja o exemplo e descubra a ideia • 7 min",
+  "title": "Comandos para começar e sincronizar",
+  "summary": "Conheça init, remote, clone, pull e push • 7 min",
   "idea": "Nem todo comando precisa ser repetido em todas as aulas.",
   "items": [
    "git init → iniciar o Git numa pasta ainda sem repositório",
@@ -259,8 +295,8 @@ const phase1Steps=[
  {
   "id": "f1-command-cards",
   "type": "command-deck",
-  "title": "14 · Baralho Git: toque para revelar 🃏",
-  "summary": "Revisão rápida dos comandos apresentados • 4 min",
+  "title": "Desafio: revise os comandos com cartões",
+  "summary": "Toque para revelar a função de cada comando • 4 min",
   "commands": [
    [
     "git init",
@@ -299,8 +335,8 @@ const phase1Steps=[
  {
   "id": "f1-direction",
   "type": "choice-scenario",
-  "title": "15 · Qual comando resolve? 🎮",
-  "summary": "Escolha a melhor solução com base nos exemplos anteriores • 5 min",
+  "title": "Desafio: enviar, receber ou copiar?",
+  "summary": "Escolha entre push, pull e clone • 5 min",
   "scenarios": [
    [
     "Tenho commits locais e quero enviá-los ao GitHub.",
@@ -334,8 +370,8 @@ const phase1Steps=[
  {
   "id": "f1-commit-intro",
   "type": "visual-summary",
-  "title": "16 · Um bom commit conta o que mudou 💬",
-  "summary": "Veja o exemplo e descubra a ideia • 4 min",
+  "title": "Como escrever uma mensagem de commit?",
+  "summary": "Compare mensagens claras e vagas • 4 min",
   "idea": "A mensagem deve ajudar você a entender o histórico depois.",
   "items": [
    "Ruim: \"coisas\" → não explica nada",
@@ -348,8 +384,8 @@ const phase1Steps=[
  {
   "id": "f1-commit",
   "type": "choice-scenario",
-  "title": "17 · Escolha a melhor mensagem ✨",
-  "summary": "Escolha a melhor solução com base nos exemplos anteriores • 4 min",
+  "title": "Desafio: escolha uma boa mensagem",
+  "summary": "Aplique os exemplos anteriores • 4 min",
   "scenarios": [
    [
     "Você criou a estrutura inicial do EduTech.",
@@ -372,10 +408,19 @@ const phase1Steps=[
   ]
  },
  {
+  "id": "f1-block-5",
+  "type": "content",
+  "title": "BLOCO 5 · Revisão e preparação para o EduTech",
+  "summary": "Comece por aqui: neste bloco você aprende antes de responder.",
+  "body": [
+   "Objetivo: conferir o aprendizado e iniciar a prática acompanhada."
+  ]
+ },
+ {
   "id": "f1-final",
   "type": "quiz",
-  "title": "18 · Checkpoint: você está pronto? 🏁",
-  "summary": "Confira o que aprendeu na etapa anterior • 3 min",
+  "title": "Checkpoint final · O que você aprendeu?",
+  "summary": "Revisão dos conceitos trabalhados • 3 min",
   "question": "Qual é a sequência correta para registrar e enviar uma alteração?",
   "options": [
    "Salvar → status → add → commit → push",
@@ -388,8 +433,8 @@ const phase1Steps=[
  {
   "id": "f1-handoff",
   "type": "visual-summary",
-  "title": "19 · Agora é mão na massa! 🛠️",
-  "summary": "Veja o exemplo e descubra a ideia • 5 min",
+  "title": "Agora é com o instrutor: EduTech",
+  "summary": "Veja o que faremos na prática • 5 min",
   "idea": "Na Prática Guiada, o instrutor mostrará cada passo no EduTech.",
   "items": [
    "Abrir a pasta no VS Code e criar a estrutura inicial",
