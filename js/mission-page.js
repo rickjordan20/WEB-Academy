@@ -5,7 +5,7 @@ import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
 let projectContext=null,scheduledLesson=null;
-async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode").eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data; if(mission&&missionStatus(id)!==STATUS.LOCKED)render()}catch(error){console.warn("Cronograma da missão:",error)}}
+async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active").limit(1);const classId=members?.[0]?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data; if(mission&&missionStatus(id)!==STATUS.LOCKED)render()}catch(error){console.warn("Cronograma da missão:",error)}}
 const params=new URLSearchParams(location.search),id=params.get("id"),root=document.querySelector("#missionRoot");
 const state=getState();if(!state?.student?.name)location.replace("index.html");
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
