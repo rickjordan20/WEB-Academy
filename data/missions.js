@@ -69,6 +69,12 @@ export const EXTRA_MISSIONS=[
 {id:"R6",title:"Conectando as Camadas",official:"Cliente-Servidor e Banco de Dados: Fluxo e Persistência",hours:4,competencies:["I2","I4","I5"]},
 {id:"R7",title:"Desafio Full Stack",official:"Jornada Web: Desafio Integrado de Consolidação",hours:4,competencies:["I1","I2","I3","I4","I5","I6"]}
 ];
+// Pré-configuração das sete atividades remotas: editável por turma no painel do instrutor.
+EXTRA_MISSIONS.forEach(m=>{m.subtitle=m.official;m.steps=[
+{id:m.id+"-intro",type:"content",title:"Objetivos e contextualização",summary:m.official,body:["Nesta atividade remota você vai consolidar os conhecimentos de: "+m.official+".","Leia os objetivos, realize a prática proposta e registre sua aprendizagem."]},
+{id:m.id+"-practice",type:"guided",title:"Prática autônoma",summary:"Aplicação individual dos conhecimentos",instructions:["Revise o material das aulas anteriores relacionado ao tema.","Desenvolva uma pequena melhoria ou exercício aplicado ao projeto em andamento.","Execute testes, revise o resultado e registre as alterações realizadas."]},
+{id:m.id+"-evidence",type:"evidence",title:"Evidência e reflexão",summary:"Comprove sua participação",fields:["O que você desenvolveu ou estudou?","Informe o link do repositório, commit ou evidência do exercício.","Qual dificuldade encontrou e como buscou resolvê-la?"]}
+]});
 export const ASSESSMENT_MILESTONES=[
 {id:"M1",title:"Preparação do Desenvolvedor",official:"Avaliação 1 — Ambiente de Desenvolvimento e Versionamento",after:"1B",competencies:["I1","I6"]},
 {id:"M2",title:"Construção da Interface",official:"Avaliação 2 — Desenvolvimento da Interface Web",after:"6B",competencies:["I2","I3","I6"]},
