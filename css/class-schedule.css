@@ -3,3 +3,5 @@ body.schedule-page{background:#081421;color:#f2f6ff;min-height:100vh} .schedule-
 .schedule-mission-link{color:#b7aaff;text-decoration:none;font-weight:650;line-height:1.4}
 .schedule-mission-link:hover{text-decoration:underline;color:#d3cbff}
 .schedule-form select[name="mission_id"]{width:100%}
+
+.schedule-help{margin:-.4rem 0 .2rem;color:#aebed7;font-size:.8rem;line-height:1.55}
