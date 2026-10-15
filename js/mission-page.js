@@ -12,7 +12,7 @@ const state=getState();if(!state?.student?.name)location.replace("index.html");
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission)root.innerHTML='<section class="card current-mission"><h1>Missão ainda não disponível</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
 else if(missionStatus(id)===STATUS.LOCKED)root.innerHTML='<section class="card current-mission"><h1>🔒 Missão bloqueada</h1><p>Conclua a missão anterior para continuar sua Jornada.</p><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
-else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(id);if(access.state!=="open"){root.replaceChildren(windowNotice(access));}else{startMission(id);projectContext=await getMissionProjectContext(mission);render();refreshMissionSchedule();}}
+else{root.innerHTML='<section class="card current-mission"><h1>Verificando disponibilidade...</h1></section>';const access=await missionWindow(id);if(access.state!=="open"){root.replaceChildren(windowNotice(access));}else{startMission(id);projectContext=await getMissionProjectContext(mission);render();refreshMissionSchedule();startWindowWatch(id);}}
 function render(){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
  const guidedContent=mission.type==="training"?`
@@ -24,3 +24,4 @@ function render(){
  mission.steps.forEach(step=>{const completed=done.includes(step.id);bindStep(step,id,render,undefined,{completed})});
  if(done.length===total)root.insertAdjacentHTML("beforeend",`<section class="card current-mission mission-complete"><p class="eyebrow">Missão ${pad(mission.number)} concluída</p><h2>${mission.type==="training"?"Aula registrada! 🎉":"Desafio da Guilda concluído! 🎉"}</h2><p>Seu progresso e suas evidências foram salvos.</p><a class="btn btn-primary" href="journey.html">Continuar Jornada →</a></section>`);
 }
+function startWindowWatch(missionId){let checking=false;const check=async()=>{if(checking||document.hidden)return;checking=true;try{const access=await missionWindow(missionId);if(access.state!=="open"){root.replaceChildren(windowNotice(access));clearInterval(timer);document.removeEventListener("visibilitychange",check)}}finally{checking=false}};const timer=setInterval(check,60000);document.addEventListener("visibilitychange",check)}
