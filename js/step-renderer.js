@@ -17,7 +17,7 @@ const linkedText=value=>{
  return html+esc(raw.slice(last));
 };
 const renderCommand=command=>`<div class="learning-command"><code>${esc(command)}</code><button type="button" class="learning-copy-btn" data-copy-command="${esc(command)}" aria-label="Copiar comando">Copiar</button></div>`;
-const guidedInstruction=value=>{const raw=String(value??"");const match=raw.match(/^(?:Digite|Execute) (git (?:--version|init|status|add \\.|commit -m "[^"]+"|log -1 --oneline|config --global (?:user\\.name|user\\.email)(?: "[^"]+")?|remote (?:add origin [^ ]+|-v)|branch -M main|push(?: -u origin main)?|pull|clone[^.]*))(?=[., ]|$)/i);if(!match)return linkedText(raw);const cmd=match[1];return linkedText(raw)+renderCommand(cmd)};
+const guidedInstruction=value=>{const raw=String(value??"");const match=raw.match(/^(?:Digite|Execute) (git (?:--version|init|status|add \.|commit -m "[^"]+"|log -1 --oneline|config --global (?:user\.name|user\.email)(?: "[^"]+")?|remote (?:add origin [^ ]+|-v)|branch -M main|push(?: -u origin main)?|pull))(?=[., ]|$)/i);if(!match)return linkedText(raw);return linkedText(raw)+renderCommand(match[1])};
 export function renderStep(step,missionId,done,options={}){
  const saved=options.previewStore?options.previewStore.answers.get(step.id):options.preview===true?null:readAnswer(missionId,step.id); const editable=options.editableCompleted===true;
  const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
