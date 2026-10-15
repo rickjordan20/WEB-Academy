@@ -1,3 +1,6 @@
 js/supabase-config.js
 .env
 .env.*
+
+# Local-only Supabase credentials for Docker testing
+js/supabase-config.local.js
