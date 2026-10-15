@@ -52,3 +52,58 @@
 
 .learning-step .guided-tip{padding:14px 16px;border:1px solid var(--line,#dce3e8);border-left:4px solid #c68b25;border-radius:12px;margin:14px 0;background:var(--surface-secondary,#fff9ed)}
 .learning-step .guided-tip strong{display:block;margin-bottom:6px}.learning-step .guided-tip p{margin:0;line-height:1.55}
+
+
+/* Contraste acessível: cartões claros dentro do tema escuro da plataforma.
+   Não depender de --text, que é branco no tema escuro. */
+.learning-step .guided-goal,
+.learning-step .guided-outcome,
+.learning-step .guided-tip,
+.learning-step .learning-section {
+  color:#172b40;
+  background:#f3f7fb;
+}
+.learning-step .guided-goal *,
+.learning-step .guided-outcome *,
+.learning-step .guided-tip *,
+.learning-step .learning-section * {
+  color:inherit;
+}
+.learning-step .guided-goal strong,
+.learning-step .guided-outcome strong,
+.learning-step .guided-tip strong,
+.learning-step .learning-section h3 {
+  color:#12263c;
+}
+.learning-step .guided-goal p,
+.learning-step .guided-outcome p,
+.learning-step .guided-tip p,
+.learning-step .learning-section p,
+.learning-step .learning-section li {
+  color:#243b53;
+}
+.learning-step .guided-tip {
+  background:#fff7e8;
+  border-color:#e6c17b;
+  border-left-color:#b97811;
+}
+.learning-step .guided-outcome {
+  background:#ecf9f2;
+  border-color:#9ed5b6;
+  border-left-color:#198754;
+}
+.learning-step .guided-goal {
+  background:#eef5ff;
+  border-color:#b9d3f4;
+  border-left-color:#3177c6;
+}
+.learning-step .learning-section-head span {
+  background:#e4ecf4;
+  color:#172b40;
+}
+.learning-step .learning-section .guided-link,
+.learning-step .guided-goal .guided-link,
+.learning-step .guided-tip .guided-link,
+.learning-step .guided-outcome .guided-link {
+  color:#075b8f;
+}
