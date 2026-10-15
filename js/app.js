@@ -129,8 +129,43 @@ function showBackupRestoreStatus(info){
 }
 try{const saved=localStorage.getItem(BACKUP_RESTORE_KEY);if(saved)showBackupRestoreStatus(JSON.parse(saved))}catch{};
 $("#openSettings").addEventListener("click", () => settings.showModal());
-$("#profileButton").addEventListener("click", () => profile.showModal());
-$("#showProfile").addEventListener("click", () => profile.showModal());
+let studentProfileDetails=null;
+const studentProfileForm=$("#studentProfileForm");
+const profileFeedback=$("#studentProfileFeedback");
+async function openStudentProfile(){
+ profile.showModal();
+ profileFeedback.textContent="";
+ if(!cloudSession){studentProfileForm.querySelector('button[type="submit"]').disabled=true;profileFeedback.textContent="Faça login para editar seus dados.";return}
+ try{
+  const {data,error}=await sb.from("student_profile_details").select("display_name,bio,learning_goal,github_url,portfolio_url,linkedin_url").eq("user_id",cloudSession.user.id).maybeSingle();
+  if(error)throw error;
+  studentProfileDetails=data||{};
+  for(const field of ["display_name","bio","learning_goal","github_url","portfolio_url","linkedin_url"])studentProfileForm.elements.namedItem(field).value=studentProfileDetails[field]||"";
+  $("#profileLoginEmail").textContent=cloudSession.user.email||"Não informado";
+  studentProfileForm.querySelector('button[type="submit"]').disabled=false;
+ }catch(err){profileFeedback.textContent="Não foi possível carregar os dados: "+err.message;profileFeedback.className="feedback error";studentProfileForm.querySelector('button[type="submit"]').disabled=true}
+}
+$("#profileButton").addEventListener("click",openStudentProfile);
+$("#showProfile").addEventListener("click",openStudentProfile);
+$("#closeProfile").addEventListener("click",()=>profile.close());
+studentProfileForm.addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!cloudSession)return;
+ const button=$("#saveStudentProfile"),data=Object.fromEntries(new FormData(studentProfileForm));
+ for(const field of Object.keys(data))data[field]=String(data[field]||"").trim();
+ for(const field of ["github_url","portfolio_url","linkedin_url"]){
+  if(data[field]&&!/^https:\/\//i.test(data[field])){profileFeedback.textContent="Os links devem começar com https://";profileFeedback.className="feedback error";return}
+ }
+ button.disabled=true;profileFeedback.textContent="Salvando...";profileFeedback.className="feedback";
+ try{
+  const {error}=await sb.from("student_profile_details").upsert({user_id:cloudSession.user.id,...data,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  if(error)throw error;
+  studentProfileDetails=data;
+  profileFeedback.textContent="Perfil atualizado com sucesso.";profileFeedback.className="feedback success";
+  toast("Informações do perfil salvas.");
+ }catch(err){profileFeedback.textContent="Não foi possível salvar: "+err.message;profileFeedback.className="feedback error"}
+ finally{button.disabled=false}
+});
 $("#exportBackup").addEventListener("click", () => { try { exportState(); toast("Backup exportado."); } catch(e) { toast(e.message); } });
 const picker = $("#backupFile");
 $("#importBackup").addEventListener("click", () => picker.click());
