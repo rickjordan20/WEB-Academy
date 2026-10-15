@@ -219,6 +219,12 @@ async function openStudentProfile(){
 }
 $("#profileButton").addEventListener("click",openStudentProfile);
 $("#showProfile").addEventListener("click",openStudentProfile);
+// Acesso às opções do dashboard a partir do menu compartilhado das páginas internas.
+const requestedPanel=new URLSearchParams(location.search).get("panel");
+if(requestedPanel==="settings")settings.showModal();
+else if(requestedPanel==="profile")openStudentProfile().catch(error=>console.warn("Não foi possível abrir o perfil:",error));
+if(requestedPanel==="settings"||requestedPanel==="profile")history.replaceState(null,"",location.pathname);
+
 $("#closeProfile").addEventListener("click",()=>profile.close());
 studentProfileForm.addEventListener("submit",async e=>{
  e.preventDefault();
