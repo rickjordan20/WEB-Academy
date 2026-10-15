@@ -20,7 +20,9 @@ async function load(){
  let profiles=[];if(ids.length){const result=await sb.from('profiles').select('id,full_name').in('id',ids);if(result.error){$('#reviewStatus').textContent=result.error.message;return}profiles=result.data||[]}
  const filtered=(data||[]).filter(x=>$('#reviewFilter').value==='all'||x.status===$('#reviewFilter').value);
  $('#reviewStatus').textContent=filtered.length+' entrega(s) encontrada(s).';
+ $('#reviewCount').textContent=filtered.length+' entrega(s)';
  $('#reviewList').replaceChildren();
+ if(!filtered.length){$('#reviewList').innerHTML='<div class="card review-empty"><div aria-hidden="true" style="font-size:2rem">📭</div><h3>Nenhuma entrega nesta situação</h3><p>Quando os estudantes enviarem as missões para avaliação, elas aparecerão aqui. Você também pode selecionar “Todas” para consultar outros status.</p></div>';return;}
  for(const item of filtered){
   const name=profiles.find(p=>p.id===item.student_id)?.full_name||'Estudante';
   const card=document.createElement('article');card.className='card';card.style.marginTop='1rem';
