@@ -1,11 +1,26 @@
 import {parseBehaviorChecks,evaluateCodeLab} from "./code-lab-checks.js";
 import { completeStep,saveAnswer as persistAnswer,getAnswer as readAnswer,recordCodeAttempt as persistCodeAttempt,getCodeAttempts as readCodeAttempts } from "./mission-engine.js";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+// Renderiza URLs e links Markdown com segurança, sem interpretar HTML do editor.
+const linkedText=value=>{
+ const raw=String(value??"");
+ const pattern=/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>()]+)/g;
+ let html="",last=0,match;
+ while((match=pattern.exec(raw))){
+  html+=esc(raw.slice(last,match.index));
+  let url=match[2]||match[3],label=match[1]||url;
+  if(!match[2]){const suffix=url.match(/[.,;!?]+$/)?.[0]||"";url=url.slice(0,url.length-suffix.length);label=url;}
+  try{const parsed=new URL(url);if(!["http:","https:"].includes(parsed.protocol))throw Error("Invalid link");html+=`<a href="${esc(parsed.href)}" target="_blank" rel="noopener noreferrer" class="guided-link">${esc(label)}</a>`;}catch{html+=esc(match[0]);}
+  if(!match[2])html+=esc((match[3]||"").slice(url.length));
+  last=pattern.lastIndex;
+ }
+ return html+esc(raw.slice(last));
+};
 export function renderStep(step,missionId,done,options={}){
  const saved=options.previewStore?options.previewStore.answers.get(step.id):options.preview===true?null:readAnswer(missionId,step.id); const editable=options.editableCompleted===true;
  const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
  let body="";
- if(step.type==="content")body=`${(step.body||[]).map(p=>`<p>${esc(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
+ if(step.type==="content")body=`${(step.body||[]).map(p=>`<p>${linkedText(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
  if(step.type==="visual-summary")body=`<div class="visual-idea">${esc(step.idea)}</div><div class="visual-summary-grid">${step.items.map((x,i)=>`<div><span>${String(i+1).padStart(2,"0")}</span><strong>${esc(x)}</strong></div>`).join("")}</div>`;
  if(step.type==="match-cards")body=`<div class="match-card-grid">${step.pairs.map((x,i)=>`<button type="button" class="match-card" data-reveal-card="${i}"><span>${esc(x[0])}</span><strong>Toque para revelar</strong><em>${esc(x[1])}</em></button>`).join("")}</div>`;
  if(step.type==="command-deck")body=`<div class="command-deck">${step.commands.map((x,i)=>`<button type="button" class="command-card" data-reveal-card="${i}"><code>${esc(x[0])}</code><span>Para que serve?</span><strong>${esc(x[1])}</strong></button>`).join("")}</div>`;
@@ -13,7 +28,7 @@ export function renderStep(step,missionId,done,options={}){
  if(step.type==="quiz")body=`<fieldset class="quiz-options"><legend>${esc(step.question)}</legend>${step.options.map((o,i)=>`<label><input type="radio" name="q-${step.id}" value="${i}" ${String(saved)===String(i)?"checked":""}> <span>${esc(o)}</span></label>`).join("")}</fieldset><div class="feedback" data-feedback></div>`;
  if(step.type==="complete-code")body=`<div class="code-complete"><code>${esc(step.prefix)}</code><input data-code-answer placeholder="${esc(step.placeholder)}" value="${esc(saved||"")}"></div><div class="feedback" data-feedback></div>`;
  if(step.type==="editor")body=`<div class="lab-grid"><div><div class="lab-toolbar"><b>Laboratório HTML, CSS e JavaScript</b><button type="button" class="btn btn-secondary" data-run>Executar ▶</button></div><label class="lab-editor-label">HTML<textarea class="code-editor" data-editor spellcheck="false">${esc(typeof saved==="string"?saved:saved?.html??(step.prefillHtml===false?"":step.starter??""))}</textarea></label><label class="lab-editor-label">CSS<textarea class="code-editor" data-css-editor spellcheck="false">${esc(saved?.css??(step.prefillCss===false?"":step.starterCss??""))}</textarea></label><label class="lab-editor-label">JavaScript<textarea class="code-editor" data-js-editor spellcheck="false">${esc(saved?.js??(step.prefillJs===false?"":step.starterJs??""))}</textarea></label><div class="feedback" data-code-feedback role="status"></div><small data-attempt-count></small></div><div><div class="lab-toolbar"><b>Resultado</b></div><iframe class="preview-frame" data-preview sandbox="allow-scripts" referrerpolicy="no-referrer" title="Resultado do código"></iframe></div></div>`;
- if(step.type==="guided")body=`${step.goal?`<div class="guided-goal"><strong>🎯 Objetivo desta etapa</strong><p>${esc(step.goal)}</p></div>`:""}<ol class="instruction-list">${(step.instructions||[]).map(x=>`<li>${esc(x).replace(/https:\/\/[^\\s&lt;&gt;()]+/g,url=>`<a href="${url}" target="_blank" rel="noopener noreferrer" class="guided-link">${url}</a>`)}</li>`).join("")}</ol>${step.outcome?`<div class="guided-outcome"><strong>✅ Antes de avançar, confira</strong><p>${esc(step.outcome)}</p></div>`:""}`;
+ if(step.type==="guided")body=`${step.goal?`<div class="guided-goal"><strong>🎯 Objetivo desta etapa</strong><p>${esc(step.goal)}</p></div>`:""}<ol class="instruction-list">${(step.instructions||[]).map(x=>`<li>${linkedText(x)}</li>`).join("")}</ol>${step.outcome?`<div class="guided-outcome"><strong>✅ Antes de avançar, confira</strong><p>${esc(step.outcome)}</p></div>`:""}`;
  if(step.type==="reflection")body=`<div class="reflection-fields">${step.prompts.map((p,i)=>`<label>${esc(p)}<textarea data-reflection="${i}" placeholder="Escreva sua resposta...">${esc(saved?.[i]||"")}</textarea></label>`).join("")}</div>`;
  if(step.type==="checkpoint")body=`<p class="checkpoint-question">${esc(step.question)}</p><div class="checkpoint-options">${step.options.map((o,i)=>`<label><input type="radio" name="cp-${step.id}" value="${i}" ${String(saved)===String(i)?"checked":""}> ${esc(o)}</label>`).join("")}</div>`;
  if(step.type==="sequence")body=`<p class="checkpoint-question">${esc(step.prompt)}</p><div class="sequence-list" data-sequence-list>${step.items.map((x,i)=>`<button type="button" class="sequence-item" data-sequence-item="${i}"><span>${i+1}</span><code>${esc(x)}</code></button>`).join("")}</div><p class="sequence-answer" data-sequence-answer></p><div class="feedback" data-feedback></div>`;
