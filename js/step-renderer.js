@@ -1,7 +1,7 @@
-import { completeStep,saveAnswer,getAnswer,recordCodeAttempt,getCodeAttempts } from "./mission-engine.js";
+import { completeStep,saveAnswer as persistAnswer,getAnswer as readAnswer,recordCodeAttempt as persistCodeAttempt,getCodeAttempts as readCodeAttempts } from "./mission-engine.js";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 export function renderStep(step,missionId,done,options={}){
- const saved=options.preview===true?null:getAnswer(missionId,step.id); const editable=options.editableCompleted===true;
+ const saved=options.previewStore?options.previewStore.answers.get(step.id):options.preview===true?null:readAnswer(missionId,step.id); const editable=options.editableCompleted===true;
  const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
  let body="";
  if(step.type==="content")body=`${(step.body||[]).map(p=>`<p>${esc(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
@@ -22,6 +22,11 @@ export function renderStep(step,missionId,done,options={}){
 }
 export function bindStep(step,missionId,onChange,complete=completeStep,options={}){
  const card=document.querySelector(`[data-step-card="${step.id}"]`);if(!card)return; const completed=options.completed===true;
+ const store=options.previewStore;
+ const saveAnswer=(unit,key,value)=>{if(store){store.answers.set(key,structuredClone(value));return}return persistAnswer(unit,key,value)};
+ const getAnswer=(unit,key)=>store?store.answers.get(key):readAnswer(unit,key);
+ const recordCodeAttempt=(unit,key,result)=>{if(store){const count=(store.attempts.get(key)||0)+1;store.attempts.set(key,count);return {count}}return persistCodeAttempt(unit,key,result)};
+ const getCodeAttempts=(unit,key)=>store?{count:store.attempts.get(key)||0}:readCodeAttempts(unit,key);
  const finish=()=>{const ok=complete(missionId,step.id);if(!ok){throw new Error(`Não foi possível concluir a etapa ${step.id}.`)}onChange();requestAnimationFrame(()=>{const next=document.querySelector(`[data-step-card]:not(.done)`);next?.scrollIntoView({behavior:"smooth",block:"center"})})};
  if(step.type==="visual-summary"){card.querySelector("[data-complete-step]").onclick=finish;return}
  if(step.type==="match-cards"||step.type==="command-deck"){const reveal=[...card.querySelectorAll("[data-reveal-card]")];reveal.forEach(b=>b.onclick=()=>b.classList.toggle("revealed"));card.querySelector("[data-complete-step]").onclick=()=>{if(reveal.some(b=>!b.classList.contains("revealed"))){const s=card.querySelector(".save-state");s.textContent="Explore todos os cards antes de concluir.";return}finish()};return}
