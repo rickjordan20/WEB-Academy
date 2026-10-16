@@ -1,3 +1,5 @@
+import {mountMissionSubmission} from './mission-submission.js';
+import {organizeMission} from './mission-wizard.js';
 import {loadEditedMissionContent,applyEditedMissionContent} from "./mission-content.js";
 import {missionWindow,windowNotice} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
@@ -7,7 +9,7 @@ import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
 let projectContext=null,scheduledLesson=null;
-async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active").limit(1);const classId=members?.[0]?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,class_id").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data;if(scheduledLesson){const {data:classData}=await sb.from("classes").select("lesson_start_time,lesson_end_time").eq("id",classId).maybeSingle();scheduledLesson.start=String(scheduledLesson.start_time_override||classData?.lesson_start_time||"").slice(0,5);scheduledLesson.end=String(scheduledLesson.end_time_override||classData?.lesson_end_time||"").slice(0,5)} if(mission&&missionStatus(id)!==STATUS.LOCKED)render()}catch(error){console.warn("Cronograma da missão:",error)}}
+async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active");const preferred=localStorage.getItem("webacademy.student.activeClass");const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,class_id").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data;if(scheduledLesson){const {data:classData}=await sb.from("classes").select("lesson_start_time,lesson_end_time").eq("id",classId).maybeSingle();scheduledLesson.start=String(scheduledLesson.start_time_override||classData?.lesson_start_time||"").slice(0,5);scheduledLesson.end=String(scheduledLesson.end_time_override||classData?.lesson_end_time||"").slice(0,5)} if(mission&&missionStatus(id)!==STATUS.LOCKED)render()}catch(error){console.warn("Cronograma da missão:",error)}}
 const params=new URLSearchParams(location.search),id=params.get("id"),root=document.querySelector("#missionRoot");
 const state=getState();if(!state?.student?.name)location.replace("index.html");
 try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
@@ -24,5 +26,7 @@ function render(){
  if(mission.type==="training"&&!fundDone)return;
  mission.steps.forEach(step=>{const completed=done.includes(step.id);bindStep(step,id,render,undefined,{completed})});
  if(done.length===total)root.insertAdjacentHTML("beforeend",`<section class="card current-mission mission-complete"><p class="eyebrow">Missão ${pad(mission.number)} concluída</p><h2>${mission.type==="training"?"Aula registrada! 🎉":"Desafio da Guilda concluído! 🎉"}</h2><p>Seu progresso e suas evidências foram salvos.</p><a class="btn btn-primary" href="journey.html">Continuar Jornada →</a></section>`);
+ organizeMission(root,mission,done,fundDone);
+ if(done.length===total)mountMissionSubmission(id,root).then(()=>organizeMission(root,mission,done,fundDone)).catch(error=>console.warn('Entrega:',error));
 }
 function startWindowWatch(missionId){let checking=false;const check=async()=>{if(checking||document.hidden)return;checking=true;try{const access=await missionWindow(missionId);if(access.state!=="open"){root.replaceChildren(windowNotice(access));clearInterval(timer);document.removeEventListener("visibilitychange",check)}}finally{checking=false}};const timer=setInterval(check,60000);document.addEventListener("visibilitychange",check)}
