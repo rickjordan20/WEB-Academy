@@ -12,7 +12,7 @@ const params=new URLSearchParams(location.search),id=params.get("id"),root=docum
 const state=getState();if(!state?.student?.name)location.replace("index.html");
 try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission)root.innerHTML='<section class="card current-mission"><h1>Missão ainda não disponível</h1><a class="btn btn-primary" href="journey.html">Voltar ao mapa</a></section>';
-else{root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';const access=await missionWindow(id);const editable=missionStatus(id)!==STATUS.LOCKED&&access.state==="open";missionReadOnly=!editable;missionAccess=access;if(editable)startMission(id);projectContext=await getMissionProjectContext(mission);render(!editable,access);refreshMissionSchedule();if(editable)startWindowWatch(id);else if(access.state==="upcoming")startWindowWatch(id); }
+else{root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';const access=await missionWindow(id);const editable=true;missionReadOnly=!editable;missionAccess=access;if(editable)startMission(id);projectContext=await getMissionProjectContext(mission);render(!editable,access);refreshMissionSchedule(); }
 function render(readOnly=false,access=null){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
  const guidedContent=mission.type==="training"?`
