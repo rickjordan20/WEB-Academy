@@ -129,3 +129,18 @@
 .eval-concepts label:has(input:checked){border-color:var(--primary-2);background:rgba(132,112,255,.16)}
 .eval-actions .btn{white-space:normal}
 @media(max-width:600px){#lateMissionReview{padding:.8rem}.eval-row-actions{width:100%}.eval-row-actions .btn{flex:1}.eval-actions .btn{flex:1 1 100%}}
+
+
+/* Avaliação guiada: resumo de progresso, XP e modelos editáveis */
+.eval-progress-summary{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0 1.6rem}
+.eval-progress-summary>div{display:grid;align-content:start;gap:.4rem;border:1px solid var(--line);border-radius:14px;padding:1rem;background:#0b1929}
+.eval-progress-summary small{color:var(--muted);font-size:.78rem}
+.eval-progress-summary strong{font-size:1.18rem;color:var(--text)}
+.eval-progress-summary .muted{font-size:.78rem}
+.eval-progress-track{height:8px;background:#06101f;border-radius:99px;overflow:hidden;margin-top:.3rem}
+.eval-progress-track i{display:block;height:100%;background:#8675f9;border-radius:99px}
+.eval-feedback-tools{display:grid;gap:.7rem;margin-top:1rem;padding:.85rem;border-radius:10px;background:rgba(135,119,255,.055);border:1px solid var(--line)}
+.eval-feedback-tools>label:first-child{display:grid;gap:.45rem;font-size:.82rem}
+.eval-feedback-tools select{width:100%;max-width:100%}
+.eval-check-status{font-size:.84rem;font-weight:650;color:#5ad7bc}
+@media(max-width:640px){.eval-progress-summary{grid-template-columns:1fr}}
