@@ -1,6 +1,6 @@
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
-import {getMission,getFundamental} from "./mission-engine.js";
+import {getMission,getFundamental,completeFundamentalStep} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 const reasons=[["absence","Ausência ou falta à aula"],["organization","Falta de atenção ou organização"],["platform","Problema na plataforma"],["internet","Internet ou equipamento"],["personal","Motivo pessoal ou de saúde"],["other","Outro motivo"]];
@@ -35,7 +35,7 @@ export async function mountMissionDelivery(missionId,access,root){
    reviewFund.innerHTML='<h2>Fundamentos · revisar nesta página</h2><p>Se houver atividades de Fundamentos pendentes, você também pode corrigi-las aqui.</p><div class="inline-fundamental-steps">'+(fundamental.steps||[]).map(step=>'<div class="inline-fundamental-step" data-fundamental-step="'+safeText(step.id)+'">'+makeNote(fundamental.id,step,"Fundamentos")+renderStep(step,fundamental.id,done.has(step.id),{editableCompleted:true})+'</div>').join("")+'</div>';
    const deliveryAnchor=root.querySelector(".learning-list");
    if(deliveryAnchor)deliveryAnchor.after(reviewFund);else root.append(reviewFund);
-   for(const step of fundamental.steps||[])bindStep(step,fundamental.id,()=>location.reload(),undefined,{completed:done.has(step.id)});
+   for(const step of fundamental.steps||[])bindStep(step,fundamental.id,()=>location.reload(),completeFundamentalStep,{completed:done.has(step.id)});
   }
  }
  const late=access?.state==="closed"||(access?.closesAt&&new Date(access.closesAt).getTime()<Date.now());
