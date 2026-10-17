@@ -7,20 +7,20 @@ if(sb){
  if(!session){setActiveUser(null);location.replace("auth.html")}
  else{
   setActiveUser(session.user.id);
-  let pending=false, syncing=false, retryTimer=null,debounceTimer=null;
+  let pending=false, syncing=false, retryTimer=null,debounceTimer=null,saveVersion=0;
   const scheduleRetry=()=>{clearTimeout(retryTimer);if(navigator.onLine)retryTimer=setTimeout(()=>syncPending(),5000)};
   async function syncPending(){
    if(syncing||!navigator.onLine||!pending)return;
-   syncing=true;
+   syncing=true;const startedAtVersion=saveVersion;
    try{
     const result=await pushCloudState();
-    if(result?.synced)pending=false;
+    if(result?.synced){pending=saveVersion!==startedAtVersion;if(pending)scheduleRetry();}
     else scheduleRetry();
    }catch(error){console.warn("Sincronização pendente; progresso local preservado:",error);scheduleRetry()}
    finally{syncing=false}
   }
   window.addEventListener("uc7:state-saved",()=>{
-   pending=true;clearTimeout(debounceTimer);
+   pending=true;saveVersion++;clearTimeout(debounceTimer);
    debounceTimer=setTimeout(syncPending,700);
   });
   window.addEventListener("online",()=>{pending=true;clearTimeout(retryTimer);syncPending()});
