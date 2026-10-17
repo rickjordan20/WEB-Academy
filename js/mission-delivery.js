@@ -34,7 +34,17 @@ export async function mountMissionDelivery(missionId,access,root){
   button.disabled=true;feedback.textContent="Enviando...";
   try{
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
-   const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:state?.evidence||[],status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!late,deadline_at:access?.closesAt||null,late_reason:late?reason.value:null,late_explanation:late?explanation.value.trim():"",submitted_at:new Date().toISOString()};
+   const phase=Number(String(missionId).match(/^\\d+/)?.[0]||0);
+   const missionProgress=state?.journey?.missionProgress?.[missionId]||{};
+   const fundamentalId="F"+phase;
+   const fundamentalProgress=state?.journey?.fundamentalProgress?.[fundamentalId]||{};
+   const progressSnapshot={
+    version:1,capturedAt:new Date().toISOString(),
+    mission:{completedSteps:[...(missionProgress.completedSteps||[])],startedAt:missionProgress.startedAt||null,completed:!!state?.journey?.completedMissions?.includes(missionId)},
+    fundamentals:{id:fundamentalId,completedSteps:[...(fundamentalProgress.completedSteps||[])],startedAt:fundamentalProgress.startedAt||null,completed:!!state?.journey?.completedFundamentals?.includes(fundamentalId)},
+    codeAttempts:Object.fromEntries(Object.entries(state?.codeAttempts||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith(fundamentalId+":")))
+   };
+   const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!late,deadline_at:access?.closesAt||null,late_reason:late?reason.value:null,late_explanation:late?explanation.value.trim():"",submitted_at:new Date().toISOString()};
    const result=previous?.id?await sb.from("mission_submissions").update(payload).eq("id",previous.id):await sb.from("mission_submissions").insert(payload);
    if(result.error)throw result.error;
    feedback.textContent="Entrega registrada para avaliação do instrutor.";button.textContent="Entrega enviada";
