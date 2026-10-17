@@ -6,3 +6,18 @@
 .delivery-preflight ul{padding-left:1.35rem;max-height:240px;overflow:auto;margin:.6rem 0}
 .delivery-preflight li{margin:.35rem 0}
 .delivery-preflight p{margin:.6rem 0}
+
+/* Revisão integrada: feedback junto aos campos editáveis */
+.inline-revision-overview{border:1px solid rgba(238,166,74,.48);background:rgba(238,166,74,.08);padding:1.4rem;margin:1.2rem 0 1.5rem;border-radius:16px}
+.inline-revision-overview h2{margin:.4rem 0}.inline-revision-overview p{line-height:1.6}
+.inline-revision-overview>a{color:#9c70f2;font-weight:700;text-decoration:underline}
+.inline-teacher-message{border-left:4px solid #d59c44;background:rgba(238,166,74,.08);padding:1rem;margin:1rem 0}
+.inline-teacher-message p{white-space:pre-wrap;margin:.4rem 0 0}
+.inline-revision-note{padding:1rem;border:1px solid rgba(150,160,180,.3);border-radius:12px;background:rgba(90,110,150,.08);margin:1rem 0}
+.inline-revision-note.needs-work{border-color:rgba(225,151,54,.65);background:rgba(225,151,54,.09)}
+.inline-revision-note strong{display:block;margin-bottom:.4rem}
+.inline-revision-note p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;margin:.4rem 0}
+.inline-fundamentals-review{margin:1.4rem 0;padding:1.2rem;border-radius:16px}
+.inline-fundamental-steps{display:grid;gap:1rem}.inline-fundamental-step{min-width:0}
+.inline-fundamental-step .learning-step{margin:0}
+@media(max-width:600px){.inline-revision-overview,.inline-fundamentals-review{padding:1rem}}
