@@ -12,32 +12,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
- if(isRevision){
-  const grades=previous.grades||{},comments=grades.blocks||{},concepts=grades.blockIndicators||{};
-  const human={A:"Aprendizagem demonstrada",PA:"Precisa melhorar",NA:"Ainda não demonstrada"};
-  const makeNote=(unit,step,area)=>{
-   const key=unit+":"+step.id,comment=String(comments[key]||"").trim(),mentions=concepts[key]||{};
-   const needs=Object.values(mentions).some(v=>v==="PA"||v==="NA");
-   const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
-   if(!needs&&!comment)return "";
-   return '<aside class="inline-revision-note '+(needs?"needs-work":"")+'"><strong>Orientação do instrutor · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment&&!generic?'<p>'+safeText(comment)+'</p>':generic?'<p>Confira esta atividade e marque a conclusão quando terminar.</p>':"")+'</aside>';
-  };
-  const banner=document.createElement("section");banner.className="inline-revision-overview card";banner.innerHTML='<p class="eyebrow">Revisão solicitada</p><h2>Revise e corrija nesta página</h2><p>Leia o recado do instrutor e faça as correções logo abaixo de cada atividade. Suas respostas continuam editáveis. Quando terminar, use o botão de envio no final da página.</p>'+(previous.feedback?'<div class="inline-teacher-message"><strong>Recado do instrutor</strong><p>'+safeText(previous.feedback)+'</p></div>':"")+'<a href="#inlineReviewStart">Ir para as atividades ↓</a>';
-  root.insertAdjacentElement("afterbegin",banner);
-  const first=root.querySelector(".learning-list");if(first)first.id="inlineReviewStart";
-  for(const step of mission.steps||[]){
-   const wrap=[...root.querySelectorAll("[data-mission-step]")].find(el=>el.dataset.missionStep===step.id);
-   if(wrap){const note=makeNote(missionId,step,step.type==="evidence"?"Relatório individual":"Prática da missão");if(note)wrap.insertAdjacentHTML("afterbegin",note)}
-  }
-  if(fundamental){
-   const s=getState(),done=new Set(s?.journey?.fundamentalProgress?.[fundamental.id]?.completedSteps||[]);
-   const reviewFund=document.createElement("section");reviewFund.className="inline-fundamentals-review card";
-   reviewFund.innerHTML='<h2>Fundamentos · revisar nesta página</h2><p>Se houver atividades de Fundamentos pendentes, você também pode corrigi-las aqui.</p><div class="inline-fundamental-steps">'+(fundamental.steps||[]).map(step=>'<div class="inline-fundamental-step" data-fundamental-step="'+safeText(step.id)+'">'+makeNote(fundamental.id,step,"Fundamentos")+renderStep(step,fundamental.id,done.has(step.id),{editableCompleted:true})+'</div>').join("")+'</div>';
-   const deliveryAnchor=root.querySelector(".learning-list");
-   if(deliveryAnchor)deliveryAnchor.after(reviewFund);else root.append(reviewFund);
-   for(const step of fundamental.steps||[])bindStep(step,fundamental.id,()=>location.reload(),(_,stepId)=>completeFundamentalStep(mission.phase,stepId),{completed:done.has(step.id)});
-  }
- }
+ applyMissionRevision(root,mission,previous);
  const late=access?.state==="closed"||(access?.closesAt&&new Date(access.closesAt).getTime()<Date.now());
  const section=document.createElement("section");section.className="card current-mission mission-delivery"+(late?" is-overdue":"");
  const options=reasons.map(([value,label])=>'<option value="'+value+'">'+label+'</option>').join("");
@@ -101,4 +76,37 @@ export async function mountMissionDelivery(missionId,access,root){
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  };
  root.append(section);
+}
+
+export function applyMissionRevision(root,mission,previous){
+ const missionId=mission.id;
+ const fundamental=mission.type==="training"?getFundamental(mission.phase):null;
+ const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+ const isRevision=previous?.status==="changes_requested";
+ if(isRevision){
+  const grades=previous.grades||{},comments=grades.blocks||{},concepts=grades.blockIndicators||{};
+  const human={A:"Aprendizagem demonstrada",PA:"Precisa melhorar",NA:"Ainda não demonstrada"};
+  const makeNote=(unit,step,area)=>{
+   const key=unit+":"+step.id,comment=String(comments[key]||"").trim(),mentions=concepts[key]||{};
+   const needs=Object.values(mentions).some(v=>v==="PA"||v==="NA");
+   const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
+   if(!needs&&!comment)return "";
+   return '<aside class="inline-revision-note '+(needs?"needs-work":"")+'"><strong>Orientação do instrutor · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment&&!generic?'<p>'+safeText(comment)+'</p>':generic?'<p>Confira esta atividade e marque a conclusão quando terminar.</p>':"")+'</aside>';
+  };
+  const banner=document.createElement("section");banner.className="inline-revision-overview card";banner.innerHTML='<p class="eyebrow">Revisão solicitada</p><h2>Revise e corrija nesta página</h2><p>Leia o recado do instrutor e faça as correções logo abaixo de cada atividade. Suas respostas continuam editáveis. Quando terminar, use o botão de envio no final da página.</p>'+(previous.feedback?'<div class="inline-teacher-message"><strong>Recado do instrutor</strong><p>'+safeText(previous.feedback)+'</p></div>':"")+'<a href="#inlineReviewStart">Ir para as atividades ↓</a>';
+  root.insertAdjacentElement("afterbegin",banner);
+  const first=root.querySelector(".learning-list");if(first)first.id="inlineReviewStart";
+  for(const step of mission.steps||[]){
+   const wrap=[...root.querySelectorAll("[data-mission-step]")].find(el=>el.dataset.missionStep===step.id);
+   if(wrap){const note=makeNote(missionId,step,step.type==="evidence"?"Relatório individual":"Prática da missão");if(note)wrap.insertAdjacentHTML("afterbegin",note)}
+  }
+  if(fundamental){
+   const s=getState(),done=new Set(s?.journey?.fundamentalProgress?.[fundamental.id]?.completedSteps||[]);
+   const reviewFund=document.createElement("section");reviewFund.className="inline-fundamentals-review card";
+   reviewFund.innerHTML='<h2>Fundamentos · revisar nesta página</h2><p>Se houver atividades de Fundamentos pendentes, você também pode corrigi-las aqui.</p><div class="inline-fundamental-steps">'+(fundamental.steps||[]).map(step=>'<div class="inline-fundamental-step" data-fundamental-step="'+safeText(step.id)+'">'+makeNote(fundamental.id,step,"Fundamentos")+renderStep(step,fundamental.id,done.has(step.id),{editableCompleted:true})+'</div>').join("")+'</div>';
+   const deliveryAnchor=root.querySelector(".learning-list");
+   if(deliveryAnchor)deliveryAnchor.before(reviewFund);else root.append(reviewFund);
+   for(const step of fundamental.steps||[])bindStep(step,fundamental.id,()=>location.reload(),(_,stepId)=>completeFundamentalStep(mission.phase,stepId),{completed:done.has(step.id)});
+  }
+ }
 }
