@@ -4,3 +4,20 @@
 .mm-page-tab{font:inherit;font-weight:700;cursor:pointer;border:1px solid rgba(160,180,210,.27);background:#0b192a;color:#b7c8df;padding:.85rem 1.1rem;border-radius:11px}
 .mm-page-tab.active{background:rgba(147,128,250,.16);border-color:#9380fa;color:#fff}
 .mm-page-tab:focus-visible{outline:2px solid #9380fa;outline-offset:3px}
+
+/* Devolutiva acessível ao estudante */
+.mm-next{padding:1.15rem;border:1px solid rgba(244,171,67,.35);background:rgba(244,171,67,.09);border-radius:14px;margin:1.25rem 0}
+.mm-next h3{margin:0 0 .6rem;color:#f5e0ba}.mm-next ol{margin:.5rem 0 1rem;padding-left:1.4rem;line-height:1.75}
+.mm-teacher{padding:1rem 1.1rem;border:1px solid rgba(155,138,250,.35);border-radius:12px;background:rgba(155,138,250,.08)}
+.mm-teacher h3{margin:0 0 .5rem}.mm-teacher p{margin:0;line-height:1.65;white-space:pre-wrap}
+.mm-subtle{color:#a4b4c8;font-size:.84rem;line-height:1.55}
+.mm-task{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.8rem .95rem;margin:.55rem 0;border:1px solid rgba(160,180,210,.22);border-radius:11px}
+.mm-task>div{display:grid;gap:.2rem}.mm-task strong{font-size:.92rem}
+.mm-task a,.mm-step-link{font-weight:700;font-size:.84rem;color:#b9aaff;text-decoration:underline;text-underline-offset:3px}
+.mm-task a{white-space:nowrap}.mm-block h4,.mm-answer-item h4{margin:.3rem 0 .55rem;font-size:.95rem}
+.mm-block .mm-need{color:#f4c788;font-weight:700;font-size:.82rem}
+.mm-answers summary{cursor:pointer;font-weight:700;padding:.6rem 0}.mm-answers summary:focus-visible{outline:2px solid #9380fa}
+.mm-answer-item{border-top:1px solid rgba(160,180,210,.2);padding:.9rem 0}
+.mm-answer-fields{display:grid;gap:.35rem}.mm-answer-fields p{margin:.2rem 0;line-height:1.55}.mm-answer-fields em{color:#e8c6a1}
+.mm-answer-text{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:650px){.mm-task{align-items:flex-start;flex-direction:column}.mm-task a{white-space:normal}}
