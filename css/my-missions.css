@@ -21,3 +21,13 @@
 .mm-answer-fields{display:grid;gap:.35rem}.mm-answer-fields p{margin:.2rem 0;line-height:1.55}.mm-answer-fields em{color:#e8c6a1}
 .mm-answer-text{white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:650px){.mm-task{align-items:flex-start;flex-direction:column}.mm-task a{white-space:normal}}
+
+/* Correção e feedback no mesmo painel */
+.mm-inline-editor{margin:1.4rem 0;border:1px solid rgba(150,170,220,.32);border-radius:15px;overflow:hidden;background:#071423}
+.mm-editor-heading{padding:1rem 1.15rem;border-bottom:1px solid rgba(150,170,220,.22)}
+.mm-editor-heading h3{margin:0 0 .4rem}.mm-editor-heading p{margin:0;color:#b5c6db}
+#mmEditorFrame{display:block;width:100%;height:min(78vh,900px);min-height:480px;border:0;background:#0b1726}
+.mm-inline-editor>.mm-subtle{padding:.7rem 1rem;margin:0}
+button.mm-step-link{border:0;background:transparent;cursor:pointer;font:inherit;font-size:.84rem;font-weight:700;padding:.25rem 0;text-align:left}
+button.mm-step-link:focus-visible{outline:2px solid #9380fa;outline-offset:3px}
+@media(max-width:640px){#mmEditorFrame{height:75vh;min-height:450px}}
