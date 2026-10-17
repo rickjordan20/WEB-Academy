@@ -120,11 +120,11 @@ if(new URLSearchParams(location.search).get("classroom")==="1"){setTimeout(async
 
 renderClassManagement();
 function setAdminView(view,{updateHash=true}={}){
- const valid=["overview","classes","students","guilds","participation","projects","missions","indicators"];if(!valid.includes(view))view="overview";const globalMode=localStorage.getItem("webacademy.instructor.activeClass")==="all";if(globalMode&&["guilds","participation","projects","missions","indicators"].includes(view)){alert("Esta área exige uma turma específica. Selecione uma turma no rodapé para gerenciar estes dados.");view="overview"}
+ const valid=["overview","classes","students","guilds","participation","projects","missions","indicators","evaluations"];if(!valid.includes(view))view="overview";const globalMode=localStorage.getItem("webacademy.instructor.activeClass")==="all";if(globalMode&&["guilds","participation","projects","missions","indicators"].includes(view)){alert("Esta área exige uma turma específica. Selecione uma turma no rodapé para gerenciar estes dados.");view="overview"}
  document.querySelectorAll(".admin-view").forEach(el=>el.hidden=true);
  const target=document.querySelector("#"+view+"View");if(target)target.hidden=false;
  document.querySelectorAll("[data-admin-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.adminView===view));
- const titles={overview:["Gestão da turma","Área do Instrutor"],classes:["Administração acadêmica","Gestão de Turmas"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],participation:["Projeto Restaurante","Participação das Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"],missions:["Planejamento pedagógico","Missões"],indicators:["Currículo da UC","Indicadores"]};
+ const titles={overview:["Gestão da turma","Área do Instrutor"],classes:["Administração acadêmica","Gestão de Turmas"],students:["Acompanhamento da turma","Estudantes"],guilds:["Projeto Restaurante","Gerenciar Guildas"],participation:["Projeto Restaurante","Participação das Guildas"],projects:["Situações de aprendizagem","Projetos e Requisitos"],missions:["Planejamento pedagógico","Missões"],indicators:["Currículo da UC","Indicadores"],evaluations:["Acompanhamento da aprendizagem","Avaliações"]};
  const [eyebrow,title]=titles[view];document.querySelector(".topbar .eyebrow").textContent=eyebrow;document.querySelector(".topbar h1").textContent=title;
  if(updateHash)history.replaceState(null,"","#"+view);
 }
