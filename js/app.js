@@ -14,6 +14,17 @@ if(cloudSession){
  if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
 }
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
+// Synchronize student progress saved on the dashboard, without re-running cloud-bootstrap.
+// Mission, journey and catalog pages already install their own listener there.
+if(cloudSession){
+ let progressSyncTimer;
+ window.addEventListener("uc7:state-saved",()=>{
+  clearTimeout(progressSyncTimer);
+  progressSyncTimer=setTimeout(()=>{
+   pushCloudState().catch(error=>console.warn("Sincronização pendente:",error));
+  },700);
+ });
+}
 
 let state=getState();
 let studentRealtimeChannel=null,guildRealtimeChannel=null,realtimeRefreshTimer=null;
