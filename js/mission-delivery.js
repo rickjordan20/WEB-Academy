@@ -3,6 +3,8 @@ import {getState} from "./storage.js";
 import {getMission,getFundamental,completeFundamentalStep} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 import {renderStep,bindStep} from "./step-renderer.js";
+let cachedRevision=null;
+export function reapplyMissionRevision(root,mission){if(cachedRevision?.missionId===mission?.id)applyMissionRevision(root,mission,cachedRevision.previous)}
 const reasons=[["absence","Ausência ou falta à aula"],["organization","Falta de atenção ou organização"],["platform","Problema na plataforma"],["internet","Internet ou equipamento"],["personal","Motivo pessoal ou de saúde"],["other","Outro motivo"]];
 export async function mountMissionDelivery(missionId,access,root){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return;
@@ -12,7 +14,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
- applyMissionRevision(root,mission,previous);
+ if(isRevision){cachedRevision={missionId,previous};applyMissionRevision(root,mission,previous)}
  const late=access?.state==="closed"||(access?.closesAt&&new Date(access.closesAt).getTime()<Date.now());
  const section=document.createElement("section");section.className="card current-mission mission-delivery"+(late?" is-overdue":"");
  const options=reasons.map(([value,label])=>'<option value="'+value+'">'+label+'</option>').join("");
