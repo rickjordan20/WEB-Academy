@@ -52,7 +52,7 @@ export async function mountMissionDelivery(missionId,access,root){
    const pending=steps.filter(step=>!completed.has(step.id));
    const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
    const estimate=estimateMissionXp(mission,progressSnapshot);
-   const fingerprint=JSON.stringify({answers,progressSnapshot,lateReason:reason?.value,lateExplanation:explanation?.value});
+   const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value});
    if(confirmedFingerprint!==fingerprint){
     confirmedFingerprint=fingerprint;
     const missing=[...pending.map(s=>"Missão: "+s.title),...fundamentalPending.map(s=>"Fundamentos: "+s.title)];
