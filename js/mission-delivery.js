@@ -47,8 +47,8 @@ export async function mountMissionDelivery(missionId,access,root){
  <div class="delivery-heading"><div class="delivery-icon" aria-hidden="true">${late?"!":"✓"}</div><div class="delivery-heading-copy"><span class="delivery-eyebrow">${late?"ENTREGA FORA DO PRAZO":"REGISTRO DE ENTREGA"}</span><h2>${late?"Prazo encerrado":"Entregar missão"}</h2><p>${late?"Você ainda pode entregar esta missão. Informe o motivo do atraso para que o instrutor possa analisar sua justificativa.":"Envie sua atividade para avaliação do instrutor."}</p></div><span class="delivery-status">${late?"Prazo vencido":"No prazo"}</span></div>
  ${previous?`<div class="delivery-history"><strong>Última entrega:</strong> ${new Date(previous.submitted_at).toLocaleString("pt-BR")} <span>· ${statuses[previous.status]||safe(previous.status)}</span></div>`:""}
  ${previous?.grades?.indicators&&Object.keys(previous.grades.indicators).length?`<div class="delivery-history"><strong>Indicadores avaliados:</strong> ${Object.entries(previous.grades.indicators).map(([k,v])=>safe(k)+" — "+safe(v)).join(" · ")}</div>`:""}
- ${previous?.grades?.blocks&&Object.values(previous.grades.blocks).some(Boolean)?`<div class="delivery-history"><strong>Feedback por etapa:</strong> ${Object.entries(previous.grades.blocks).filter(([,v])=>v).map(([k,v])=>"<p>"+safe(k)+": "+safe(v)+"</p>").join("")}</div>`:""}
- ${previous?.feedback?`<div class="delivery-history"><strong>Feedback do instrutor:</strong> ${safe(previous.feedback)}</div>`:""}
+ 
+ ${previous?.feedback&&!isRevision?`<div class="delivery-history"><strong>Recado do instrutor:</strong> ${safe(previous.feedback)}</div>`:""}
  <div class="delivery-fields" ${late?"":"hidden"}>
  <label class="delivery-field"><span>Motivo do atraso <em>Obrigatório</em></span><select data-late-reason><option value="">Selecione o motivo</option>${options}</select></label>
  <label class="delivery-field"><span>Justificativa <em>Obrigatória</em></span><textarea data-late-explanation rows="4" placeholder="Conte brevemente o que aconteceu e por que não conseguiu entregar no prazo."></textarea><small>Escreva pelo menos 10 caracteres.</small></label>
