@@ -1,7 +1,7 @@
 import "./cloud-bootstrap.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
-import {MISSIONS,getMission} from "./mission-engine.js";
+import {MISSIONS,getFundamental} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 const root=document.querySelector("#myMissions");
 const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -16,29 +16,55 @@ function localProgress(m,s){
 function situation(r){if(r.submission?.status==="changes_requested")return "changes_requested";if(r.submission?.status==="evaluated")return "evaluated";if(r.submission)return "submitted";return r.local.started?"in_progress":"not_started"}
 const labels={changes_requested:"Revisão solicitada",evaluated:"Avaliada",submitted:"Aguardando avaliação",in_progress:"Em andamento",not_started:"Não iniciada"};
 function link(r){return "mission.html?id="+encodeURIComponent(r.mission.id)}
+
+const conceptName={A:"Aprendizagem demonstrada",PA:"Precisa melhorar",NA:"Ainda não demonstrada"};
+function allSteps(r){
+ const fundamental=r.mission.type==="training"?getFundamental(r.mission.phase):null;
+ return [...(fundamental?.steps||[]).map(s=>({unit:fundamental.id,step:s,area:"Fundamentos",url:"fundamentals.html?phase="+r.mission.phase})),...(r.mission.steps||[]).map(s=>({unit:r.mission.id,step:s,area:s.title?.toLowerCase().includes("relatório")?"Relatório individual":"Prática da missão",url:link(r)}))];
+}
+function stepInfo(r,key){
+ const match=allSteps(r).find(x=>x.unit+":"+x.step.id===key);
+ if(match)return {...match,title:match.step.title||match.area};
+ return {title:"Registro complementar",area:"Atividade da missão",url:link(r)};
+}
+function formatAnswer(value){
+ if(Array.isArray(value)){
+  const prompts=["O que eu fiz?","Como eu fiz?","O que eu aprendi?","Qual dificuldade encontrei?","Como resolvi ou tentei resolver?","Link da evidência"];
+  return '<div class="mm-answer-fields">'+value.map((v,i)=>'<p><strong>'+esc(prompts[i]||"Resposta "+(i+1))+':</strong> '+(String(v||"").trim()?esc(v):'<em>Não respondido</em>')+'</p>').join("")+'</div>';
+ }
+ if(value&&typeof value==="object")return '<pre>'+esc(JSON.stringify(value,null,2))+'</pre>';
+ return '<p class="mm-answer-text">'+(String(value??"").trim()?esc(value):'<em>Não respondido</em>')+'</p>';
+}
 function blockFeedback(r){
  const g=r.submission?.grades||{},blocks=g.blocks||{},concepts=g.blockIndicators||{};
  const entries=[...new Set([...Object.keys(blocks),...Object.keys(concepts)])];
  return entries.map(key=>{
-  const [unit,...parts]=key.split(":"),stepId=parts.join(":");
-  const step=r.mission.steps?.find(x=>x.id===stepId);
-  const result=concepts[key]||{};
+  const info=stepInfo(r,key),result=concepts[key]||{},comment=String(blocks[key]||"").trim();
   const needs=Object.values(result).some(v=>v==="PA"||v==="NA");
-  return '<div class="mm-block '+(needs?"mm-attention":"")+'"><strong>'+esc(step?.title||key)+'</strong>'+(Object.keys(result).length?'<p>'+Object.entries(result).map(([k,v])=>'<span class="mm-concept">'+esc(k)+' · '+esc(v)+'</span>').join(" ")+'</p>':"")+(blocks[key]?'<p>'+esc(blocks[key])+'</p>':"")+(needs?'<small>Revise este bloco conforme as orientações.</small>':"")+'</div>';
+  const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
+  if(!needs&&!comment)return "";
+  return '<article class="mm-block '+(needs?"mm-attention":"")+'"><small>'+esc(info.area)+'</small><h4>'+esc(info.title)+'</h4>'+(Object.keys(result).length?'<p>'+Object.entries(result).map(([k,v])=>'<span class="mm-concept" title="'+esc(conceptName[v]||v)+'">'+esc(k)+': '+esc(conceptName[v]||v)+'</span>').join("")+'</p>':"")+(comment&&!generic?'<p>'+esc(comment)+'</p>':generic?'<p class="mm-subtle">'+(needs?"Revise esta atividade conforme as orientações do instrutor.":"Confira se você registrou a conclusão desta atividade.")+'</p>':"")+(needs?'<p class="mm-need">Este conteúdo precisa de atenção.</p>':"")+'<a class="mm-step-link" href="'+info.url+'">Ir para '+esc(info.area.toLowerCase())+' →</a></article>';
  }).join("");
 }
 function renderDetail(r){
  const sub=r.submission,g=sub?.grades||{},snapshot=sub?.progress_snapshot||{},progress=sub?estimateMissionXp(r.mission,snapshot):r.local.progress;
- const status=situation(r),feedback=blockFeedback(r);
- const notes=status==="changes_requested"?"O instrutor solicitou ajustes. Leia as orientações e reenvie sua missão.":status==="evaluated"?"Avaliação concluída. Confira suas menções e o feedback.":"Acompanhe seus registros e continue sua aprendizagem.";
+ const status=situation(r),feedback=blockFeedback(r),steps=allSteps(r);
+ const missionDone=new Set(snapshot.mission?.completedSteps||[]),fundDone=new Set(snapshot.fundamentals?.completedSteps||[]);
+ const pending=sub?steps.filter(x=>!(x.unit===r.mission.id?missionDone:fundDone).has(x.step.id)):[];
+ const attention=status==="changes_requested";
+ const message=attention?"Seu instrutor pediu que você revise esta missão. Veja abaixo o que falta e abra a atividade correspondente.":status==="evaluated"?"Sua avaliação foi concluída. Veja o resultado e os comentários.":status==="submitted"?"Sua entrega foi recebida e aguarda a avaliação do instrutor.":"Continue de onde parou.";
+ const overview=attention?'<section class="mm-next"><h3>O que preciso fazer agora?</h3><ol><li>Leia o recado do instrutor.</li><li>Confira as atividades que precisam de atenção.</li><li>Abra cada atividade, faça os ajustes e envie novamente.</li></ol><a class="btn btn-primary" href="'+link(r)+'">Abrir missão para corrigir →</a></section>':"";
+ const pendingHTML=pending.length?'<section class="mm-review"><h3>Atividades sem conclusão registrada</h3><p class="mm-subtle">Essas atividades ficaram sem a marcação de conclusão no momento do envio. Isso não significa necessariamente que você errou.</p>'+pending.map(x=>'<div class="mm-task"><div><small>'+esc(x.area)+'</small><strong>'+esc(x.step.title||x.area)+'</strong></div><a href="'+x.url+'">Abrir e revisar →</a></div>').join("")+'</section>':"";
+ const result=Object.entries(g.indicators||{}).map(([k,v])=>'<span class="mm-concept">'+esc(k)+': '+esc(conceptName[v]||v)+'</span>').join(" ");
  const answered=Object.entries(sub?.answers||{}).filter(([k])=>k.startsWith(r.mission.id+":")||k.startsWith("F"+r.mission.phase+":"));
- root.innerHTML='<button type="button" class="btn btn-secondary" id="mmBack">← Voltar às minhas missões</button><article class="mm-detail"><div class="mm-detail-head"><div><p class="eyebrow">Detalhes da entrega</p><h2>'+esc(r.mission.title)+'</h2></div><span class="mm-status '+status+'">'+labels[status]+'</span></div><p>'+notes+'</p><div class="mm-stats"><div><small>Progresso registrado</small><strong>'+progress.percent+'%</strong></div><div><small>Etapas com check</small><strong>'+progress.completed+' / '+progress.total+'</strong></div><div><small>XP '+(status==="evaluated"?"registrado":"estimado")+'</small><strong>'+(status==="evaluated"?(g.xp??"—"):progress.xp)+'</strong></div></div><div class="mm-bar"><i style="width:'+progress.percent+'%"></i></div>'+(sub?'<p class="mm-meta">Enviada em '+date(sub.submitted_at)+(sub.is_late?" · Fora do prazo":"")+'</p>':'<p class="mm-meta">Esta missão ainda não foi enviada.</p>')+(sub?.feedback?'<section class="mm-review"><h3>Feedback geral do instrutor</h3><p>'+esc(sub.feedback)+'</p></section>':"")+(Object.keys(g.indicators||{}).length?'<section class="mm-review"><h3>Indicadores avaliados</h3><p>'+Object.entries(g.indicators).map(([k,v])=>'<span class="mm-concept">'+esc(k)+' · '+esc(v)+'</span>').join(" ")+'</p></section>':"")+(feedback?'<section class="mm-review"><h3>Orientações por bloco</h3>'+feedback+'</section>':"")+(sub?'<section class="mm-review"><h3>Checks e respostas da entrega</h3>'+(r.mission.steps||[]).map(step=>{const checked=(snapshot.mission?.completedSteps||[]).includes(step.id),key=r.mission.id+":"+step.id;return '<div class="mm-check"><span>'+(checked?"☑":"☐")+' '+esc(step.title||step.id)+'</span>'+(sub.answers&&Object.hasOwn(sub.answers,key)?'<pre>'+esc(typeof sub.answers[key]==="string"?sub.answers[key]:JSON.stringify(sub.answers[key],null,2))+'</pre>':"")+'</div>'}).join("")+(answered.filter(([k])=>!(r.mission.steps||[]).some(s=>k===r.mission.id+":"+s.id)).length?'<h4>Outros registros e Fundamentos</h4>'+answered.filter(([k])=>!(r.mission.steps||[]).some(s=>k===r.mission.id+":"+s.id)).map(([k,v])=>'<div class="mm-check"><small>'+esc(k)+'</small><pre>'+esc(typeof v==="string"?v:JSON.stringify(v,null,2))+'</pre></div>').join(""):"")+'</section>':"")+'<a class="btn btn-primary" href="'+link(r)+'">'+(status==="changes_requested"?"Revisar e reenviar":"Abrir missão")+' →</a></article>';
+ const answersHTML=answered.map(([key,value])=>{const info=stepInfo(r,key);return '<div class="mm-answer-item"><small>'+esc(info.area)+'</small><h4>'+esc(info.title)+'</h4>'+formatAnswer(value)+'<a class="mm-step-link" href="'+info.url+'">Abrir atividade →</a></div>'}).join("");
+ root.innerHTML='<button type="button" class="btn btn-secondary" id="mmBack">← Voltar às minhas missões</button><article class="mm-detail"><div class="mm-detail-head"><div><p class="eyebrow">Acompanhamento da missão</p><h2>'+esc(r.mission.title)+'</h2></div><span class="mm-status '+status+'">'+labels[status]+'</span></div><p>'+message+'</p>'+overview+(sub?.feedback?'<section class="mm-review mm-teacher"><h3>Recado do instrutor</h3><p>'+esc(sub.feedback)+'</p></section>':"")+'<div class="mm-stats"><div><small>Quanto você registrou</small><strong>'+progress.percent+'%</strong></div><div><small>Atividades marcadas</small><strong>'+progress.completed+' de '+progress.total+'</strong></div><div><small>Pontos '+(status==="evaluated"?"registrados":"possíveis (estimativa)")+'</small><strong>'+(status==="evaluated"?(g.xp??"—"):progress.xp)+'</strong></div></div><div class="mm-bar"><i style="width:'+progress.percent+'%"></i></div><p class="mm-subtle">O percentual considera as etapas da missão marcadas como concluídas. Não representa sua nota nem garante aprovação.</p>'+(sub?'<p class="mm-meta">Último envio: '+date(sub.submitted_at)+(sub.is_late?" · Fora do prazo":"")+'</p>':'<p class="mm-meta">Esta missão ainda não foi enviada.</p>')+pendingHTML+(result?'<section class="mm-review"><h3>Como fui avaliado?</h3><p>'+result+'</p></section>':"")+(feedback?'<section class="mm-review"><h3>Comentários sobre as atividades</h3>'+feedback+'</section>':"")+(answersHTML?'<details class="mm-review mm-answers"><summary>Ver minhas respostas enviadas ('+answered.length+')</summary><p class="mm-subtle">Estas são as respostas salvas no último envio. Para mudar alguma resposta, abra a atividade.</p>'+answersHTML+'</details>':"")+'<div class="mm-actions"><a class="btn btn-primary" href="'+link(r)+'">'+(attention?"Corrigir e enviar novamente":"Abrir missão")+' →</a></div></article>';
  root.querySelector("#mmBack").onclick=()=>{detail=null;render()};
 }
 function card(r){
  const sub=r.submission,status=situation(r),p=sub?estimateMissionXp(r.mission,sub.progress_snapshot||{}):r.local.progress;
  const pending=Object.values(sub?.grades?.blockIndicators||{}).filter(v=>Object.values(v).some(x=>x==="PA"||x==="NA")).length;
- return '<article class="mm-card '+(status==="changes_requested"?"mm-urgent":"")+'"><div class="mm-card-top"><div><small>Fase '+r.mission.phase+' · '+(r.mission.type==="training"?"Prática Guiada":"Prática Autônoma")+'</small><h3>'+esc(r.mission.title)+'</h3></div><span class="mm-status '+status+'">'+labels[status]+'</span></div><div class="mm-bar"><i style="width:'+p.percent+'%"></i></div><p class="mm-meta">'+p.completed+'/'+p.total+' etapas · '+p.percent+'% · '+(sub?"Enviada em "+date(sub.submitted_at):"Ainda não enviada")+'</p>'+(status==="changes_requested"?'<p class="mm-callout"><strong>Você tem ajustes para revisar.</strong> '+(pending?pending+" bloco(s) com menções PA/NA. ":"")+'Consulte as orientações do instrutor.</p>':"")+(sub?.feedback?'<p class="mm-feedback"><strong>Feedback:</strong> '+esc(sub.feedback)+'</p>':"")+'<div class="mm-actions">'+(sub?'<button class="btn btn-secondary" data-mm-detail="'+esc(r.mission.id)+'">Ver envio e feedback</button>':"")+'<a class="btn btn-primary" href="'+link(r)+'">'+(status==="changes_requested"?"Revisar e reenviar":sub?"Abrir missão":"Começar missão")+' →</a></div></article>';
+ return '<article class="mm-card '+(status==="changes_requested"?"mm-urgent":"")+'"><div class="mm-card-top"><div><small>Fase '+r.mission.phase+' · '+(r.mission.type==="training"?"Prática Guiada":"Prática Autônoma")+'</small><h3>'+esc(r.mission.title)+'</h3></div><span class="mm-status '+status+'">'+labels[status]+'</span></div><div class="mm-bar"><i style="width:'+p.percent+'%"></i></div><p class="mm-meta">'+p.completed+'/'+p.total+' etapas · '+p.percent+'% · '+(sub?"Enviada em "+date(sub.submitted_at):"Ainda não enviada")+'</p>'+(status==="changes_requested"?'<p class="mm-callout"><strong>Você tem ajustes para revisar.</strong> '+(pending?pending+" atividade(s) precisam de atenção. ":"")+'Veja o recado do instrutor e saiba onde corrigir.</p>':"")+(sub?.feedback?'<p class="mm-feedback"><strong>Feedback:</strong> '+esc(sub.feedback)+'</p>':"")+'<div class="mm-actions">'+(sub?'<button class="btn btn-secondary" data-mm-detail="'+esc(r.mission.id)+'">Ver o que preciso revisar</button>':"")+'<a class="btn btn-primary" href="'+link(r)+'">'+(status==="changes_requested"?"Abrir para corrigir":sub?"Abrir missão":"Começar missão")+' →</a></div></article>';
 }
 function render(){
  if(detail){const r=rows.find(x=>x.mission.id===detail);if(r){renderDetail(r);return}detail=null}
