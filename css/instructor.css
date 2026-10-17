@@ -101,3 +101,31 @@
 .visual-step-head button:disabled{opacity:.35;cursor:not-allowed}
 .visual-step-fields{display:grid;gap:10px;min-width:0}.visual-step-fields textarea,.visual-step-fields input,.visual-step-fields select{width:100%;box-sizing:border-box}
 .visual-step-fields small{opacity:.7}.remote-step-list{grid-column:1/-1;width:100%;min-width:0}
+
+
+/* Central de Avaliação UC7 */
+#lateMissionReview{padding:1.4rem;min-width:0}
+.eval-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.eval-heading h2,.eval-detail-header h2{margin:.3rem 0}
+.eval-filters,.eval-search,.eval-actions{display:flex;flex-wrap:wrap;gap:.65rem;margin:1rem 0}
+.eval-filter{border:1px solid var(--line);border-radius:999px;padding:.55rem .85rem;background:#0b1929;color:var(--text);cursor:pointer;font:inherit;font-size:.82rem}
+.eval-filter.active{border-color:var(--primary-2);background:rgba(132,112,255,.18);font-weight:700}
+.eval-search input{flex:1 1 220px;min-width:0}.eval-search select{flex:1 1 210px;min-width:0}
+.eval-list{display:grid;gap:.7rem}
+.eval-row,.eval-block{border:1px solid var(--line);background:#0b1929;border-radius:13px;padding:1rem;min-width:0}
+.eval-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.eval-row p,.eval-row small{display:block;color:var(--muted);margin:.3rem 0;font-size:.82rem}
+.eval-row-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.eval-tag{font-size:.75rem;border:1px solid var(--line);border-radius:999px;padding:.35rem .6rem;color:var(--muted)}
+.eval-late{color:#ff8894}.eval-late-box{border:1px solid rgba(255,136,148,.35);border-radius:12px;padding:1rem;margin:1rem 0;background:rgba(255,136,148,.06)}
+.eval-detail-header{padding:1.2rem 0;border-bottom:1px solid var(--line);margin-bottom:1.2rem}
+.eval-block{margin:1rem 0}.eval-block-head{display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap}.eval-block-head span,.eval-submitted small{color:var(--muted);font-size:.8rem}
+.eval-submitted{margin:.9rem 0;padding:.8rem;border:1px solid var(--line);border-radius:9px;overflow-wrap:anywhere;background:#071523}
+.eval-answer{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.55;margin:.5rem 0;color:var(--text)}
+.eval-comment-label{display:grid;gap:.5rem;margin-top:1rem;color:var(--text);font-size:.87rem}
+.eval-comment-label textarea{width:100%;min-height:85px;resize:vertical}
+.eval-indicator{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.eval-concepts{display:flex;gap:.55rem}.eval-concepts label{display:flex;align-items:center;gap:.25rem;border:1px solid var(--line);padding:.45rem .7rem;border-radius:8px;cursor:pointer}
+.eval-concepts label:has(input:checked){border-color:var(--primary-2);background:rgba(132,112,255,.16)}
+.eval-actions .btn{white-space:normal}
+@media(max-width:600px){#lateMissionReview{padding:.8rem}.eval-row-actions{width:100%}.eval-row-actions .btn{flex:1}.eval-actions .btn{flex:1 1 100%}}
