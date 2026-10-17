@@ -1,5 +1,7 @@
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
+import {getMission,getFundamental} from "./mission-engine.js";
+import {estimateMissionXp} from "./mission-assessment-utils.js";
 const reasons=[["absence","Ausência ou falta à aula"],["organization","Falta de atenção ou organização"],["platform","Problema na plataforma"],["internet","Internet ou equipamento"],["personal","Motivo pessoal ou de saúde"],["other","Outro motivo"]];
 export async function mountMissionDelivery(missionId,access,root){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return;
@@ -21,17 +23,18 @@ export async function mountMissionDelivery(missionId,access,root){
  <label class="delivery-field"><span>Motivo do atraso <em>Obrigatório</em></span><select data-late-reason><option value="">Selecione o motivo</option>${options}</select></label>
  <label class="delivery-field"><span>Justificativa <em>Obrigatória</em></span><textarea data-late-explanation rows="4" placeholder="Conte brevemente o que aconteceu e por que não conseguiu entregar no prazo."></textarea><small>Escreva pelo menos 10 caracteres.</small></label>
  </div>
+ <div class="delivery-preflight" data-delivery-preflight hidden></div>
  <div class="delivery-footer"><p class="delivery-help">A entrega ficará registrada com a data e o horário do envio para análise do instrutor.</p><button class="btn btn-primary delivery-submit" type="button" data-submit-mission>${late?"Enviar entrega atrasada":"Enviar para avaliação"} →</button></div>
  <p class="delivery-feedback" data-delivery-feedback role="status" aria-live="polite"></p>`;
 
  if(!late){section.querySelector(".delivery-fields").remove();}
+ const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
  if(late){reason.closest("label").hidden=false;explanation.closest("label").hidden=false;}
  if(late&&previous?.late_reason)reason.value=previous.late_reason;if(late&&previous?.late_explanation)explanation.value=previous.late_explanation;
  if(previous?.status==="evaluated"){button.disabled=true;feedback.textContent="Entrega já avaliada. Consulte o feedback do instrutor."}
  button.onclick=async()=>{
   if(late&&(!reason?.value||explanation?.value.trim().length<10)){feedback.textContent="Selecione o motivo do atraso e escreva uma justificativa com pelo menos 10 caracteres.";return}
-  button.disabled=true;feedback.textContent="Enviando...";
   try{
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
    const phase=Number(String(missionId).match(/^\\d+/)?.[0]||0);
@@ -44,11 +47,28 @@ export async function mountMissionDelivery(missionId,access,root){
     fundamentals:{id:fundamentalId,completedSteps:[...(fundamentalProgress.completedSteps||[])],startedAt:fundamentalProgress.startedAt||null,completed:!!state?.journey?.completedFundamentals?.includes(fundamentalId)},
     codeAttempts:Object.fromEntries(Object.entries(state?.codeAttempts||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith(fundamentalId+":")))
    };
+   const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(phase):null;
+   const steps=mission?.steps||[],completed=new Set(progressSnapshot.mission.completedSteps);
+   const pending=steps.filter(step=>!completed.has(step.id));
+   const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
+   const estimate=estimateMissionXp(mission,progressSnapshot);
+   const fingerprint=JSON.stringify({answers,progressSnapshot,lateReason:reason?.value,lateExplanation:explanation?.value});
+   if(confirmedFingerprint!==fingerprint){
+    confirmedFingerprint=fingerprint;
+    const missing=[...pending.map(s=>"Missão: "+s.title),...fundamentalPending.map(s=>"Fundamentos: "+s.title)];
+    preflight.hidden=false;
+    preflight.innerHTML='<strong>Revisão antes do envio</strong><p>Progresso registrado: '+estimate.completed+' de '+estimate.total+' etapas ('+estimate.percent+'%). XP sugerido: '+estimate.xp+' de '+estimate.max+'.</p>'+(missing.length?'<p><strong>'+missing.length+' item(ns) ainda sem check:</strong></p><ul>'+missing.map(t=>'<li>'+safe(t)+'</li>').join("")+'</ul><p>Você pode enviar assim mesmo. Os itens não concluídos serão apresentados ao instrutor.</p>':'<p>Todos os checks previstos estão registrados. Confirme para enviar.</p>')+'<p><strong>Confirme o envio clicando novamente no botão abaixo.</strong></p>';
+    button.textContent="Confirmar envio →";
+    feedback.textContent="Confira o resumo antes de confirmar.";
+    preflight.scrollIntoView({behavior:"smooth",block:"nearest"});
+    return;
+   }
+   button.disabled=true;feedback.textContent="Enviando...";
    const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!late,deadline_at:access?.closesAt||null,late_reason:late?reason.value:null,late_explanation:late?explanation.value.trim():"",submitted_at:new Date().toISOString()};
    const result=previous?.id?await sb.from("mission_submissions").update(payload).eq("id",previous.id):await sb.from("mission_submissions").insert(payload);
    if(result.error)throw result.error;
-   feedback.textContent="Entrega registrada para avaliação do instrutor.";button.textContent="Entrega enviada";
-  }catch(error){button.disabled=false;feedback.textContent="Não foi possível entregar: "+error.message}
+   feedback.textContent="Entrega registrada para avaliação do instrutor.";button.textContent="Entrega enviada";preflight.hidden=true;
+  }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  };
  root.append(section);
 }
