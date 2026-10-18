@@ -87,6 +87,7 @@ export function applyMissionRevision(root,mission,previous){
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const isRevision=previous?.status==="changes_requested";
  if(isRevision){
+  if(root.querySelector(".inline-revision-overview"))return;
   const grades=previous.grades||{},comments=grades.blocks||{},concepts=grades.blockIndicators||{};
   const reviewed=revisionBlocks(normalizeMissionDefinition(mission),grades);
   const reviewedById=new Map(reviewed.map(block=>[block.id,block.review]));
@@ -95,8 +96,8 @@ export function applyMissionRevision(root,mission,previous){
    const key=unit+":"+step.id,review=unit===missionId?reviewedById.get(step.id):null,comment=String(review?.comment??comments[key]??"").trim(),mentions=review?.concepts??concepts[key]??{};
    const needs=Object.values(mentions).some(v=>v==="PA"||v==="NA");
    const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
-   if(!needs&&!comment)return "";
-   return '<aside class="inline-revision-note '+(needs?"needs-work":"")+'"><strong>Orientação do instrutor · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment&&!generic?'<p>'+safeText(comment)+'</p>':generic?'<p>Confira esta atividade e marque a conclusão quando terminar.</p>':"")+'</aside>';
+   if(generic||(!needs&&!comment))return "";
+   return '<aside class="inline-revision-note '+(needs?"needs-work":"")+'"><strong>Orientação do instrutor · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment?'<p>'+safeText(comment)+'</p>':"")+'</aside>';
   };
   const banner=document.createElement("section");banner.className="inline-revision-overview card";banner.innerHTML='<p class="eyebrow">Revisão solicitada</p><h2>Revise e corrija nesta página</h2><p>Leia o recado do instrutor e faça as correções logo abaixo de cada atividade. Suas respostas continuam editáveis. Quando terminar, use o botão de envio no final da página.</p>'+(previous.feedback?'<div class="inline-teacher-message"><strong>Recado do instrutor</strong><p>'+safeText(previous.feedback)+'</p></div>':"")+'<a href="#inlineReviewStart">Ir para as atividades ↓</a>';
   root.insertAdjacentElement("afterbegin",banner);
