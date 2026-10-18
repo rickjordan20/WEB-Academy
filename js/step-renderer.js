@@ -40,7 +40,7 @@ export function renderStep(step,missionId,done,options={}){
  return `<article class="learning-step card ${done?"done":""}" data-step-card="${step.id}">${head}<div class="learning-body">${body}</div><div class="learning-actions"><span class="save-state">${done?(editable?"✓ Concluída • respostas podem ser revisadas":"✓ Etapa concluída"):"Seu progresso é salvo neste navegador"}</span><button type="button" class="btn ${done?"btn-secondary":"btn-primary"}" data-complete-step="${step.id}" ${done?"disabled":""}>${done?(editable?"Concluída • editável":"Concluído"):"Concluir etapa"}</button></div></article>`;
 }
 export function bindStep(step,missionId,onChange,complete=completeStep,options={}){
- const card=document.querySelector(`[data-step-card="${step.id}"]`);if(!card)return; const completed=options.completed===true;
+ const card=[...document.querySelectorAll(`[data-step-card="${step.id}"]`)].find(el=>el.closest("[data-fundamental-step]")?.dataset.fundamentalStep===step.id&&missionId.startsWith("F")||el.closest("[data-mission-step]")?.dataset.missionStep===step.id&&!missionId.startsWith("F"))||document.querySelector(`[data-step-card="${step.id}"]`);if(!card)return; const completed=options.completed===true;
  const store=options.previewStore;
  const saveAnswer=(unit,key,value)=>{if(store){store.answers.set(key,structuredClone(value));return}return persistAnswer(unit,key,value)};
  const getAnswer=(unit,key)=>store?store.answers.get(key):readAnswer(unit,key);
