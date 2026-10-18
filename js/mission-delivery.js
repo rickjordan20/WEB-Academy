@@ -1,3 +1,4 @@
+import {normalizeMissionDefinition,revisionBlocks} from "./mission-builder-core.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
 import {getMission,getFundamental,completeFundamentalStep} from "./mission-engine.js";
@@ -87,9 +88,11 @@ export function applyMissionRevision(root,mission,previous){
  const isRevision=previous?.status==="changes_requested";
  if(isRevision){
   const grades=previous.grades||{},comments=grades.blocks||{},concepts=grades.blockIndicators||{};
+  const reviewed=revisionBlocks(normalizeMissionDefinition(mission),grades);
+  const reviewedById=new Map(reviewed.map(block=>[block.id,block.review]));
   const human={A:"Aprendizagem demonstrada",PA:"Precisa melhorar",NA:"Ainda não demonstrada"};
   const makeNote=(unit,step,area)=>{
-   const key=unit+":"+step.id,comment=String(comments[key]||"").trim(),mentions=concepts[key]||{};
+   const key=unit+":"+step.id,review=unit===missionId?reviewedById.get(step.id):null,comment=String(review?.comment??comments[key]??"").trim(),mentions=review?.concepts??concepts[key]??{};
    const needs=Object.values(mentions).some(v=>v==="PA"||v==="NA");
    const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
    if(!needs&&!comment)return "";
