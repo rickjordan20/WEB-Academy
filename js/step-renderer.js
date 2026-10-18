@@ -52,7 +52,28 @@ export function bindStep(step,missionId,onChange,complete=completeStep,options={
  if(step.type==="visual-summary"){card.querySelector("[data-complete-step]").onclick=finish;return}
  if(step.type==="match-cards"||step.type==="command-deck"){const reveal=[...card.querySelectorAll("[data-reveal-card]")];const visitedKey=step.id+":revealed";const prior=getAnswer(missionId,visitedKey);const visited=new Set(Array.isArray(prior)?prior.map(String):[]);const mark=b=>{visited.add(String(b.dataset.revealCard));b.classList.add("revealed");b.setAttribute("aria-pressed","true");saveAnswer(missionId,visitedKey,[...visited]);const state=card.querySelector(".save-state");if(state&&!completed)state.textContent=visited.size===reveal.length?"Todos os cartões explorados. Agora você pode concluir a etapa.":"Cartões explorados: "+visited.size+" de "+reveal.length+"."};reveal.forEach(b=>{if(visited.has(String(b.dataset.revealCard))){b.classList.add("revealed");b.setAttribute("aria-pressed","true")}else b.setAttribute("aria-pressed","false");b.onclick=()=>mark(b)});card.querySelector("[data-complete-step]").onclick=()=>{try{finish()}catch(error){console.error(error);const state=card.querySelector(".save-state");state.textContent="Não foi possível concluir a etapa. Atualize a página e tente novamente.";state.setAttribute("role","alert")}};return}
 
- if(step.type==="choice-scenario"){card.querySelector("[data-complete-step]").onclick=()=>{let all=true,correct=true;step.scenarios.forEach((s,i)=>{const checked=card.querySelector(`input[name="sc-${step.id}-${i}"]:checked`),fb=card.querySelector(`[data-scenario-feedback="${i}"]`);if(!checked){all=false;fb.textContent="Escolha uma opção.";fb.className="feedback error";return}const ok=Number(checked.value)===s[2];correct=correct&&ok;fb.textContent=ok?"✓ Boa!":"Tente novamente e pense na finalidade.";fb.className=`feedback ${ok?"success":"error"}`});if(all&&correct)setTimeout(finish,450)};return}
+ if(step.type==="choice-scenario"){
+  const choices=step.scenarios.map((scenario,i)=>[...card.querySelectorAll(`input[name="sc-${step.id}-${i}"]`)]);
+  const previous=getAnswer(missionId,step.id);
+  const selections=Array.isArray(previous)?previous.slice():[];
+  choices.forEach((radios,i)=>radios.forEach(radio=>{
+   if(String(selections[i])===radio.value)radio.checked=true;
+   radio.addEventListener("change",()=>{selections[i]=Number(radio.value);saveAnswer(missionId,step.id,selections)});
+  }));
+  card.querySelector("[data-complete-step]").onclick=()=>{
+   let all=true,correct=true;
+   step.scenarios.forEach((scenario,i)=>{
+    const checked=choices[i].find(r=>r.checked),fb=card.querySelector(`[data-scenario-feedback="${i}"]`);
+    if(!checked){all=false;fb.textContent="Selecione uma alternativa para continuar.";fb.className="feedback error";return}
+    const ok=Number(checked.value)===scenario[2];correct=correct&&ok;
+    fb.textContent=ok?"✓ Resposta correta.":"Esta alternativa ainda não está correta. Revise e tente novamente.";
+    fb.className=`feedback ${ok?"success":"error"}`;
+   });
+   if(!all||!correct){const state=card.querySelector(".save-state");state.textContent=!all?"Responda a todas as situações para concluir.":"Revise as alternativas destacadas e tente novamente.";state.setAttribute("role","status");return}
+   try{finish()}catch(error){console.error(error);const state=card.querySelector(".save-state");state.textContent="Não foi possível registrar a conclusão. Tente novamente.";state.setAttribute("role","alert")}
+  };return
+ }
+
  if(step.type==="quiz"){const radios=[...card.querySelectorAll(`input[name="q-${step.id}"]`)];radios.forEach(r=>r.addEventListener("change",()=>saveAnswer(missionId,step.id,Number(r.value))));if(completed)return;card.querySelector("[data-complete-step]").onclick=()=>{const v=card.querySelector("input:checked")?.value,f=card.querySelector("[data-feedback]");if(v==null){f.textContent="Escolha uma alternativa.";return}saveAnswer(missionId,step.id,Number(v));if(Number(v)!==step.answer){f.textContent="Ainda não. "+step.feedback;f.className="feedback error";return}f.textContent="Correto! "+step.feedback;f.className="feedback success";setTimeout(finish,500)};return}
  if(step.type==="complete-code"){const input=card.querySelector("[data-code-answer]");input.addEventListener("input",()=>saveAnswer(missionId,step.id,input.value));if(completed)return;card.querySelector("[data-complete-step]").onclick=()=>{const input=card.querySelector("[data-code-answer]"),f=card.querySelector("[data-feedback]"),v=input.value.trim();saveAnswer(missionId,step.id,v);if(v!==step.expected){f.textContent="Revise o comando e tente novamente.";f.className="feedback error";return}f.textContent="Comando correto!";f.className="feedback success";setTimeout(finish,400)};return}
  if(step.type==="editor"){
