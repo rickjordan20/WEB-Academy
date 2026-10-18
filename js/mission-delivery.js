@@ -11,7 +11,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return;
  const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1);
  const classId=members?.[0]?.class_id;if(!classId)return;
- const {data:previous}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
+ const {data:previous}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades,progress_snapshot").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -91,19 +91,25 @@ export function applyMissionRevision(root,mission,previous){
   const grades=previous.grades||{},comments=grades.blocks||{},concepts=grades.blockIndicators||{};
   const reviewed=revisionBlocks(normalizeMissionDefinition(mission),grades);
   const reviewedById=new Map(reviewed.map(block=>[block.id,block.review]));
+  const snapshot=previous.progress_snapshot||{};
+  const saved=getState();
+  const missionDone=new Set(snapshot.mission?.completedSteps||[]);
+  const fundamentalDone=new Set(snapshot.fundamentals?.completedSteps||[]);
   const human={A:"Aprendizagem demonstrada",PA:"Precisa melhorar",NA:"Ainda não demonstrada"};
+  const incomplete=(unit,step)=>!(unit===missionId?missionDone:fundamentalDone).has(step.id);
   const makeNote=(unit,step,area)=>{
    const key=unit+":"+step.id,review=unit===missionId?reviewedById.get(step.id):null,comment=String(review?.comment??comments[key]??"").trim(),mentions=review?.concepts??concepts[key]??{};
    const needs=Object.values(mentions).some(v=>v==="PA"||v==="NA");
    const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);
-   if(generic||(!needs&&!comment))return "";
-   return '<aside class="inline-revision-note '+(needs?"needs-work":"")+'"><strong>Orientação do instrutor · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment?'<p>'+safeText(comment)+'</p>':"")+'</aside>';
+   const pending=incomplete(unit,step);
+   if((generic||(!needs&&!comment))&&!pending)return "";
+   return '<aside class="inline-revision-note '+(needs||pending?"needs-work":"")+'"><strong>'+(needs||(!generic&&comment)?'Orientação do instrutor':'Pendência identificada automaticamente')+' · '+safeText(area)+'</strong>'+(Object.keys(mentions).length?'<p>'+Object.entries(mentions).map(([k,v])=>safeText(k)+': '+safeText(human[v]||v)).join(" · ")+'</p>':"")+(comment&&!generic?'<p>'+safeText(comment)+'</p>':"")+(pending?'<p>Esta etapa não estava marcada como concluída na última entrega. Confira a atividade, complete o que faltar e registre a conclusão.</p>':"")+'</aside>';
   };
   const attentionKeys=new Set();
-  const isFlagged=(unit,step)=>{const key=unit+":"+step.id,review=unit===missionId?reviewedById.get(step.id):null;const mentions=review?.concepts??concepts[key]??concepts[step.id]??{};const comment=String(review?.comment??comments[key]??comments[step.id]??"").trim();const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);return Object.values(mentions).some(v=>v==="PA"||v==="NA")||!!(comment&&!generic)};
+  const isFlagged=(unit,step)=>{const key=unit+":"+step.id,review=unit===missionId?reviewedById.get(step.id):null;const mentions=review?.concepts??concepts[key]??concepts[step.id]??{};const comment=String(review?.comment??comments[key]??comments[step.id]??"").trim();const generic=/^(Etapa concluída conforme o registro|Registro de conclusão identificado|A conclusão da etapa foi registrada|Ainda não há conclusão registrada|Revise o conteúdo deste bloco)/.test(comment);return incomplete(unit,step)||Object.values(mentions).some(v=>v==="PA"||v==="NA")||!!(comment&&!generic)};
   for(const step of mission.steps||[])if(isFlagged(missionId,step))attentionKeys.add(missionId+":"+step.id);
   for(const step of fundamental?.steps||[])if(isFlagged(fundamental.id,step))attentionKeys.add(fundamental.id+":"+step.id);
-  const banner=document.createElement("section");banner.className="inline-revision-overview card";banner.innerHTML='<p class="eyebrow">Revisão solicitada</p><h2>Revise e corrija nesta página</h2><p>Leia o recado do instrutor e faça as correções logo abaixo de cada atividade. Suas respostas continuam editáveis. Quando terminar, use o botão de envio no final da página.</p>'+(previous.feedback?'<div class="inline-teacher-message"><strong>Recado do instrutor</strong><p>'+safeText(previous.feedback)+'</p></div>':"")+'<p class="revision-count">'+attentionKeys.size+' atividade(s) com orientações específicas para revisar.</p><div class="revision-filters" role="group" aria-label="Filtrar atividades"><button type="button" class="btn btn-secondary" data-revision-filter="pending" aria-pressed="false">Somente as que precisam de revisão</button><button type="button" class="btn btn-secondary" data-revision-filter="all" aria-pressed="true">Todas as atividades</button></div><a href="#inlineReviewStart">Ir para as atividades ↓</a>';
+  const banner=document.createElement("section");banner.className="inline-revision-overview card";banner.innerHTML='<p class="eyebrow">Revisão solicitada</p><h2>Revise e corrija nesta página</h2><p>Leia o recado do instrutor e faça as correções logo abaixo de cada atividade. Suas respostas continuam editáveis. Quando terminar, use o botão de envio no final da página.</p>'+(previous.feedback?'<div class="inline-teacher-message"><strong>Recado do instrutor</strong><p>'+safeText(previous.feedback)+'</p></div>':"")+'<p class="revision-count">'+attentionKeys.size+' atividade(s) para conferir: etapas não concluídas na última entrega e/ou orientações específicas do instrutor.</p><div class="revision-filters" role="group" aria-label="Filtrar atividades"><button type="button" class="btn btn-secondary" data-revision-filter="pending" aria-pressed="false">Somente as que precisam de revisão</button><button type="button" class="btn btn-secondary" data-revision-filter="all" aria-pressed="true">Todas as atividades</button></div><a href="#inlineReviewStart">Ir para as atividades ↓</a>';
   root.insertAdjacentElement("afterbegin",banner);
   const first=root.querySelector(".learning-list");if(first)first.id="inlineReviewStart";
   for(const step of mission.steps||[]){
