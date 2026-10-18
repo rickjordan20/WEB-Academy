@@ -142,3 +142,11 @@
  margin-top:8px;
 }
 .builder-shell .visual-step-fields textarea{resize:vertical}
+
+/* Orçamento de XP da missão */
+.builder-shell .builder-xp-allocation{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,180px) auto;align-items:end;gap:14px;margin:20px 0;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--bg-soft)}
+.builder-shell .builder-xp-allocation strong{font-size:1rem}
+.builder-shell .builder-xp-allocation p{margin:6px 0 0;line-height:1.5;font-size:.83rem}
+.builder-shell .builder-xp-allocation .admin-label{margin:0}
+.builder-shell .builder-xp-allocation #missionXpDistributionSummary{grid-column:1/-1;margin:0}
+@media(max-width:900px){.builder-shell .builder-xp-allocation{grid-template-columns:1fr}.builder-shell .builder-xp-allocation #distributeMissionXp{width:100%}}
