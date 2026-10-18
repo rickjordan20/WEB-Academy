@@ -84,3 +84,61 @@
 @media(max-width:650px){.guided-moment-navigation{grid-template-columns:1fr}.guided-moment-tab{padding:13px}.guided-moment-intro{padding:17px}.guided-moment-footer .btn{width:100%}}
 
 .builder-student-frame{display:block;width:100%;min-height:780px;height:80vh;border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:auto}.builder-preview #builderPreviewBody{width:100%;min-width:0}
+
+/* Editor de atividades: leitura vertical, sem campos lado a lado. */
+.builder-shell .visual-step-fields{
+ grid-template-columns:minmax(0,1fr);
+ gap:18px;
+}
+.builder-shell .visual-step-fields > *{min-width:0;grid-column:1/-1}
+.builder-shell .visual-step-fields > fieldset{
+ width:100%;
+ min-width:0;
+ margin:4px 0;
+ box-sizing:border-box;
+}
+.builder-shell .visual-step-fields > fieldset:has([data-meta-flag]){
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:14px!important;
+ padding:20px!important;
+ background:var(--bg-soft);
+ border:1px solid var(--line);
+ border-radius:14px;
+}
+.builder-shell .visual-step-fields > fieldset:has([data-meta-flag]) legend{
+ padding:0 8px;
+ font-weight:700;
+ color:var(--text);
+}
+.builder-shell .visual-step-fields > fieldset:has([data-meta-flag]) > small{
+ display:block;
+ color:var(--muted);
+ line-height:1.5;
+}
+.builder-shell .visual-step-fields label:has(> [data-meta-flag]){
+ display:flex!important;
+ align-items:center!important;
+ justify-content:flex-start;
+ gap:12px!important;
+ min-height:32px;
+ font-weight:500;
+ line-height:1.4;
+}
+.builder-shell .visual-step-fields [data-meta-flag]{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+ margin:0;
+ accent-color:var(--primary);
+}
+.builder-shell .visual-step-fields [data-meta-xp],
+.builder-shell .visual-step-fields [data-meta-indicators],
+.builder-shell .visual-step-fields [data-meta-criterion]{
+ display:block;
+ width:100%;
+ max-width:100%;
+ box-sizing:border-box;
+ margin-top:8px;
+}
+.builder-shell .visual-step-fields textarea{resize:vertical}
