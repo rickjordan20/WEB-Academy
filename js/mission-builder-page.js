@@ -15,6 +15,7 @@ function validate(value){
   if(!steps)continue;
   if(!Array.isArray(steps)||!steps.length||steps.some(s=>!s||!s.id||!s.title||!s.type)||new Set(steps.map(s=>s.id)).size!==steps.length)
    throw Error(name+": informe etapas com títulos, tipos e identificadores únicos.");
+  for(const step of steps){if(step.xp!==undefined&&(!Number.isInteger(step.xp)||step.xp<0||step.xp>10000))throw Error(name+": XP inválido em "+step.title);if(step.indicators!==undefined&&(!Array.isArray(step.indicators)||step.indicators.some(code=>typeof code!=="string"||!code.trim())))throw Error(name+": indicadores inválidos em "+step.title)}
  }
 }
 function publishedSnapshot(data){
