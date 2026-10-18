@@ -21,3 +21,6 @@
 .inline-fundamental-steps{display:grid;gap:1rem}.inline-fundamental-step{min-width:0}
 .inline-fundamental-step .learning-step{margin:0}
 @media(max-width:600px){.inline-revision-overview,.inline-fundamentals-review{padding:1rem}}
+
+/* Revisão por bloco: filtro sem remover respostas nem alterar o estado salvo. */
+.revision-filters{display:flex;flex-wrap:wrap;gap:.65rem;margin:1rem 0}.revision-filters [aria-pressed="true"]{outline:2px solid currentColor;outline-offset:2px}.revision-count{font-weight:600}.revision-only-pending [data-mission-step][data-revision-attention="false"],.revision-only-pending .inline-fundamental-step[data-revision-attention="false"]{display:none}.inline-fundamentals-review[hidden]{display:none!important}@media(max-width:600px){.revision-filters{flex-direction:column}.revision-filters button{width:100%}}
