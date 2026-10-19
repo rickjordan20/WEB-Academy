@@ -62,6 +62,7 @@ function renderDetail(r){
  const answered=Object.entries(sub?.answers||{}).filter(([k])=>k.startsWith(r.mission.id+":")||k.startsWith("F"+r.mission.phase+":"));
  const answersHTML=answered.map(([key,value])=>{const info=stepInfo(r,key);return '<div class="mm-answer-item"><small>'+esc(info.area)+'</small><h4>'+esc(info.title)+'</h4>'+formatAnswer(value)+'</div>'}).join("");
  root.innerHTML='<button type="button" class="btn btn-secondary" id="mmBack">← Voltar às minhas missões</button><article class="mm-detail"><div class="mm-detail-head"><div><p class="eyebrow">Acompanhamento da missão</p><h2>'+esc(r.mission.title)+'</h2></div><span class="mm-status '+status+'">'+labels[status]+'</span></div><p>'+message+'</p>'+overview+(sub?.feedback?'<section class="mm-review mm-teacher"><h3>Recado do instrutor</h3><p>'+esc(sub.feedback)+'</p></section>':"")+'<div class="mm-stats"><div><small>Quanto você registrou</small><strong>'+progress.percent+'%</strong></div><div><small>Atividades marcadas</small><strong>'+progress.completed+' de '+progress.total+'</strong></div><div><small>Pontos '+(status==="evaluated"?"registrados":"possíveis (estimativa)")+'</small><strong>'+(status==="evaluated"?(g.xp??"—"):progress.xp)+'</strong></div></div><div class="mm-bar"><i style="width:'+progress.percent+'%"></i></div><p class="mm-subtle">O percentual considera as etapas da missão marcadas como concluídas. Não representa sua nota nem garante aprovação.</p>'+(sub?'<p class="mm-meta">Último envio: '+date(sub.submitted_at)+(sub.is_late?" · Fora do prazo":"")+'</p>':'<p class="mm-meta">Esta missão ainda não foi enviada.</p>')+pendingHTML+(result?'<section class="mm-review"><h3>Como fui avaliado?</h3><p>'+result+'</p></section>':"")+(feedback?'<section class="mm-review"><h3>Comentários sobre as atividades</h3>'+feedback+'</section>':"")+(answersHTML?'<details class="mm-review mm-answers"><summary>Ver minhas respostas enviadas ('+answered.length+')</summary><p class="mm-subtle">Estas são as respostas salvas no último envio. Para mudar alguma resposta, abra a atividade.</p>'+answersHTML+'</details>':"")+'<div class="mm-actions"><a class="btn btn-primary" href="'+link(r)+'">'+(attention?"Corrigir na missão":"Abrir missão")+' →</a></div></article>';
+ lockUnpublishedLinks();
  root.querySelector("#mmBack").onclick=()=>{detail=null;render()};
 
 }
@@ -75,9 +76,19 @@ function render(){
  const counts=Object.fromEntries(filters.map(([key])=>[key,key==="all"?rows.length:rows.filter(r=>situation(r)===key).length]));
  const found=rows.filter(r=>(active==="all"||situation(r)===active)&&(!query||[r.mission.title,r.mission.subtitle,String(r.mission.phase)].some(x=>String(x||"").toLowerCase().includes(query))));
  root.innerHTML=(loadError?'<p class="mm-error">'+esc(loadError)+'</p>':"")+'<div class="mm-summary"><strong>'+counts.changes_requested+'</strong><span>missão(ões) aguardando sua revisão</span></div><div class="mm-controls"><div class="mm-filters">'+filters.map(([key,label])=>'<button type="button" class="mm-filter '+(active===key?"active":"")+'" data-mm-filter="'+key+'">'+label+' ('+counts[key]+')</button>').join("")+'</div><input id="mmSearch" type="search" placeholder="Buscar missão ou fase..." value="'+esc(query)+'" aria-label="Buscar missão"></div><div class="mm-list">'+(found.length?found.map(card).join(""):'<div class="mm-empty">Nenhuma missão corresponde aos filtros. <a href="missions.html">Explorar missões</a></div>')+'</div>';
+ lockUnpublishedLinks();
  root.querySelectorAll("[data-mm-filter]").forEach(b=>b.onclick=()=>{active=b.dataset.mmFilter;render()});
  root.querySelector("#mmSearch").oninput=e=>{const pos=e.target.selectionStart;query=e.target.value.toLowerCase().trim();render();const input=root.querySelector("#mmSearch");input.focus();input.setSelectionRange(pos,pos)};
  root.querySelectorAll("[data-mm-detail],[data-mm-correct]").forEach(b=>b.onclick=()=>{detail=b.dataset.mmDetail||b.dataset.mmCorrect;render();root.scrollIntoView({block:"start"})});
+}
+function lockUnpublishedLinks(){
+ root.querySelectorAll('a[href*="mission.html?id="],a[href*="fundamentals.html?phase="]').forEach(a=>{
+  const url=new URL(a.href,location.href),phase=Number(url.searchParams.get("phase"));
+  const missionId=url.pathname.endsWith("fundamentals.html")?`${phase}A`:url.searchParams.get("id");
+  const row=rows.find(r=>r.mission.id===missionId);
+  if(!row||available(row))return;
+  a.removeAttribute("href");a.setAttribute("aria-disabled","true");a.setAttribute("title",row.access?.message||"Aguardando publicação");a.textContent="🔒 "+(row.access?.state==="upcoming"?"Aguardando publicação":"Acesso indisponível");a.classList.remove("btn-primary");a.classList.add("btn-secondary");
+ });
 }
 async function load(){
  const state=getState();rows=MISSIONS.map(m=>({mission:m,local:localProgress(m,state),submission:null,access:null}));
