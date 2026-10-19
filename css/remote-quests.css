@@ -24,3 +24,14 @@ body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-
  body.journey-page:has(#extrasRoot) .remote-quest-symbol{width:48px;height:48px;font-size:1.6rem}
  body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-left:0}
 }
+
+/* Card inteiro funciona como link para a missão cadastrada. */
+.remote-card-link{display:block;text-decoration:none;color:inherit;min-width:0;border-radius:17px}
+.remote-card-link .remote-quest-card{height:100%}
+.remote-card-link:hover .remote-quest-card{border-color:#8f84ff;box-shadow:0 15px 32px rgba(0,0,0,.18);transform:translateY(-2px)}
+.remote-card-link:focus-visible{outline:3px solid #8f84ff;outline-offset:4px}
+.remote-open-hint{display:inline-block;margin-top:16px;font-size:.86rem;font-weight:800;color:var(--primary-2,#8175fa)}
+.remote-detail-back{margin:0 0 20px}.remote-detail-back a{color:var(--primary-2,#8175fa);font-weight:700}
+.remote-detail{padding:clamp(20px,3vw,38px);margin-bottom:22px}.remote-detail h2{font-size:clamp(1.7rem,3vw,2.6rem);margin:15px 0}.remote-detail .remote-quest-description{font-size:1.03rem;max-width:85ch}
+.remote-detail-steps{display:grid;gap:18px}.remote-detail-steps>h2{margin:0 0 4px}.remote-detail-empty{padding:24px}
+@media(prefers-reduced-motion:reduce){.remote-card-link:hover .remote-quest-card{transform:none}}
