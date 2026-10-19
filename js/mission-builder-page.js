@@ -37,12 +37,12 @@ async function saveProjectLink(){
 }
 function baseline(){const f=!remote&&mission.type==="training"?getFundamental(mission.phase):null;return {title:mission.title,subtitle:mission.subtitle||mission.official||"",steps:structuredClone(mission.steps||[]),...(f?{fundamental:{title:f.title,objective:f.objective,steps:structuredClone(f.steps||[])}}:{})}}
 function working(){return {title:$("#builderTitle").value.trim(),subtitle:$("#builderSubtitle").value,steps:mainEditor.getSteps(),...(fundamental?{fundamental:{title:$("#fundamentalTitle").value.trim(),objective:$("#fundamentalObjective").value,steps:fundEditor.getSteps()}}:{})}}
-function validate(value){
+function validate(value,{requireActivities=false}={}){
  if(!value.title)throw Error("Informe o título da missão.");
  for(const [name,steps] of [["Missão",value.steps],["Fundamentos",value.fundamental?.steps]]){
   if(!steps)continue;
   if(!Array.isArray(steps))throw Error(name+": formato das atividades inválido.");
-  if(!steps.length)throw Error(name+": nenhuma atividade cadastrada. Adicione uma atividade antes de salvar.");
+  if(requireActivities&&!steps.length)throw Error(name+": nenhuma atividade cadastrada. Adicione uma atividade antes de publicar.");
   const ids=new Set();
   for(const [index,step] of steps.entries()){
    const position=index+1;
@@ -152,7 +152,7 @@ draw();
  $("#builderWorkspace").hidden=true;$(".builder-tabs").hidden=true;$("#builderPreview").hidden=false
 }
 function exitPreview(){$("#builderPreview").hidden=true;$("#builderWorkspace").hidden=false;$(".builder-tabs").hidden=false}
-async function save(mode){try{const value=working();validate(value);const next={...stored};if(mode==="draft"){next.draft=value;next.status=stored.status||(Object.keys(stored).length?"published":"draft")}else if(mode==="publish"){
+async function save(mode){try{const value=working();validate(value,{requireActivities:mode==="publish"});const next={...stored};if(mode==="draft"){next.draft=value;next.status=stored.status||(Object.keys(stored).length?"published":"draft")}else if(mode==="publish"){
  const removed=stored.status==="published"?removedPublishedSteps(stored,value):[];
  if(removed.length&&!confirm("Você removeu etapas da versão publicada:\\n"+removed.join("\\n")+"\\n\\nIsso pode afetar a consulta de respostas anteriores. Deseja continuar?"))return;
  const now=new Date().toISOString();
