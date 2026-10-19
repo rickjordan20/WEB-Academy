@@ -155,3 +155,20 @@
 .eval-block-indicators .eval-indicator{padding:.55rem 0}
 .eval-block-indicators .eval-concepts label{font-size:.83rem}
 @media(max-width:560px){.eval-block-indicators .eval-indicator{align-items:flex-start}.eval-block-indicators .eval-concepts{flex-wrap:wrap}}
+
+/* Navegação do instrutor: rolagem própria em qualquer zoom ou altura de tela. */
+body:has(#activeClassSelect) .app-shell>.sidebar{
+ height:100dvh;
+ max-height:100dvh;
+ min-height:0;
+ box-sizing:border-box;
+ overflow-y:auto;
+ overflow-x:hidden;
+ overscroll-behavior:contain;
+ scrollbar-width:thin;
+ scrollbar-color:rgba(148,163,184,.55) transparent;
+}
+body:has(#activeClassSelect) .app-shell>.sidebar::-webkit-scrollbar{display:block;width:7px}
+body:has(#activeClassSelect) .app-shell>.sidebar::-webkit-scrollbar-thumb{background:rgba(148,163,184,.48);border-radius:9px}
+body:has(#activeClassSelect) .app-shell>.sidebar .nav-list{flex:0 0 auto}
+body:has(#activeClassSelect) .app-shell>.sidebar .sidebar-footer{flex:0 0 auto;margin-top:1.25rem;padding-bottom:.7rem}
