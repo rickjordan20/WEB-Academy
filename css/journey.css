@@ -78,3 +78,37 @@
 .learning-section.section-tip .learning-section-head>span{background:rgba(240,185,93,.12)}
 .guided-action-heading{display:flex;align-items:center;gap:.55rem;font-weight:850;margin:1.25rem 0 .5rem}
 .guided-action-heading>span{font-size:1.3rem}
+
+
+/* Student mission explorer: presentation only, preserves existing access decisions and links */
+.mission-explorer{padding:1.35rem;border:1px solid var(--line);border-radius:20px;background:linear-gradient(125deg,rgba(109,93,252,.11),rgba(32,214,181,.055));margin-bottom:1.2rem}
+.mission-explorer-heading{display:flex;justify-content:space-between;gap:1rem;align-items:center}
+.mission-explorer-heading h2{font-size:clamp(1.35rem,3vw,2rem);margin:.2rem 0}
+.mission-explorer-heading p{margin:.2rem 0 0;color:var(--muted);font-size:.88rem}
+.mission-explorer-heading>strong{white-space:nowrap;font-size:.8rem;border:1px solid var(--line);padding:.5rem .8rem;border-radius:30px}
+.mission-explorer-controls{margin-top:1.2rem;display:grid;gap:.85rem}
+.mission-explorer-search input{width:100%;border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;background:var(--surface,#101c2c);color:var(--text);font:inherit}
+.mission-explorer-filters{display:flex;gap:.5rem;flex-wrap:wrap}
+.mission-explorer-filters button{border:1px solid var(--line);background:rgba(255,255,255,.035);color:var(--text);border-radius:999px;padding:.55rem .8rem;font:inherit;font-size:.82rem;cursor:pointer}
+.mission-explorer-filters button.active,.mission-explorer-filters button[aria-pressed=true]{border-color:var(--primary-2,#8679ff);background:rgba(109,93,252,.18);font-weight:800}
+.mission-explorer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.mission-explorer-card{border:1px solid var(--line);background:var(--surface,#101b2a);border-radius:18px;padding:1.15rem;display:flex;flex-direction:column;gap:.6rem;min-width:0;position:relative;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+.mission-explorer-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8270ff,#34d7b5)}
+.mission-explorer-card.guild:before{background:linear-gradient(90deg,#f4b860,#e17b75)}
+.mission-explorer-card-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.mission-explorer-index{font-size:.73rem;letter-spacing:.1em;font-weight:900}
+.mission-explorer-type{border:1px solid var(--line);border-radius:999px;padding:.3rem .55rem;font-size:.75rem}
+.mission-explorer-symbol{height:40px;width:40px;display:grid;place-items:center;border-radius:13px;background:rgba(109,93,252,.15);font-size:1.5rem;font-weight:800}
+.mission-explorer-card.guild .mission-explorer-symbol{background:rgba(244,184,96,.13)}
+.mission-explorer-phase{font-size:.71rem!important;letter-spacing:.07em;font-weight:800;color:var(--muted);margin:0!important}
+.mission-explorer-card h3{font-size:1.15rem;line-height:1.3;margin:0}
+.mission-explorer-description{line-height:1.55;font-size:.9rem;color:var(--muted);margin:0;flex:1}
+.mission-explorer-bottom{border-top:1px solid var(--line);padding-top:.85rem;margin-top:.4rem;display:grid;gap:.65rem}
+.mission-explorer-date{font-size:.77rem;color:var(--muted);margin:0}
+.mission-explorer-state{font-size:.78rem;font-weight:800}
+.mission-explorer-card .btn{justify-self:start;align-self:start}
+.mission-explorer-card.is-locked{opacity:1}
+.mission-explorer-card.is-locked .mission-explorer-state{color:var(--muted)}
+.mission-explorer-empty{grid-column:1/-1;padding:1.5rem;text-align:center;color:var(--muted)}
+.mission-explorer-search .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(max-width:720px){.mission-explorer-grid{grid-template-columns:1fr}.mission-explorer-heading{align-items:flex-start}.mission-explorer{padding:1rem}}
