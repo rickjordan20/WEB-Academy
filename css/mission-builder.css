@@ -186,3 +186,13 @@
 .builder-requirements-compact .builder-indicator small{font-size:.76rem;line-height:1.35}
 .builder-project-details-body>button{margin-top:12px}
 @media(max-width:580px){.builder-project-details>summary{flex-wrap:wrap}#builderProjectSummary{text-align:left;margin-left:0}}
+
+/* Editor de conteúdo visual isolado */
+.builder-shell .visual-html-preview-wrap{display:grid;gap:12px;min-width:0;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg-soft)}
+.builder-shell .visual-html-preview-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.builder-shell .visual-html-preview-toolbar strong{margin-right:auto}
+.builder-shell .visual-html-preview-toolbar span,.builder-shell .visual-html-preview-wrap small{color:var(--muted);font-size:.78rem}
+.builder-shell .visual-html-preview-frame{width:100%;min-height:420px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.builder-shell .visual-html-preview-frame:fullscreen{width:100vw;height:100vh;border:0;border-radius:0}
+.learning-visual-frame{display:block;width:100%;height:min(70vh,720px);min-height:340px;border:1px solid var(--line,#64748b);border-radius:12px;background:#fff}
+@media(max-width:600px){.builder-shell .visual-html-preview-frame{min-height:320px}.learning-visual-frame{min-height:280px;height:65vh}}

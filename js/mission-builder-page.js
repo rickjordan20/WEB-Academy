@@ -37,12 +37,23 @@ async function saveProjectLink(){
 }
 function baseline(){const f=!remote&&mission.type==="training"?getFundamental(mission.phase):null;return {title:mission.title,subtitle:mission.subtitle||mission.official||"",steps:structuredClone(mission.steps||[]),...(f?{fundamental:{title:f.title,objective:f.objective,steps:structuredClone(f.steps||[])}}:{})}}
 function working(){return {title:$("#builderTitle").value.trim(),subtitle:$("#builderSubtitle").value,steps:mainEditor.getSteps(),...(fundamental?{fundamental:{title:$("#fundamentalTitle").value.trim(),objective:$("#fundamentalObjective").value,steps:fundEditor.getSteps()}}:{})}}
-function validate(value){
+function validate(value,{requireActivities=false}={}){
  if(!value.title)throw Error("Informe o título da missão.");
  for(const [name,steps] of [["Missão",value.steps],["Fundamentos",value.fundamental?.steps]]){
   if(!steps)continue;
-  if(!Array.isArray(steps)||!steps.length||steps.some(s=>!s||!s.id||!s.title||!s.type)||new Set(steps.map(s=>s.id)).size!==steps.length)
-   throw Error(name+": informe etapas com títulos, tipos e identificadores únicos.");
+  if(!Array.isArray(steps))throw Error(name+": formato das atividades inválido.");
+  if(requireActivities&&!steps.length)throw Error(name+": nenhuma atividade cadastrada. Adicione uma atividade antes de publicar.");
+  const ids=new Set();
+  for(const [index,step] of steps.entries()){
+   const position=index+1;
+   if(!step||typeof step!=="object")throw Error(name+": atividade "+position+" está inválida.");
+   if(!String(step.title??"").trim())throw Error(name+": atividade "+position+" está sem título.");
+   if(!String(step.type??"").trim())throw Error(name+": atividade "+position+" ("+String(step.title||"sem título")+") está sem tipo.");
+   if(!String(step.id??"").trim())throw Error(name+": atividade "+position+" ("+step.title+") está sem identificador.");
+   const id=String(step.id).trim();
+   if(ids.has(id))throw Error(name+": identificador repetido na atividade "+position+" ("+step.title+").");
+   ids.add(id);
+  }
   for(const step of steps){if(step.xp!==undefined&&(!Number.isInteger(step.xp)||step.xp<0||step.xp>10000))throw Error(name+": XP inválido em "+step.title);if(step.indicators!==undefined&&(!Array.isArray(step.indicators)||step.indicators.some(code=>typeof code!=="string"||!code.trim())))throw Error(name+": indicadores inválidos em "+step.title)}
  }
 }
@@ -141,7 +152,7 @@ draw();
  $("#builderWorkspace").hidden=true;$(".builder-tabs").hidden=true;$("#builderPreview").hidden=false
 }
 function exitPreview(){$("#builderPreview").hidden=true;$("#builderWorkspace").hidden=false;$(".builder-tabs").hidden=false}
-async function save(mode){try{const value=working();validate(value);const next={...stored};if(mode==="draft"){next.draft=value;next.status=stored.status||(Object.keys(stored).length?"published":"draft")}else if(mode==="publish"){
+async function save(mode){try{const value=working();validate(value,{requireActivities:mode==="publish"});const next={...stored};if(mode==="draft"){next.draft=value;next.status=stored.status||(Object.keys(stored).length?"published":"draft")}else if(mode==="publish"){
  const removed=stored.status==="published"?removedPublishedSteps(stored,value):[];
  if(removed.length&&!confirm("Você removeu etapas da versão publicada:\\n"+removed.join("\\n")+"\\n\\nIsso pode afetar a consulta de respostas anteriores. Deseja continuar?"))return;
  const now=new Date().toISOString();
