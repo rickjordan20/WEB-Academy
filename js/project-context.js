@@ -4,10 +4,16 @@ export async function getMissionProjectContext(mission){
  try{
   const sb=await getSupabase(),session=await getSession();if(!sb||!session||!mission)return null;
   const cr=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1).maybeSingle();if(cr.error||!cr.data)return null;
-  const pr=await sb.from("learning_projects").select("*").eq("class_id",cr.data.class_id).eq("slug",mission.project).eq("active",true).maybeSingle();if(pr.error||!pr.data)return null;
-  const [rr,lr]=await Promise.all([sb.from("project_requirements").select("*").eq("project_id",pr.data.id).eq("active",true).order("sort_order"),sb.from("mission_curriculum_links").select("*").eq("class_id",cr.data.class_id).eq("mission_id",mission.id).maybeSingle()]);
-  if(rr.error)return null;
-  const link=lr.error?null:lr.data,codes=new Set(link?.requirement_codes||mission.requirements||[]),stored=rr.data||[],defaults=DEFAULT_REQUIREMENTS[mission.project]||[];
+  const lr=await sb.from("mission_curriculum_links").select("*").eq("class_id",cr.data.class_id).eq("mission_id",mission.id).maybeSingle();
+  if(lr.error)throw lr.error;
+  const link=lr.data;
+  const projects=await sb.from("learning_projects").select("*").eq("class_id",cr.data.class_id).eq("active",true);
+  if(projects.error)throw projects.error;
+  const pr={data:(projects.data||[]).find(p=>link?.project_id?p.id===link.project_id:p.slug===mission.project)};
+  if(!pr.data)return null;
+  const rr=await sb.from("project_requirements").select("*").eq("project_id",pr.data.id).eq("active",true).order("sort_order");
+  if(rr.error)throw rr.error;
+  const codes=new Set(link?.requirement_codes??mission.requirements??[]),stored=rr.data||[],defaults=DEFAULT_REQUIREMENTS[pr.data.slug]||[];
   const requirements=[...codes].map(code=>stored.find(x=>x.code===code)||(()=>{const d=defaults.find(x=>x[0]===code);return d?{code:d[0],requirement_type:d[1],title:d[2],description:d[3],acceptance_criteria:d[4]}:null})()).filter(Boolean);
   return {project:pr.data,requirements,competencies:link?.indicator_codes||mission.competencies||[],implementationNote:link?.implementation_note||""};
  }catch(error){console.warn("Contexto do projeto indisponível",error);return null}
