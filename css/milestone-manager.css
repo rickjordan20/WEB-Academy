@@ -1,1 +1,15 @@
 body.journey-page .journey-container{max-width:1250px;width:calc(100% - 44px)}.mm-manager-toolbar{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:20px;margin-bottom:14px}.mm-manager-toolbar label,.mm-manager-dialog label{display:grid;gap:7px;color:var(--muted);font-weight:650}.mm-manager-toolbar select,.mm-manager-dialog input,.mm-manager-dialog select,.mm-manager-dialog textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 12px;font:inherit;max-width:100%;box-sizing:border-box}.mm-manager-list{display:grid;gap:15px}.mm-manager-card{display:flex;justify-content:space-between;gap:22px;padding:24px}.mm-manager-card h2{margin:8px 0}.mm-manager-card p{color:var(--muted);white-space:pre-wrap}.mm-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.mm-meta span{padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.8rem}.mm-card-actions{display:flex;align-items:start;gap:9px;flex-shrink:0}.mm-manager-dialog{background:var(--surface,#14263b);color:var(--text);border:1px solid var(--line);border-radius:18px;width:min(650px,calc(100% - 32px));max-height:90vh;overflow:auto;padding:24px}.mm-manager-dialog::backdrop{background:rgba(0,0,0,.75)}.mm-manager-dialog form{display:grid;gap:16px}.mm-manager-dialog h2{margin:0}.mm-manager-dialog textarea{resize:vertical}.mm-manager-dialog fieldset{border:1px solid var(--line);border-radius:12px;padding:12px}.mm-indicators{display:flex;flex-wrap:wrap;gap:14px}.mm-indicators label{display:flex;align-items:center;gap:7px}.mm-form-actions{display:flex;justify-content:flex-end;gap:10px}@media(max-width:700px){.mm-manager-toolbar,.mm-manager-card{flex-direction:column;align-items:stretch}.mm-card-actions{align-self:flex-start}body.journey-page .journey-container{width:calc(100% - 28px)}}
+/* A gestão de marcos reutiliza o layout administrativo da WEB Academy. */
+.mm-dashboard{max-width:none;min-width:0}
+.mm-hero{padding:1.55rem 1.85rem;margin-bottom:1rem}
+.mm-hero h2{font-size:clamp(1.5rem,2.4vw,2rem);margin:.4rem 0}
+.mm-hero>p:last-child{color:var(--muted);line-height:1.6;margin-bottom:0;max-width:850px}
+.mm-manager-toolbar{background:var(--surface);box-shadow:none}
+.mm-manager-toolbar select{min-width:min(430px,65vw);background:#091625;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:.8rem .9rem}
+.mm-manager-card{background:var(--surface);box-shadow:none;border:1px solid var(--line);border-radius:16px}
+.mm-manager-card h2{font-size:1.2rem}
+.mm-manager-card .eyebrow{color:var(--accent)}
+.mm-manager-card .mm-meta span{background:rgba(255,255,255,.035)}
+.mm-manager-dialog{background:#102033}
+.mm-manager-dialog input,.mm-manager-dialog select,.mm-manager-dialog textarea{background:#091625}
+@media(max-width:700px){.mm-manager-toolbar select{min-width:0;width:100%}.mm-hero{padding:1.2rem}.mm-manager-card{padding:18px}}
