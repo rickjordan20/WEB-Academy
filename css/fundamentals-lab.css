@@ -92,3 +92,11 @@
 
 /* Legendas simples para os comandos da prática guiada */
 .learning-command-details{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.learning-command-details code{overflow-wrap:anywhere}.learning-command-details small{font-size:.8rem;line-height:1.4;opacity:.82}.learning-command{align-items:center;gap:12px}.learning-copy-btn{flex-shrink:0}
+
+/* Revisão visual: imagem anexada e legível no tema escuro */
+.learning-image-review{margin:16px 0 22px;padding:12px;background:#122238;border:1px solid #334b66;border-radius:14px;text-align:center}
+.learning-image-review img{display:block;max-width:100%;width:auto;max-height:75vh;height:auto;margin:0 auto;border-radius:9px;object-fit:contain}
+.learning-image-review figcaption{color:#dce8f5;font-size:.92rem;line-height:1.6;padding:12px 6px 3px}
+.image-review-upload{display:grid;gap:10px;margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:12px}
+.image-review-upload input[type=file]{width:100%;padding:10px;border:1px dashed var(--line);border-radius:8px}
+.image-review-preview{max-width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:#102035}
