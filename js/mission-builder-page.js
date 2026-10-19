@@ -18,7 +18,7 @@ async function renderRequirements(){
  if(error)throw error;
  requirements=data||[];
  const checked=link?.project_id===project.id?(link.requirement_codes||[]):(project.slug===mission.project?mission.requirements||[]:[]);
- host.innerHTML=requirements.map(r=>'<label class="builder-indicator"><input type="checkbox" value="'+esc(r.code)+'" '+(checked.includes(r.code)?"checked":"")+'><span><strong>'+esc(r.code)+' — '+esc(r.title)+'</strong><small>'+esc(r.description||"")+'</small></span></label>').join("");
+ host.innerHTML=requirements.map(r=>'<label class="builder-indicator"><input type="checkbox" value="'+esc(r.code)+'" '+(checked.includes(r.code)?"checked":"")+'><span><strong>'+esc(r.code)+' — '+esc(r.title)+'</strong><small>'+esc(r.description||"")+'</small></span></label>').join("");updateProjectSummary();
 }
 function renderProjects(){
  const selected=link?.project_id||projects.find(p=>p.slug===mission.project)?.id||"";
