@@ -224,8 +224,8 @@ const phaseRequirementMap={
 14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"]}
 };
 export const MISSIONS=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>[
-{id:`${phase}A`,number:(phase-1)*2+1,lesson:(phase-1)*2+1,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,structure:[{kind:"fundamentals",label:"Fundamentos",hours:1.5},{kind:"guided",label:"Prática Guiada EduTech",hours:2},{kind:"report",label:"Relatório Individual",hours:.5}],competencies,requirements:phaseRequirementMap[phase].edutech,steps:guidedSteps(phase,topic,a)},
-{id:`${phase}B`,number:(phase-1)*2+2,lesson:(phase-1)*2+2,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,structure:[{kind:"guild",label:"Missão da Guilda",hours:4}],competencies,requirements:phaseRequirementMap[phase].restaurante,steps:guildSteps(phase,topic,b,axis)}
+{id:`${phase}A`,number:(phase-1)*2+1,lesson:(phase-1)*2+1,phase,type:"training",title:topic,subtitle:a,project:"edutech",hours:4,structure:[{kind:"fundamentals",label:"Fundamentos",hours:1.5},{kind:"guided",label:"Prática Guiada EduTech",hours:2},{kind:"report",label:"Relatório Individual",hours:.5}],competencies,requirements:phaseRequirementMap[phase].edutech,steps:[]},
+{id:`${phase}B`,number:(phase-1)*2+2,lesson:(phase-1)*2+2,phase,type:"guild",title:topic,subtitle:b,project:"restaurante",hours:4,structure:[{kind:"guild",label:"Missão da Guilda",hours:4}],competencies,requirements:phaseRequirementMap[phase].restaurante,steps:[]}
 ]);
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
@@ -237,11 +237,7 @@ export const EXTRA_MISSIONS=[
 {id:"R7",title:"Desafio Full Stack",official:"Jornada Web: Desafio Integrado de Consolidação",hours:4,competencies:["I1","I2","I3","I4","I5","I6"]}
 ];
 // Pré-configuração das sete atividades remotas: editável por turma no painel do instrutor.
-EXTRA_MISSIONS.forEach(m=>{m.subtitle=m.official;m.steps=[
-{id:m.id+"-intro",type:"content",title:"Objetivos e contextualização",summary:m.official,body:["Nesta atividade remota você vai consolidar os conhecimentos de: "+m.official+".","Leia os objetivos, realize a prática proposta e registre sua aprendizagem."]},
-{id:m.id+"-practice",type:"guided",title:"Prática autônoma",summary:"Aplicação individual dos conhecimentos",instructions:["Revise o material das aulas anteriores relacionado ao tema.","Desenvolva uma pequena melhoria ou exercício aplicado ao projeto em andamento.","Execute testes, revise o resultado e registre as alterações realizadas."]},
-{id:m.id+"-evidence",type:"evidence",title:"Evidência e reflexão",summary:"Comprove sua participação",fields:["O que você desenvolveu ou estudou?","Informe o link do repositório, commit ou evidência do exercício.","Qual dificuldade encontrou e como buscou resolvê-la?"]}
-]});
+EXTRA_MISSIONS.forEach(m=>{m.subtitle=m.official;m.steps=[];});
 export const ASSESSMENT_MILESTONES=[
 {id:"M1",title:"Preparação do Desenvolvedor",official:"Avaliação 1 — Ambiente de Desenvolvimento e Versionamento",after:"1B",competencies:["I1","I6"]},
 {id:"M2",title:"Construção da Interface",official:"Avaliação 2 — Desenvolvimento da Interface Web",after:"6B",competencies:["I2","I3","I6"]},
