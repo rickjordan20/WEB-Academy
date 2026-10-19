@@ -1,3 +1,4 @@
+import {mountVisualFrame} from "./visual-content.js";
 import {parseBehaviorChecks,evaluateCodeLab} from "./code-lab-checks.js";
 import { completeStep,saveAnswer as persistAnswer,getAnswer as readAnswer,recordCodeAttempt as persistCodeAttempt,getCodeAttempts as readCodeAttempts } from "./mission-engine.js";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -23,6 +24,7 @@ export function renderStep(step,missionId,done,options={}){
  const saved=options.previewStore?options.previewStore.answers.get(step.id):options.preview===true?null:readAnswer(missionId,step.id); const editable=options.editableCompleted===true;
  const head=`<div class="learning-step-head"><span class="step-type">${label(step.type)}</span><h2>${esc(step.title)}</h2><p>${esc(step.summary||"")}</p></div>`;
  let body="";
+ if(step.type==="visual-html")body=`<iframe class="learning-visual-frame" data-visual-content title="Conteúdo visual: ${esc(step.title)}" sandbox="" referrerpolicy="no-referrer"></iframe>`;
  if(step.type==="content")body=`${step.id?.startsWith("f1-block-")?`<div class="learning-block-intro"><span aria-hidden="true">🧭</span><strong>O que você vai aprender neste bloco</strong></div>`:""}${(step.body||[]).map(p=>`<p>${linkedText(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
  if(step.type==="visual-summary")body=`<div class="visual-idea">${esc(step.idea)}</div>${step.sections?.length?`<div class="learning-section-stack">${step.sections.map(section=>`<section class="learning-section ${/exemplo|veja/i.test(section.title)?"section-example":/dica|atenção|cuidado|importante|evite/i.test(section.title)?"section-tip":"section-concept"}"><div class="learning-section-head"><span aria-hidden="true">${/conceito|o que é|para que serve|termo/i.test(section.title)?"📘":/exemplo|veja|visual/i.test(section.title)?"👀":/dica|atenção|cuidado|importante/i.test(section.title)?"💡":"🧩"}</span><h3>${esc(section.title)}</h3></div><ul>${(section.items||[]).map(item=>`<li>${linkedText(item)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="visual-summary-grid">${(step.items||[]).map((x,i)=>`<div><span>${String(i+1).padStart(2,"0")}</span><strong>${esc(x)}</strong></div>`).join("")}</div>`}`;
  if(step.type==="match-cards")body=`<div class="match-card-grid">${step.pairs.map((x,i)=>`<button type="button" class="match-card" data-reveal-card="${i}"><span>${esc(x[0])}</span><strong>Toque para revelar</strong><em>${esc(x[1])}</em></button>`).join("")}</div>`;
@@ -41,6 +43,7 @@ export function renderStep(step,missionId,done,options={}){
 }
 export function bindStep(step,missionId,onChange,complete=completeStep,options={}){
  const card=[...document.querySelectorAll(`[data-step-card="${step.id}"]`)].find(el=>el.closest("[data-fundamental-step]")?.dataset.fundamentalStep===step.id&&missionId.startsWith("F")||el.closest("[data-mission-step]")?.dataset.missionStep===step.id&&!missionId.startsWith("F"))||document.querySelector(`[data-step-card="${step.id}"]`);if(!card)return; const completed=options.completed===true;
+ if(step.type==="visual-html"){const frame=card.querySelector("[data-visual-content]");if(frame)mountVisualFrame(frame,step.visualHtml||"",step.visualCss||"");card.querySelector("[data-complete-step]").onclick=()=>{const ok=complete(missionId,step.id);if(ok)onChange()};return}
  const store=options.previewStore;
  const saveAnswer=(unit,key,value)=>{if(store){store.answers.set(key,structuredClone(value));return}return persistAnswer(unit,key,value)};
  const getAnswer=(unit,key)=>store?store.answers.get(key):readAnswer(unit,key);
