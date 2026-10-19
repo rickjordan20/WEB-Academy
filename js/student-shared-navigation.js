@@ -4,7 +4,7 @@ const links=[
  ["journey.html","🗺","Minha Jornada","14 fases"],
  ["class-schedule.html","📅","Cronograma","Aulas"],
  ["missions.html","🎯","Missões","28 aulas"],
- ["edutech.html","🎓","EduTech","Projeto"],
+ ["projects.html","📁","Meus Projetos",""],
  ["guild.html","⚔","Minha Guilda","Kanban"],
  ["extras.html","🧭","Missões Remotas","7 missões"],
  ["milestones.html","🏁","Marcos Avaliativos","4"],
