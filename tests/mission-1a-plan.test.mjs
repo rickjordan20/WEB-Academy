@@ -1,0 +1,11 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {MISSION_1A_PLAN as plan} from "../data/mission-1a-plan.js";
+import {validateMissionDraft} from "../js/mission-draft-validation.js";
+test("Missão 1A aprovada é publicável em termos de estrutura",()=>assert.equal(validateMissionDraft(plan,{requireActivities:true}),true));
+test("Fundamentos têm 18 atividades e XP 55",()=>{assert.equal(plan.fundamental.steps.length,18);assert.equal(plan.fundamental.steps.reduce((n,s)=>n+(s.xp||0),0),55)});
+test("Prática e relatório têm 9 atividades e XP 75",()=>{assert.equal(plan.steps.length,9);assert.equal(plan.steps.reduce((n,s)=>n+(s.xp||0),0),75)});
+test("XP total é 130",()=>assert.equal([...plan.fundamental.steps,...plan.steps].reduce((n,s)=>n+(s.xp||0),0),130));
+test("IDs são únicos entre momentos",()=>{const ids=[...plan.fundamental.steps,...plan.steps].map(s=>s.id);assert.equal(new Set(ids).size,ids.length)});
+test("Prática preserva a estrutura oficial EduTech",()=>{const content=JSON.stringify(plan.steps);for(const name of ["CSS/style.css","JS/function1.js","PAGES/page1.html","index.html"])assert.ok(content.includes(name),name)});
+test("Relatório é a última etapa",()=>assert.equal(plan.steps.at(-1).type,"evidence"));
