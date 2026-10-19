@@ -8,7 +8,7 @@ const root=document.querySelector("#myMissions");
 const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const date=v=>v?new Date(v).toLocaleString("pt-BR"):"—";
 const filters=[["all","Todas"],["changes_requested","Revisão solicitada"],["submitted","Aguardando avaliação"],["evaluated","Avaliadas"],["in_progress","Em andamento"],["not_started","Não iniciadas"]];
-let rows=[],active="all",query="",detail=null,loadError="";
+let rows=[],active="all",query="",detail=null,loadError="",verifiedXp=null;
 const available=r=>["open","closed"].includes(r.access?.state);
 const actionLink=(r,label)=>available(r)?'<a class="btn btn-primary" href="'+link(r)+'">'+label+' →</a>':'<span class="btn btn-secondary" aria-disabled="true">🔒 '+esc(r.access?.message||"Aguardando publicação")+'</span>';
 function localProgress(m,s){
@@ -75,7 +75,7 @@ function render(){
  if(detail){const r=rows.find(x=>x.mission.id===detail);if(r){renderDetail(r);return}detail=null}
  const counts=Object.fromEntries(filters.map(([key])=>[key,key==="all"?rows.length:rows.filter(r=>situation(r)===key).length]));
  const found=rows.filter(r=>(active==="all"||situation(r)===active)&&(!query||[r.mission.title,r.mission.subtitle,String(r.mission.phase)].some(x=>String(x||"").toLowerCase().includes(query))));
- root.innerHTML=(loadError?'<p class="mm-error">'+esc(loadError)+'</p>':"")+'<div class="mm-summary"><strong>'+counts.changes_requested+'</strong><span>missão(ões) aguardando sua revisão</span></div><div class="mm-controls"><div class="mm-filters">'+filters.map(([key,label])=>'<button type="button" class="mm-filter '+(active===key?"active":"")+'" data-mm-filter="'+key+'">'+label+' ('+counts[key]+')</button>').join("")+'</div><input id="mmSearch" type="search" placeholder="Buscar missão ou fase..." value="'+esc(query)+'" aria-label="Buscar missão"></div><div class="mm-list">'+(found.length?found.map(card).join(""):'<div class="mm-empty">Nenhuma missão corresponde aos filtros. <a href="missions.html">Explorar missões</a></div>')+'</div>';
+ root.innerHTML=(verifiedXp?'<p class="mm-summary"><strong>'+verifiedXp.verified_xp+' XP</strong> validado(s) pelo servidor em '+verifiedXp.evaluated_missions+' missão(ões) avaliadas. Avaliações sem XP atribuído não somam pontos oficiais.</p>':"")+(loadError?'<p class="mm-error">'+esc(loadError)+'</p>':"")+'<div class="mm-summary"><strong>'+counts.changes_requested+'</strong><span>missão(ões) aguardando sua revisão</span></div><div class="mm-controls"><div class="mm-filters">'+filters.map(([key,label])=>'<button type="button" class="mm-filter '+(active===key?"active":"")+'" data-mm-filter="'+key+'">'+label+' ('+counts[key]+')</button>').join("")+'</div><input id="mmSearch" type="search" placeholder="Buscar missão ou fase..." value="'+esc(query)+'" aria-label="Buscar missão"></div><div class="mm-list">'+(found.length?found.map(card).join(""):'<div class="mm-empty">Nenhuma missão corresponde aos filtros. <a href="missions.html">Explorar missões</a></div>')+'</div>';
  lockUnpublishedLinks();
  root.querySelectorAll("[data-mm-filter]").forEach(b=>b.onclick=()=>{active=b.dataset.mmFilter;render()});
  root.querySelector("#mmSearch").oninput=e=>{const pos=e.target.selectionStart;query=e.target.value.toLowerCase().trim();render();const input=root.querySelector("#mmSearch");input.focus();input.setSelectionRange(pos,pos)};
@@ -99,6 +99,8 @@ async function load(){
   const classId=members?.[0]?.class_id;if(!classId){loadError="Nenhuma turma ativa encontrada para sua conta.";render();return}
   const {data,error}=await sb.from("mission_submissions").select("id,mission_id,status,submitted_at,is_late,feedback,grades,answers,evidence,progress_snapshot").eq("student_id",session.user.id).eq("class_id",classId).order("submitted_at",{ascending:false});
   if(error)throw error;
+  const xpResult=await sb.rpc("uc7_verified_xp");
+  if(!xpResult.error)verifiedXp=Array.isArray(xpResult.data)?xpResult.data[0]:xpResult.data;
   const latest=new Map();for(const sub of data||[])if(!latest.has(sub.mission_id))latest.set(sub.mission_id,sub);
   rows.forEach(r=>r.submission=latest.get(r.mission.id)||null);
  }catch(e){loadError="Não foi possível consultar as entregas na nuvem: "+e.message}
