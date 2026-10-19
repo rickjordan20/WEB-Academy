@@ -51,3 +51,13 @@ button.mm-step-link:focus-visible{outline:2px solid #9380fa;outline-offset:3px}
 .mm-quest .mm-actions{margin-top:auto;flex-wrap:wrap}
 .mm-quest .mm-actions>*{max-width:100%}
 @media(max-width:790px){.mm-list{grid-template-columns:1fr}}
+
+/* Full-card interactions retain the existing WEB Academy visual language. */
+.mission-explorer-card-link{display:flex;flex-direction:column;text-decoration:none;color:inherit;cursor:pointer}
+.mission-explorer-card-link .mission-explorer-bottom{margin-top:auto}
+.mission-explorer-card-link:hover,.mm-card[data-mm-card]:hover{border-color:rgba(139,127,255,.55);box-shadow:0 14px 35px rgba(0,0,0,.2);transform:translateY(-2px)}
+.mission-explorer-card-link:focus-visible,.mm-card[data-mm-card]:focus-visible{outline:3px solid var(--accent,#20d6b5);outline-offset:4px}
+.mission-explorer-card-link.is-locked{cursor:default}
+.mm-card[data-mm-card]{cursor:pointer}
+.mm-card[data-mm-card] .mm-actions a,.mm-card[data-mm-card] .mm-actions button{cursor:pointer}
+@media(prefers-reduced-motion:reduce){.mission-explorer-card-link:hover,.mm-card[data-mm-card]:hover{transform:none}}
