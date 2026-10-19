@@ -176,6 +176,7 @@ if(id==="1A"&&fundamental){
   }catch(error){message("Não foi possível carregar a imagem: "+error.message,true)}
  };
 }
+if(id==="1B"&&!stored.draft&&(!Array.isArray(stored.steps)||stored.steps.length===0)){mainEditor.setSteps(structuredClone(mission.steps));renderOverview();message("Missão 1B: roteiro do Restaurante carregado para edição. O estudante já utiliza o planejamento padrão; para persistir esta versão no Supabase, revise e publique pelo editor.");}
 $("#builderScheduleForm").addEventListener("submit",saveSchedule);$("#distributeMissionXp").onclick=()=>{
  try{
   const total=Number($("#missionXpBudget").value);
