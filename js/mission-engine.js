@@ -20,7 +20,7 @@ const canRecordUnit=id=>canRecordMissionProgress(/^F[0-9]+$/.test(id)?`${Number(
 export function ensureJourneyState(){const s=getState();if(!s)return null;s.journey||={};s.journey.currentPhase||=1;s.journey.completedMissions||=[];s.journey.unlockedMissions||=[];s.journey.missionProgress||={};s.journey.completedFundamentals||=[];s.journey.unlockedFundamentals||=["F1"];s.journey.fundamentalProgress||={};s.answers||={};s.evidence||=[];
  if(!s.journey.unlockedFundamentals.includes("F1"))s.journey.unlockedFundamentals.push("F1");
  // Compatibilidade: quem já iniciou/concluiu a antiga Missão A não perde acesso nem progresso.
- JOURNEY.forEach(({phase})=>{const a=`${phase}A`,fp=fId(phase);if(s.journey.missionProgress[a]?.startedAt||s.journey.completedMissions.includes(a)){if(!s.journey.completedFundamentals.includes(fp))s.journey.completedFundamentals.push(fp)}});
+ JOURNEY.forEach(({phase})=>{const a=`${phase}A`,fp=fId(phase);if(canRecordMissionProgress(a)&&(s.journey.missionProgress[a]?.startedAt||s.journey.completedMissions.includes(a))){if(!s.journey.completedFundamentals.includes(fp))s.journey.completedFundamentals.push(fp)}});
  if(!s.journey.unlockedMissions.includes("1A"))s.journey.unlockedMissions.push("1A");
  saveState(s);return s}
 export function missionStatus(id,s=ensureJourneyState()){const m=getMission(id);if(!m)return STATUS.LOCKED;if(s.journey.completedMissions.includes(id))return STATUS.COMPLETED;if(s.journey.missionProgress[id]?.startedAt)return STATUS.IN_PROGRESS;if(m.type==="training"&&s.journey.unlockedMissions.includes(id))return STATUS.IN_PROGRESS;if(s.journey.unlockedMissions.includes(id))return STATUS.AVAILABLE;return STATUS.LOCKED}
