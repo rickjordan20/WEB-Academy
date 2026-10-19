@@ -1,6 +1,7 @@
 import "./cloud-bootstrap.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
+import {missionWindow} from "./mission-window.js";
 import {MISSIONS,getFundamental} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 const root=document.querySelector("#myMissions");
@@ -8,6 +9,8 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"
 const date=v=>v?new Date(v).toLocaleString("pt-BR"):"—";
 const filters=[["all","Todas"],["changes_requested","Revisão solicitada"],["submitted","Aguardando avaliação"],["evaluated","Avaliadas"],["in_progress","Em andamento"],["not_started","Não iniciadas"]];
 let rows=[],active="all",query="",detail=null,loadError="";
+const available=r=>["open","closed"].includes(r.access?.state);
+const actionLink=(r,label)=>available(r)?'<a class="btn btn-primary" href="'+link(r)+'">'+label+' →</a>':'<span class="btn btn-secondary" aria-disabled="true">🔒 '+esc(r.access?.message||"Aguardando publicação")+'</span>';
 function localProgress(m,s){
  const done=s?.journey?.missionProgress?.[m.id]?.completedSteps||[];
  const started=Boolean(s?.journey?.missionProgress?.[m.id]?.startedAt||done.length||(s?.journey?.completedMissions||[]).includes(m.id));
@@ -77,7 +80,7 @@ function render(){
  root.querySelectorAll("[data-mm-detail],[data-mm-correct]").forEach(b=>b.onclick=()=>{detail=b.dataset.mmDetail||b.dataset.mmCorrect;render();root.scrollIntoView({block:"start"})});
 }
 async function load(){
- const state=getState();rows=MISSIONS.map(m=>({mission:m,local:localProgress(m,state),submission:null}));
+ const state=getState();rows=MISSIONS.map(m=>({mission:m,local:localProgress(m,state),submission:null,access:null}));
  try{
   const sb=await getSupabase(),session=await getSession();if(!sb||!session){loadError="Faça login para consultar suas entregas registradas.";render();return}
   const {data:members,error:memberError}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1);
@@ -88,6 +91,10 @@ async function load(){
   const latest=new Map();for(const sub of data||[])if(!latest.has(sub.mission_id))latest.set(sub.mission_id,sub);
   rows.forEach(r=>r.submission=latest.get(r.mission.id)||null);
  }catch(e){loadError="Não foi possível consultar as entregas na nuvem: "+e.message}
+ await refreshAccess();
  render();
 }
+async function refreshAccess(){const result=await Promise.all(rows.map(async r=>{try{return await missionWindow(r.mission.id)}catch{return {state:"error",message:"Acesso indisponível"}}}));rows.forEach((r,i)=>r.access=result[i]);}
 load();
+setInterval(async()=>{if(document.hidden)return;await refreshAccess();render()},60000);
+document.addEventListener("visibilitychange",async()=>{if(!document.hidden){await refreshAccess();render()}});
