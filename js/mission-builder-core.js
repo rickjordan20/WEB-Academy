@@ -5,6 +5,7 @@
  */
 export const BLOCK_TYPES=Object.freeze({
  content:{label:"Conteúdo",family:"content"},
+ "visual-html":{label:"Conteúdo visual (HTML + CSS)",family:"content"},
  objective:{label:"Objetivo",family:"content"},
  material:{label:"Material de apoio",family:"content"},
  quiz:{label:"Perguntas",family:"answers"},
