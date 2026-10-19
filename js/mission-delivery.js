@@ -1,6 +1,7 @@
 import {normalizeMissionDefinition,revisionBlocks} from "./mission-builder-core.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
+import {mountMissionParticipation} from "./mission-participation.js";
 import {getMission,getFundamental,completeFundamentalStep} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 import {renderStep,bindStep} from "./step-renderer.js";
@@ -31,11 +32,13 @@ export async function mountMissionDelivery(missionId,access,root){
  <label class="delivery-field"><span>Motivo do atraso <em>Obrigatório</em></span><select data-late-reason><option value="">Selecione o motivo</option>${options}</select></label>
  <label class="delivery-field"><span>Justificativa <em>Obrigatória</em></span><textarea data-late-explanation rows="4" placeholder="Conte brevemente o que aconteceu e por que não conseguiu entregar no prazo."></textarea><small>Escreva pelo menos 10 caracteres.</small></label>
  </div>
+ ${mission?.type==="guild"?'<section class="mp-summary" data-mission-participation></section>':""}
  <div class="delivery-preflight" data-delivery-preflight hidden></div>
  <div class="delivery-footer"><p class="delivery-help">A entrega ficará registrada com a data e o horário do envio para análise do instrutor.</p><button class="btn btn-primary delivery-submit" type="button" data-submit-mission>${late?"Enviar entrega atrasada":"Enviar para avaliação"} →</button></div>
  <p class="delivery-feedback" data-delivery-feedback role="status" aria-live="polite"></p>`;
 
  if(!late){section.querySelector(".delivery-fields").remove();}
+ if(mission?.type==="guild")mountMissionParticipation(section.querySelector("[data-mission-participation]"),{missionId,classId}).catch(console.warn);
  const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
  if(late){reason.closest("label").hidden=false;explanation.closest("label").hidden=false;}
