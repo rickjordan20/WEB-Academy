@@ -169,3 +169,20 @@
 .builder-schedule-form select:disabled{opacity:.7;cursor:not-allowed}
 @media(max-width:850px){.builder-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.builder-overview-grid,.builder-schedule-form{grid-template-columns:1fr}.builder-schedule-form{padding:16px}}
+
+/* Compact, collapsible project-to-mission configuration in Criteria */
+.builder-project-details{border:1px solid var(--border,#d7dfe5);border-radius:12px;margin:16px 0;padding:0;background:var(--surface,#fff)}
+.builder-project-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:13px 16px;list-style:none}
+.builder-project-details>summary::-webkit-details-marker{display:none}
+.builder-project-details>summary:after{content:"▾";font-size:15px}
+.builder-project-details[open]>summary:after{content:"▴"}
+.builder-project-details>summary strong{font-size:.95rem}
+#builderProjectSummary{font-size:.82rem;opacity:.75;margin-left:auto;text-align:right}
+.builder-project-details-body{padding:0 16px 16px}
+.builder-project-requirements-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:12px 0 8px;font-size:.88rem}
+#builderRequirementsCount{opacity:.7;font-size:.8rem}
+.builder-requirements-compact{max-height:260px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--border,#d7dfe5);border-radius:9px;padding:6px}
+.builder-requirements-compact .builder-indicator{padding:7px 9px;margin:2px 0;gap:8px}
+.builder-requirements-compact .builder-indicator small{font-size:.76rem;line-height:1.35}
+.builder-project-details-body>button{margin-top:12px}
+@media(max-width:580px){.builder-project-details>summary{flex-wrap:wrap}#builderProjectSummary{text-align:left;margin-left:0}}
