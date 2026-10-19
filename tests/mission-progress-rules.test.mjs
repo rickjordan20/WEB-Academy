@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {canCompleteSequentialStep,allStepsCompleted} from "../js/mission-progress-rules.js";
+const steps=[{id:"introducao"},{id:"pratica"},{id:"evidencia"}];
+test("primeira atividade é liberada",()=>assert.equal(canCompleteSequentialStep(steps,[],"introducao"),true));
+test("não permite pular uma atividade",()=>assert.equal(canCompleteSequentialStep(steps,[],"evidencia"),false));
+test("libera a próxima após concluir anterior",()=>assert.equal(canCompleteSequentialStep(steps,["introducao"],"pratica"),true));
+test("não permite concluir atividade inexistente",()=>assert.equal(canCompleteSequentialStep(steps,[],"inexistente"),false));
+test("permite reconhecer atividade já concluída sem duplicá-la",()=>assert.equal(canCompleteSequentialStep(steps,["introducao"],"introducao"),true));
+test("missão só termina com todas as etapas",()=>assert.equal(allStepsCompleted(steps,["introducao","pratica"]),false));
+test("ordem do histórico não afeta conclusão integral",()=>assert.equal(allStepsCompleted(steps,["evidencia","introducao","pratica"]),true));
+test("etapas vazias não concluem missão",()=>assert.equal(allStepsCompleted([],[]),false));
+test("IDs desconhecidos não substituem etapas faltantes",()=>assert.equal(allStepsCompleted(steps,["introducao","pratica","outra"]),false));
