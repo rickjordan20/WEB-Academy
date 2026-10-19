@@ -583,5 +583,5 @@ const phase1Steps=[
  }
 ];
 
-export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:1.5,steps:phase===1?phase1Steps:genericSteps(phase,title,axis)}));
+export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:1.5,steps:[]}));
 export const getFundamental=phase=>FUNDAMENTALS.find(f=>f.phase===Number(phase));
