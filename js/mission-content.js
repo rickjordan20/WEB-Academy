@@ -18,5 +18,5 @@ export function applyEditedMissionContent(missionId,content){
  const mission=[...MISSIONS,...EXTRA_MISSIONS].find(m=>m.id===missionId);if(!mission)return;
  if(typeof content.title==="string")mission.title=content.title;
  if(typeof content.subtitle==="string")mission.subtitle=content.subtitle;
- if(Array.isArray(content.steps))mission.steps=content.steps;
+ if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0))mission.steps=content.steps;
 }
