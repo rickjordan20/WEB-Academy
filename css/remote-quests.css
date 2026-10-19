@@ -1,2 +1,26 @@
 .remote-explorer{margin:20px 0 18px;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(125deg,rgba(95,111,255,.14),rgba(32,210,177,.06))}
 .remote-explorer-top{display:flex;justify-content:space-between;gap:15px;align-items:center}.remote-explorer h2{margin:5px 0;font-size:clamp(1.25rem,3vw,1.9rem)}.remote-explorer p{color:var(--muted);font-size:.88rem;margin:0}.remote-count{flex-shrink:0;border:1px solid var(--line);border-radius:999px;padding:9px 13px;font-weight:800;font-size:.8rem}.remote-search-label{display:block;margin:17px 0 12px}.remote-search-label input{box-sizing:border-box;width:100%;padding:13px 15px;background:var(--surface,#0c1a2c);border:1px solid var(--line);border-radius:12px;color:var(--text);font:inherit}.remote-filters{display:flex;gap:8px;flex-wrap:wrap}.remote-filters button{cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:8px 13px;color:var(--text);background:transparent;font:inherit;font-size:.82rem}.remote-filters button.active{border-color:#9186ff;background:rgba(113,102,245,.18);font-weight:800}.remote-results{margin-top:12px!important;font-size:.77rem!important}.remote-quest-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.remote-quest-card{position:relative;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:12px;border-radius:17px;padding:20px}.remote-quest-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#8175fa,#3ac7b2)}.remote-quest-banner{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:.75rem;font-weight:900;letter-spacing:.05em}.remote-quest-status{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.72rem;letter-spacing:0}.remote-quest-status.open{color:#49d5b4}.remote-quest-status.done{color:#8ca5ff}.remote-quest-symbol{display:grid;place-items:center;width:44px;height:44px;background:rgba(111,105,255,.15);border-radius:13px;font-size:1.6rem;margin:12px 0 8px}.remote-quest-card h2{font-size:1.18rem;line-height:1.3;margin:0 0 7px}.remote-quest-description{font-size:.9rem;line-height:1.6;color:var(--muted);margin:9px 0}.remote-quest-progress{display:flex;justify-content:space-between;font-size:.8rem;margin-top:12px}.remote-progress-track{height:7px;border-radius:9px;background:rgba(150,160,180,.2);overflow:hidden;margin:7px 0}.remote-progress-track i{display:block;height:100%;background:linear-gradient(90deg,#8073fb,#35c9ae);border-radius:9px}.remote-quest-card>button[data-extra]{margin-top:auto;align-self:start}.remote-empty{grid-column:1/-1;padding:24px;text-align:center;color:var(--muted)}.remote-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}@media(max-width:760px){.remote-quest-grid{grid-template-columns:1fr}.remote-explorer{padding:16px}.remote-explorer-top{align-items:flex-start;flex-wrap:wrap}}
+
+/* Layout remoto: uma missão por linha, usando toda a largura útil ao lado da navegação. */
+body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - clamp(32px,5vw,96px));max-width:none;margin-inline:auto}
+body.journey-page:has(#extrasRoot) .journey-intro{max-width:100%;margin-bottom:1.6rem}
+body.journey-page:has(#extrasRoot) .remote-quest-grid{grid-template-columns:minmax(0,1fr);gap:18px}
+body.journey-page:has(#extrasRoot) .remote-quest-card{width:100%;box-sizing:border-box;padding:clamp(20px,2.5vw,32px);gap:16px}
+body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2){display:grid;grid-template-columns:76px minmax(0,1fr);column-gap:22px;align-items:start}
+body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2)>.eyebrow,
+body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2)>.mission-schedule-date:first-of-type{grid-column:1/-1}
+body.journey-page:has(#extrasRoot) .remote-quest-symbol{grid-column:1;grid-row:3/span 4;width:64px;height:64px;font-size:2rem;margin:10px 0}
+body.journey-page:has(#extrasRoot) .remote-quest-card h2,
+body.journey-page:has(#extrasRoot) .remote-quest-card .remote-quest-description,
+body.journey-page:has(#extrasRoot) .remote-quest-card small,
+body.journey-page:has(#extrasRoot) .remote-quest-card .remote-quest-progress,
+body.journey-page:has(#extrasRoot) .remote-quest-card .remote-progress-track{grid-column:2}
+body.journey-page:has(#extrasRoot) .remote-quest-card h2{font-size:clamp(1.3rem,2vw,1.7rem);margin:8px 0 4px}
+body.journey-page:has(#extrasRoot) .remote-quest-description{max-width:85ch}
+body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-left:98px}
+@media(max-width:700px){
+ body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - 28px)}
+ body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2){display:block}
+ body.journey-page:has(#extrasRoot) .remote-quest-symbol{width:48px;height:48px;font-size:1.6rem}
+ body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-left:0}
+}
