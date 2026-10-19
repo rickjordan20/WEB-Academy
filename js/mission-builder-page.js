@@ -31,7 +31,7 @@ async function saveProjectLink(){
  const codes=[...$("#builderIndicators").querySelectorAll("input:checked")].map(x=>x.value);
  const payload={class_id:classId,mission_id:id,project_id:project.id,requirement_codes:selected,indicator_codes:codes,implementation_note:$("#builderAssessmentNote").value,updated_by:session.user.id};
  const {error}=await sb.from("mission_curriculum_links").upsert(payload,{onConflict:"class_id,mission_id"});
- if(error)throw error;link={...link,...payload};dirty=false;status();message("Projeto e requisitos vinculados com sucesso. O estudante verá o projeto selecionado.");
+ if(error)throw error;link={...link,...payload};status();message("Projeto e requisitos vinculados com sucesso. O estudante verá o projeto selecionado.");
  }catch(error){message("Não foi possível salvar o vínculo: "+error.message,true)}
 }
 function baseline(){const f=!remote&&mission.type==="training"?getFundamental(mission.phase):null;return {title:mission.title,subtitle:mission.subtitle||mission.official||"",steps:structuredClone(mission.steps||[]),...(f?{fundamental:{title:f.title,objective:f.objective,steps:structuredClone(f.steps||[])}}:{})}}
