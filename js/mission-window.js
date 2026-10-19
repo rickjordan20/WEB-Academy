@@ -14,6 +14,8 @@ export async function missionWindow(missionId){
  if(error)return {state:"error",message:"Falha ao consultar o cronograma: "+error.message};
  const row=data?.[0];if(!row)return {state:"unconfigured",message:"Missão ainda não vinculada ao cronograma."};
  const access={state:row.access_state,opensAt:row.opens_at,closesAt:row.closes_at,message:row.access_state==="upcoming"?"Disponível a partir de "+fmt(row.opens_at):row.access_state==="closed"?"Prazo encerrado em "+fmt(row.closes_at):row.access_state==="unconfigured"?"Horário ainda não configurado pelo instrutor.":"Disponível até "+fmt(row.closes_at)};
+ setVerifiedMissionWindow(missionId,access);
+ return access;
  }catch(error){console.warn("Verificação de publicação indisponível:",error);return {state:"error",message:"Não foi possível verificar o cronograma. Tente novamente."}}
 }
 export function windowNotice(info,returnHref="missions.html"){
