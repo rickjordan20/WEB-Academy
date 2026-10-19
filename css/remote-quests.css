@@ -1,37 +1,47 @@
-.remote-explorer{margin:20px 0 18px;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(125deg,rgba(95,111,255,.14),rgba(32,210,177,.06))}
-.remote-explorer-top{display:flex;justify-content:space-between;gap:15px;align-items:center}.remote-explorer h2{margin:5px 0;font-size:clamp(1.25rem,3vw,1.9rem)}.remote-explorer p{color:var(--muted);font-size:.88rem;margin:0}.remote-count{flex-shrink:0;border:1px solid var(--line);border-radius:999px;padding:9px 13px;font-weight:800;font-size:.8rem}.remote-search-label{display:block;margin:17px 0 12px}.remote-search-label input{box-sizing:border-box;width:100%;padding:13px 15px;background:var(--surface,#0c1a2c);border:1px solid var(--line);border-radius:12px;color:var(--text);font:inherit}.remote-filters{display:flex;gap:8px;flex-wrap:wrap}.remote-filters button{cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:8px 13px;color:var(--text);background:transparent;font:inherit;font-size:.82rem}.remote-filters button.active{border-color:#9186ff;background:rgba(113,102,245,.18);font-weight:800}.remote-results{margin-top:12px!important;font-size:.77rem!important}.remote-quest-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.remote-quest-card{position:relative;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:12px;border-radius:17px;padding:20px}.remote-quest-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#8175fa,#3ac7b2)}.remote-quest-banner{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:.75rem;font-weight:900;letter-spacing:.05em}.remote-quest-status{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.72rem;letter-spacing:0}.remote-quest-status.open{color:#49d5b4}.remote-quest-status.done{color:#8ca5ff}.remote-quest-symbol{display:grid;place-items:center;width:44px;height:44px;background:rgba(111,105,255,.15);border-radius:13px;font-size:1.6rem;margin:12px 0 8px}.remote-quest-card h2{font-size:1.18rem;line-height:1.3;margin:0 0 7px}.remote-quest-description{font-size:.9rem;line-height:1.6;color:var(--muted);margin:9px 0}.remote-quest-progress{display:flex;justify-content:space-between;font-size:.8rem;margin-top:12px}.remote-progress-track{height:7px;border-radius:9px;background:rgba(150,160,180,.2);overflow:hidden;margin:7px 0}.remote-progress-track i{display:block;height:100%;background:linear-gradient(90deg,#8073fb,#35c9ae);border-radius:9px}.remote-quest-card>button[data-extra]{margin-top:auto;align-self:start}.remote-empty{grid-column:1/-1;padding:24px;text-align:center;color:var(--muted)}.remote-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}@media(max-width:760px){.remote-quest-grid{grid-template-columns:1fr}.remote-explorer{padding:16px}.remote-explorer-top{align-items:flex-start;flex-wrap:wrap}}
-
-/* Layout remoto: uma missão por linha, usando toda a largura útil ao lado da navegação. */
-body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - clamp(32px,5vw,96px));max-width:none;margin-inline:auto}
-body.journey-page:has(#extrasRoot) .journey-intro{max-width:100%;margin-bottom:1.6rem}
-body.journey-page:has(#extrasRoot) .remote-quest-grid{grid-template-columns:minmax(0,1fr);gap:18px}
-body.journey-page:has(#extrasRoot) .remote-quest-card{width:100%;box-sizing:border-box;padding:clamp(20px,2.5vw,32px);gap:16px}
-body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2){display:grid;grid-template-columns:76px minmax(0,1fr);column-gap:22px;align-items:start}
-body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2)>.eyebrow,
-body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2)>.mission-schedule-date:first-of-type{grid-column:1/-1}
-body.journey-page:has(#extrasRoot) .remote-quest-symbol{grid-column:1;grid-row:3/span 4;width:64px;height:64px;font-size:2rem;margin:10px 0}
-body.journey-page:has(#extrasRoot) .remote-quest-card h2,
-body.journey-page:has(#extrasRoot) .remote-quest-card .remote-quest-description,
-body.journey-page:has(#extrasRoot) .remote-quest-card small,
-body.journey-page:has(#extrasRoot) .remote-quest-card .remote-quest-progress,
-body.journey-page:has(#extrasRoot) .remote-quest-card .remote-progress-track{grid-column:2}
-body.journey-page:has(#extrasRoot) .remote-quest-card h2{font-size:clamp(1.3rem,2vw,1.7rem);margin:8px 0 4px}
-body.journey-page:has(#extrasRoot) .remote-quest-description{max-width:85ch}
-body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-left:98px}
-@media(max-width:700px){
- body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - 28px)}
- body.journey-page:has(#extrasRoot) .remote-quest-card>div:nth-child(2){display:block}
- body.journey-page:has(#extrasRoot) .remote-quest-symbol{width:48px;height:48px;font-size:1.6rem}
- body.journey-page:has(#extrasRoot) .remote-quest-card>button[data-extra]{margin-left:0}
-}
-
-/* Card inteiro funciona como link para a missão cadastrada. */
-.remote-card-link{display:block;text-decoration:none;color:inherit;min-width:0;border-radius:17px}
-.remote-card-link .remote-quest-card{height:100%}
-.remote-card-link:hover .remote-quest-card{border-color:#8f84ff;box-shadow:0 15px 32px rgba(0,0,0,.18);transform:translateY(-2px)}
-.remote-card-link:focus-visible{outline:3px solid #8f84ff;outline-offset:4px}
-.remote-open-hint{display:inline-block;margin-top:16px;font-size:.86rem;font-weight:800;color:var(--primary-2,#8175fa)}
-.remote-detail-back{margin:0 0 20px}.remote-detail-back a{color:var(--primary-2,#8175fa);font-weight:700}
-.remote-detail{padding:clamp(20px,3vw,38px);margin-bottom:22px}.remote-detail h2{font-size:clamp(1.7rem,3vw,2.6rem);margin:15px 0}.remote-detail .remote-quest-description{font-size:1.03rem;max-width:85ch}
-.remote-detail-steps{display:grid;gap:18px}.remote-detail-steps>h2{margin:0 0 4px}.remote-detail-empty{padding:24px}
+/* UC7 Web Academy — cards remotos no mesmo design system da Jornada. */
+body.journey-page:has(#extrasRoot) .journey-container{width:min(1380px,calc(100% - 48px));max-width:1380px;margin-inline:auto}
+.remote-explorer{margin:0 0 22px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(21,38,59,.94),rgba(12,26,44,.94));box-shadow:var(--shadow)}
+.remote-explorer-top{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.remote-explorer h2{margin:4px 0 8px;font-size:clamp(1.35rem,2.5vw,1.85rem)}
+.remote-explorer p{color:var(--muted);font-size:.9rem;margin:0}
+.remote-count{border:1px solid rgba(32,214,181,.3);background:rgba(32,214,181,.08);color:var(--accent);border-radius:999px;padding:9px 15px;font-weight:800;white-space:nowrap;font-size:.84rem}
+.remote-search-label{display:block;margin:20px 0 12px}
+.remote-search-label input{display:block;width:100%;padding:13px 16px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+.remote-search-label input::placeholder{color:var(--muted)}
+.remote-filters{display:flex;flex-wrap:wrap;gap:9px}
+.remote-filters button{cursor:pointer;padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font:inherit;font-size:.83rem}
+.remote-filters button.active{background:rgba(109,93,252,.19);border-color:var(--primary-2);font-weight:800}
+.remote-results{margin-top:12px!important;font-size:.8rem!important}
+.remote-quest-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.remote-card-link{display:block;min-width:0;color:inherit;text-decoration:none;border-radius:var(--radius)}
+.remote-quest-card{position:relative;overflow:hidden;display:block;width:100%;min-width:0;padding:24px 28px;border-radius:var(--radius);background:linear-gradient(145deg,rgba(21,38,59,.94),rgba(12,26,44,.94));border:1px solid var(--line)}
+.remote-quest-card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.remote-quest-banner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:.76rem;font-weight:850;letter-spacing:.06em;color:var(--muted);margin-bottom:17px}
+.remote-quest-status{font-size:.76rem;letter-spacing:0;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);white-space:nowrap}
+.remote-quest-status.open{color:var(--accent);border-color:rgba(32,214,181,.35);background:rgba(32,214,181,.07)}
+.remote-quest-status.done{color:var(--primary-2);border-color:rgba(139,127,255,.35)}
+.remote-quest-content{display:grid;grid-template-columns:70px minmax(0,1fr);column-gap:22px;align-items:start}
+.remote-quest-content>.eyebrow,.remote-quest-content>.mission-schedule-date:first-of-type{grid-column:1/-1}
+.remote-quest-content>.eyebrow{margin:0 0 8px}
+.remote-quest-content>.mission-schedule-date:first-of-type{margin:0 0 16px;font-size:.81rem;line-height:1.5;color:var(--muted)}
+.remote-quest-symbol{grid-column:1;grid-row:3 / span 5;display:grid;place-items:center;width:58px;height:58px;margin:0;background:rgba(109,93,252,.14);border:1px solid rgba(139,127,255,.24);border-radius:16px;color:var(--primary-2);font-size:1.65rem}
+.remote-quest-content h2,.remote-quest-content>.mission-schedule-date:not(:first-of-type),.remote-quest-description,.remote-quest-content>small,.remote-quest-progress,.remote-progress-track,.remote-open-hint{grid-column:2;min-width:0}
+.remote-quest-content h2{font-size:clamp(1.3rem,2.4vw,1.8rem);line-height:1.25;margin:0 0 8px;color:var(--text)}
+.remote-quest-content>.mission-schedule-date:not(:first-of-type){font-size:.8rem;color:var(--muted);margin:0 0 8px}
+.remote-quest-description{font-size:.94rem;line-height:1.6;color:var(--muted);margin:0 0 10px;max-width:95ch}
+.remote-quest-content>small{font-size:.78rem;color:var(--muted)}
+.remote-open-hint{display:block;margin-top:15px;font-size:.86rem;font-weight:800;color:var(--primary-2)}
+.remote-quest-progress{display:flex;justify-content:space-between;gap:12px;margin-top:15px;font-size:.8rem;color:var(--muted)}
+.remote-progress-track{height:7px;margin:7px 0 0;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.remote-progress-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.remote-card-link:hover .remote-quest-card{border-color:rgba(139,127,255,.55);box-shadow:0 18px 40px rgba(0,0,0,.25);transform:translateY(-2px)}
+.remote-card-link:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.remote-detail-back{margin-bottom:18px}.remote-detail-back a{color:var(--primary-2);font-weight:750}
+.remote-detail{padding:clamp(22px,3vw,38px);margin-bottom:22px}.remote-detail h2{font-size:clamp(1.6rem,3vw,2.4rem);margin:10px 0 16px}
+.remote-detail .remote-quest-description{font-size:1rem;max-width:90ch}
+.remote-detail-steps{display:grid;gap:16px}.remote-detail-steps>h2{margin:0}
+.remote-detail-empty{padding:24px}.remote-help{margin:18px 0}.remote-empty{padding:25px;text-align:center;color:var(--muted)}
+.remote-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(max-width:700px){body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - 28px)}.remote-explorer{padding:17px}.remote-explorer-top{align-items:flex-start;flex-wrap:wrap}.remote-quest-card{padding:19px}.remote-quest-content{grid-template-columns:48px minmax(0,1fr);column-gap:12px}.remote-quest-symbol{width:42px;height:42px;border-radius:12px;font-size:1.3rem}.remote-quest-content h2{font-size:1.2rem}}
+@media(max-width:420px){.remote-quest-content{display:block}.remote-quest-symbol{float:left;margin:0 12px 10px 0}.remote-quest-content h2{margin-top:8px}.remote-open-hint{clear:both}}
 @media(prefers-reduced-motion:reduce){.remote-card-link:hover .remote-quest-card{transform:none}}
