@@ -112,3 +112,7 @@
 .mission-explorer-empty{grid-column:1/-1;padding:1.5rem;text-align:center;color:var(--muted)}
 .mission-explorer-search .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 @media(max-width:720px){.mission-explorer-grid{grid-template-columns:1fr}.mission-explorer-heading{align-items:flex-start}.mission-explorer{padding:1rem}}
+
+/* Apresentação visual personalizada do instrutor: conteúdo isolado em iframe. */
+.learning-visual-frame{display:block;width:100%;height:min(70vh,720px);min-height:340px;border:1px solid var(--line,#64748b);border-radius:12px;background:#fff}
+@media(max-width:600px){.learning-visual-frame{height:65vh;min-height:280px}}
