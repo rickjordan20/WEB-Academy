@@ -54,59 +54,36 @@
 .learning-step .guided-tip strong{display:block;margin-bottom:6px}.learning-step .guided-tip p{margin:0;line-height:1.55}
 
 
-/* Contraste acessível: cartões claros dentro do tema escuro da plataforma.
-   Não depender de --text, que é branco no tema escuro. */
+/* Cartões integrados ao tema escuro: contraste legível sem superfícies brancas. */
 .learning-step .guided-goal,
 .learning-step .guided-outcome,
 .learning-step .guided-tip,
 .learning-step .learning-section {
-  color:#172b40;
-  background:#f3f7fb;
+  background:#16283d;
+  color:#e7f1fb;
+  border-color:#354c66;
 }
-.learning-step .guided-goal *,
-.learning-step .guided-outcome *,
-.learning-step .guided-tip *,
-.learning-step .learning-section * {
-  color:inherit;
-}
+.learning-step .guided-goal {background:#172b44;border-left-color:#67aaff}
+.learning-step .guided-tip {background:#30291e;border-color:#665335;border-left-color:#f0b74e}
+.learning-step .guided-outcome {background:#18352e;border-color:#376b58;border-left-color:#51d3a0}
 .learning-step .guided-goal strong,
 .learning-step .guided-outcome strong,
 .learning-step .guided-tip strong,
-.learning-step .learning-section h3 {
-  color:#12263c;
-}
+.learning-step .learning-section h3 {color:#f7fbff}
 .learning-step .guided-goal p,
 .learning-step .guided-outcome p,
 .learning-step .guided-tip p,
 .learning-step .learning-section p,
-.learning-step .learning-section li {
-  color:#243b53;
-}
-.learning-step .guided-tip {
-  background:#fff7e8;
-  border-color:#e6c17b;
-  border-left-color:#b97811;
-}
-.learning-step .guided-outcome {
-  background:#ecf9f2;
-  border-color:#9ed5b6;
-  border-left-color:#198754;
-}
-.learning-step .guided-goal {
-  background:#eef5ff;
-  border-color:#b9d3f4;
-  border-left-color:#3177c6;
-}
-.learning-step .learning-section-head span {
-  background:#e4ecf4;
-  color:#172b40;
-}
-.learning-step .learning-section .guided-link,
+.learning-step .learning-section li {color:#dce8f5}
+.learning-step .learning-section-head span {background:#263e58;color:#f0f7ff}
 .learning-step .guided-goal .guided-link,
+.learning-step .guided-outcome .guided-link,
 .learning-step .guided-tip .guided-link,
-.learning-step .guided-outcome .guided-link {
-  color:#075b8f;
-}
+.learning-step .learning-section .guided-link {color:#7de4de}
+.learning-step .instruction-list>li {background:#122238;border-color:#33465d;color:#e7f1fb}
+.learning-step .instruction-list>li::before {background:#29435b;color:#f5faff}
+.learning-step .guided-code-example {background:#14253a;border-color:#354c66;color:#e7f1fb}
+.learning-step .guided-code-example strong {color:#f7fbff}
 
 /* Comandos separados do texto: leitura e cópia facilitadas. */
 .learning-step .guided-command-stack{display:grid;gap:10px;margin-top:12px}
