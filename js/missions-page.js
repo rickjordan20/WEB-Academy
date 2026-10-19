@@ -1,4 +1,4 @@
-import {phaseDescriptions} from "../data/mission-descriptions.js";
+import {loadStudentMissionCatalog,studentMissionDescription} from "./student-mission-catalog.js";
 import {missionWindow} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
 import "./cloud-bootstrap.js";import {MISSIONS,missionStatus,STATUS} from "./mission-engine.js";import {getState} from "./storage.js";
@@ -16,12 +16,12 @@ function render(){
  const filtered=MISSIONS.filter(m=>{
   const access=accessByMission.get(m.id),status=missionStatus(m.id);
   const match=catalogFilter==="all"||catalogFilter==="available"&&(access?.state==="open"||access?.state==="closed")||catalogFilter==="upcoming"&&!(access?.state==="open"||access?.state==="closed")||catalogFilter==="training"&&m.type==="training"||catalogFilter==="guild"&&m.type!=="training"||catalogFilter==="completed"&&status==="completed";
-  const desc=phaseDescriptions[m.phase-1]?.[m.type==="training"?0:1]||"Explore os desafios desta etapa da jornada web.";
+  const desc=studentMissionDescription(m);
   return match&&(`${m.id} ${m.subtitle} ${m.title||""} ${desc}`.toLocaleLowerCase("pt-BR").includes(catalogQuery));
  });
  root.innerHTML=`<div class="mission-explorer"><div class="mission-explorer-heading"><div><span class="eyebrow">ESCOLHA SEU PRÓXIMO DESAFIO</span><h2>Mapa de missões</h2><p>Aprenda, pratique e avance na sua jornada de desenvolvimento web.</p></div><strong>${filtered.length} de 28</strong></div><div class="mission-explorer-controls"><label class="mission-explorer-search"><span class="sr-only">Buscar missão</span><input id="catalogSearch" type="search" placeholder="Buscar por assunto ou missão..." value="${esc(catalogQuery)}" autocomplete="off"></label><div class="mission-explorer-filters" role="group" aria-label="Filtrar missões">${options.map(([key,label])=>`<button type="button" data-catalog-filter="${key}" aria-pressed="${catalogFilter===key}" class="${catalogFilter===key?"active":""}">${label}</button>`).join("")}</div></div></div><div class="mission-explorer-grid">${filtered.map(m=>{
   const status=missionStatus(m.id),access=accessByMission.get(m.id),editable=access?.state==="open"||access?.state==="closed",locked=!editable;
-  const guided=m.type==="training",desc=phaseDescriptions[m.phase-1]?.[guided?0:1]||"Explore os desafios desta etapa da jornada web.";
+  const guided=m.type==="training",desc=studentMissionDescription(m);
   const stateLabel=access?.state==="closed"?"Prazo vencido · justificativa necessária":access?.state==="open"?"Missão liberada":access?.state==="upcoming"?"Aguardando publicação":access?.state==="unconfigured"?"Aguardando configuração":access?.message||"Verificando disponibilidade";
   return `<article class="mission-explorer-card ${guided?"guided":"guild"} ${esc(status)} ${locked?"is-locked":""}"><div class="mission-explorer-card-top"><span class="mission-explorer-index">MISSÃO ${pad(m.number)}</span><span class="mission-explorer-type">${guided?"📘 EduTech":"⚔️ Restaurante"}</span></div><div class="mission-explorer-symbol" aria-hidden="true">${["⌘","◈","◇","✦","◉","▦","⚡","◎","⚙","⇄","▤","⛨","✚","★"][m.phase-1]||"✦"}</div><p class="mission-explorer-phase">FASE ${pad(m.phase)} · ${guided?"PRÁTICA GUIADA":"PRÁTICA AUTÔNOMA"}</p><h3>${esc(m.subtitle)}</h3><p class="mission-explorer-description">${esc(desc)}</p><div class="mission-explorer-bottom"><p class="mission-explorer-date">${esc(lessonLabel(scheduleByMission.get(m.id)))}</p><span class="mission-explorer-state">${locked?"🔒 ":""}${esc(stateLabel)}</span>${locked?`<span class="btn btn-secondary" aria-disabled="true">🔒 Aguardando liberação</span>`:`<a class="btn btn-primary" href="mission.html?id=${encodeURIComponent(m.id)}">${access?.state==="closed"?"Realizar com atraso":"Abrir missão"} →</a>`}</div></article>`
  }).join("")||'<p class="mission-explorer-empty">Nenhuma missão encontrada para este filtro.</p>'}</div>`;
@@ -29,7 +29,7 @@ function render(){
  root.querySelectorAll("[data-catalog-filter]").forEach(btn=>btn.addEventListener("click",()=>{catalogFilter=btn.dataset.catalogFilter;render()}));
 }
 
-Promise.all([loadMissionSchedule(),loadAccess()]);
+Promise.all([loadMissionSchedule(),loadAccess(),loadStudentMissionCatalog().then(render).catch(e=>console.warn("Catálogo:",e))]);
 
 setInterval(()=>{if(!document.hidden)loadAccess().catch(error=>console.warn("Atualização do cronograma:",error))},60000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadAccess().catch(error=>console.warn("Atualização do cronograma:",error))});
