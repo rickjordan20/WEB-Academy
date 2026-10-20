@@ -32,7 +32,7 @@ const classHours=id=>classes.find(c=>c.id===id);
 const effectiveHours=row=>{const c=classHours(row.class_id);return {start:hhmm(row.start_time_override)||hhmm(c?.lesson_start_time),end:hhmm(row.end_time_override)||hhmm(c?.lesson_end_time)}};
 function updateClassHoursPanel(){const c=classHours($("scheduleClass").value),start=hhmm(c?.lesson_start_time),end=hhmm(c?.lesson_end_time);$("scheduleClassHoursSummary").textContent=start&&end?"Horário padrão da turma: "+start+" – "+end+" · definido na Gestão de Turmas":"Horário padrão não configurado. O instrutor deve defini-lo na Gestão de Turmas.";}
 
-const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);if(m)return `Missão ${String(m.number).padStart(2,"0")} — ${m.subtitle}`;const extra=EXTRA_MISSIONS.find(m=>m.id===id);return extra?`Missão Remota ${id.slice(1)} — ${extra.title}`:id||"Sem missão";};
+const missionTitle=id=>{const m=MISSIONS.find(m=>m.id===id);if(m)return `Missão ${m.displayId||m.id} · Ciclo ${m.phase} — ${m.subtitle}`;const extra=EXTRA_MISSIONS.find(m=>m.id===id);return extra?`Missão Remota ${id.slice(1)} — ${extra.title}`:id||"Sem missão";};
 const days=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
 const formatDate=d=>{const [y,m,day]=d.split("-").map(Number);return String(day).padStart(2,"0")+"/"+String(m).padStart(2,"0")+"/"+y};
 const weekday=d=>{const [y,m,day]=d.split("-").map(Number);const date=new Date(Date.UTC(y,m-1,day,12));const label=days[date.getUTCDay()];return label.charAt(0).toUpperCase()+label.slice(1)};
