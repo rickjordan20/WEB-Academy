@@ -5,13 +5,33 @@ import {getSupabase,getSession} from "./supabase-client.js";
 const unique=(a=[],b=[])=>[...new Set([...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])])];
 const records=(a=[],b=[])=>{const out=new Map();for(const item of [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])]){const key=item?.key||item?.id||JSON.stringify(item);if(!out.has(key))out.set(key,item)}return [...out.values()]};
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
+const mergeFields=(remote,local,preferLocal)=>{
+ if(!plain(remote)||!plain(local))return preferLocal?local:remote;
+ const out={...remote,...local};
+ for(const key of new Set([...Object.keys(remote),...Object.keys(local)])){
+  if(!(key in remote))out[key]=local[key];
+  else if(!(key in local))out[key]=remote[key];
+  else if(plain(remote[key])&&plain(local[key]))out[key]=mergeFields(remote[key],local[key],preferLocal);
+  else out[key]=preferLocal?local[key]:remote[key];
+ }
+ return out;
+};
+const evidenceRecords=(a=[],b=[])=>{
+ const out=new Map();
+ for(const item of [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])]){
+  const key=(item?.id||"anonymous")+":"+JSON.stringify(item);
+  if(!out.has(key))out.set(key,item);
+ }
+ return [...out.values()];
+};
 const mergeAnswers=(remote,local,preferLocal,previousConflicts=[])=>{
  const answers={...remote,...local},conflicts=records(previousConflicts);
  for(const key of new Set([...Object.keys(remote||{}),...Object.keys(local||{})])){
   if(!(key in (remote||{}))){answers[key]=local[key];continue}
   if(!(key in (local||{}))){answers[key]=remote[key];continue}
   if(same(remote[key],local[key])){answers[key]=remote[key];continue}
-  answers[key]=preferLocal?local[key]:remote[key];
+  answers[key]=mergeFields(remote[key],local[key],preferLocal);
   const losing=preferLocal?remote[key]:local[key];
   const conflictKey=key+":"+JSON.stringify(losing);
   if(!conflicts.some(item=>item.id===conflictKey))conflicts.push({id:conflictKey,answerKey:key,value:losing});
@@ -45,7 +65,7 @@ export function mergeStudentStates(remote,local){
  const mergedAnswers=mergeAnswers(remote.answers||{},local.answers||{},newer,records(remote.answerConflicts,local.answerConflicts));
  return {...secondary,...primary,journey,gamification,competencies,
   answers:mergedAnswers.answers,answerConflicts:mergedAnswers.conflicts,
-  evidence:records(remote.evidence,local.evidence),
+  evidence:evidenceRecords(remote.evidence,local.evidence),
   extraMissions:{...secondary.extraMissions,...primary.extraMissions,completed:unique(remote.extraMissions?.completed,local.extraMissions?.completed)},
   meta:{...secondary.meta,...primary.meta,updatedAt:primary.meta?.updatedAt||secondary.meta?.updatedAt||new Date().toISOString()}};
 }
