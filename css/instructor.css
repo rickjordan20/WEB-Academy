@@ -172,3 +172,13 @@ body:has(#activeClassSelect) .app-shell>.sidebar::-webkit-scrollbar{display:bloc
 body:has(#activeClassSelect) .app-shell>.sidebar::-webkit-scrollbar-thumb{background:rgba(148,163,184,.48);border-radius:9px}
 body:has(#activeClassSelect) .app-shell>.sidebar .nav-list{flex:0 0 auto}
 body:has(#activeClassSelect) .app-shell>.sidebar .sidebar-footer{flex:0 0 auto;margin-top:1.25rem;padding-bottom:.7rem}
+
+/* Student tracking: keep all nine columns aligned and readable. */
+#studentsSection .table-wrap{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+#studentsSection .admin-table{min-width:1160px;table-layout:auto}
+#studentsSection .admin-table th,#studentsSection .admin-table td{vertical-align:top;white-space:nowrap}
+#studentsSection .admin-table th:first-child,#studentsSection .admin-table td:first-child{min-width:210px;max-width:280px;white-space:normal;overflow-wrap:anywhere}
+#studentsSection .admin-table th:nth-child(7),#studentsSection .admin-table td:nth-child(7){min-width:120px;white-space:normal}
+#studentsSection .admin-table th:nth-child(8),#studentsSection .admin-table td:nth-child(8){min-width:155px;white-space:normal;overflow-wrap:anywhere}
+#studentsSection .admin-table th:nth-child(9),#studentsSection .admin-table td:nth-child(9){min-width:145px;white-space:normal}
+@media print{ @page{size:A4 landscape;margin:10mm} #studentsSection .table-wrap{overflow:visible} #studentsSection .admin-table{min-width:0;width:100%;table-layout:fixed;font-size:8px} #studentsSection .admin-table th,#studentsSection .admin-table td{padding:5px 3px;white-space:normal;min-width:0!important;max-width:none!important;overflow-wrap:anywhere} #studentsSection .admin-table th:first-child{width:22%} #studentsSection .admin-table th:nth-child(8){width:15%} #studentsSection .admin-table th:nth-child(9){width:16%} #studentsSection .admin-table thead{display:table-header-group} #studentsSection .admin-table tr{break-inside:avoid} }
