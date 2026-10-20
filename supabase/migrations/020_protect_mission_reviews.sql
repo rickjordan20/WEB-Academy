@@ -27,6 +27,8 @@ returns trigger language plpgsql security definer set search_path='' as $$
 declare v_uid uuid:=auth.uid(); v_is_instructor boolean;
 begin
  if tg_op='INSERT' then return new; end if;
+ -- Only a trusted database context may bypass user checks.
+ if v_uid is null then return new; end if;
  v_is_instructor:=exists(select 1 from public.classes c where c.id=old.class_id and c.instructor_id=v_uid);
  if not v_is_instructor then
   if old.status not in ('submitted','changes_requested') or new.status<>'submitted'
@@ -40,6 +42,10 @@ begin
     new.grades is distinct from old.grades or new.feedback is distinct from old.feedback
     or new.reviewed_by is distinct from old.reviewed_by or new.reviewed_at is distinct from old.reviewed_at
   ) then raise exception 'Campos avaliativos protegidos'; end if;
+  if old.status='submitted' and (
+    new.answers is distinct from old.answers or new.evidence is distinct from old.evidence
+    or new.progress_snapshot is distinct from old.progress_snapshot
+  ) then raise exception 'Entrega submetida aguarda avaliação'; end if;
   if old.status='changes_requested' then
    if new.grades is distinct from '{}'::jsonb or new.feedback is distinct from ''
      or new.reviewed_by is not null or new.reviewed_at is not null then
