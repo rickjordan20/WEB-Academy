@@ -15,7 +15,7 @@ const state=getState();if(!state?.student?.name)location.replace("index.html");
 const initialAccess=await missionWindow(id);
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission){root.innerHTML='<section class="card current-mission"><h1>Missão não disponível</h1><a class="btn btn-primary" href="missions.html">Voltar às missões</a></section>';}
-else if(initialAccess.state==="upcoming"||initialAccess.state==="unconfigured"||initialAccess.state==="error"){root.replaceChildren(windowNotice(initialAccess));startWindowWatch(id);}
+else if(initialAccess.state==="unpublished"||initialAccess.state==="upcoming"||initialAccess.state==="unconfigured"||initialAccess.state==="error"){root.replaceChildren(windowNotice(initialAccess));startWindowWatch(id);}
 else{try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';missionAccess=initialAccess;missionReadOnly=false;startMission(id);projectContext=await getMissionProjectContext(mission);render(false,initialAccess);refreshMissionSchedule();startWindowWatch(id);}
 
 function render(readOnly=false,access=null){
