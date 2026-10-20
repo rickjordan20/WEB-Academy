@@ -13,12 +13,12 @@ export async function missionWindow(missionId){
  const {data,error}=await sb.rpc("mission_access_window",{p_class_id:chosen.class_id,p_mission_id:missionId});
  if(error)return {state:"error",message:"Falha ao consultar o cronograma: "+error.message};
  const row=data?.[0];if(!row)return {state:"unconfigured",message:"Missão ainda não vinculada ao cronograma."};
- const access={state:row.access_state,opensAt:row.opens_at,closesAt:row.closes_at,message:row.access_state==="upcoming"?"Disponível a partir de "+fmt(row.opens_at):row.access_state==="closed"?"Prazo encerrado em "+fmt(row.closes_at):row.access_state==="unconfigured"?"Horário ainda não configurado pelo instrutor.":"Disponível até "+fmt(row.closes_at)};
+ const access={state:row.access_state,opensAt:row.opens_at,closesAt:row.closes_at,message:row.access_state==="unpublished"?"Aguardando publicação pelo instrutor.":row.access_state==="upcoming"?"Disponível a partir de "+fmt(row.opens_at):row.access_state==="closed"?"Prazo encerrado em "+fmt(row.closes_at):row.access_state==="unconfigured"?"Horário ainda não configurado pelo instrutor.":"Disponível até "+fmt(row.closes_at)};
  setVerifiedMissionWindow(missionId,access);
  return access;
  }catch(error){console.warn("Verificação de publicação indisponível:",error);return {state:"error",message:"Não foi possível verificar o cronograma. Tente novamente."}}
 }
 export function windowNotice(info,returnHref="missions.html"){
- const title=info.state==="upcoming"?"🔒 Missão ainda não liberada":info.state==="closed"?"🔒 Prazo encerrado":"🔒 Acesso indisponível";
+ const title=info.state==="unpublished"?"🔒 Aguardando publicação":info.state==="upcoming"?"🔒 Missão ainda não liberada":info.state==="closed"?"🔒 Prazo encerrado":"🔒 Acesso indisponível";
  const section=document.createElement("section");section.className="card current-mission";const h=document.createElement("h1");h.textContent=title;const p=document.createElement("p");p.textContent=info.message;const a=document.createElement("a");a.className="btn btn-secondary";a.href=returnHref;a.textContent="Voltar às missões";section.append(h,p,a);return section;
 }
