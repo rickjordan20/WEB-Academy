@@ -54,6 +54,15 @@ export function mergeStudentStates(remote,local){
  gamification.rewarded=unique(remote.gamification?.rewarded,local.gamification?.rewarded);
  gamification.achievements=records(remote.gamification?.achievements,local.gamification?.achievements);
  gamification.xpHistory=records(remote.gamification?.xpHistory,local.gamification?.xpHistory);
+ gamification.xpConflicts=records(remote.gamification?.xpConflicts,local.gamification?.xpConflicts);
+ const remoteEvents=new Map((remote.gamification?.xpHistory||[]).filter(e=>e?.key).map(e=>[e.key,e]));
+ for(const event of local.gamification?.xpHistory||[]){
+  const prior=remoteEvents.get(event?.key);
+  if(prior&&Number(prior.amount)!==Number(event.amount)){
+   const id=event.key+":"+String(prior.amount)+":"+String(event.amount);
+   if(!gamification.xpConflicts.some(c=>c.id===id))gamification.xpConflicts.push({id,key:event.key,remoteAmount:prior.amount,localAmount:event.amount});
+  }
+ }
  // Event keys are idempotency identifiers. Legacy totals remain a floor, never decrease.
  const keyed=new Map();
  for(const event of gamification.xpHistory)if(event?.key&&!keyed.has(event.key))keyed.set(event.key,event);
