@@ -220,10 +220,10 @@ const phaseRequirementMap={
 8:{edutech:["RF02","RF04"],restaurante:["RF02","RF04"]},
 9:{edutech:["RF03","RF05"],restaurante:["RF03","RF05"]},
 10:{edutech:["RF06"],restaurante:["RF06"]},
-11:{edutech:["RF07"],restaurante:["RF07","RF11"]},
+11:{edutech:["RF07"],restaurante:["RF07"]},
 12:{edutech:["RF08","RF09","RNF05"],restaurante:["RF08","RF09","RNF05"]},
-13:{edutech:["RF07","RF09","RF10"],restaurante:["RF07","RF09","RF10","RF11"]},
-14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RF11","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"]}
+13:{edutech:["RF07","RF09","RF10"],restaurante:["RF07","RF09","RF10"]},
+14:{edutech:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"],restaurante:["RF01","RF02","RF03","RF04","RF05","RF06","RF07","RF08","RF09","RF10","RNF01","RNF02","RNF03","RNF04","RNF05","RNF06","RNF07","RNF08"]}
 };
 // IDs internos permanecem estáveis para preservar entregas, avaliações e vínculos.
 // A sequência pedagógica da turma tem três encontros no primeiro ciclo.
