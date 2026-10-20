@@ -1,3 +1,4 @@
+import {MISSIONS} from "./missions.js";
 export const JOURNEY = [
   ["Preparando o Ambiente","IDE, Git e GitHub","🛠️"],
   ["Construindo a Web","HTML","🧱"],
@@ -17,5 +18,5 @@ export const JOURNEY = [
   phase:index+1,
   id:`fase-${String(index+1).padStart(2,"0")}`,
   title:item[0], axis:item[1], icon:item[2],
-  missions:[`${index+1}A`,`${index+1}B`]
+  missions:MISSIONS.filter(m=>m.phase===index+1).map(m=>m.id)
 }));
