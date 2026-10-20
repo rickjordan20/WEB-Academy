@@ -47,7 +47,7 @@ export function mergeStudentStates(remote,local){
   answers:mergedAnswers.answers,answerConflicts:mergedAnswers.conflicts,
   evidence:records(remote.evidence,local.evidence),
   extraMissions:{...secondary.extraMissions,...primary.extraMissions,completed:unique(remote.extraMissions?.completed,local.extraMissions?.completed)},
-  meta:{...secondary.meta,...primary.meta,updatedAt:new Date().toISOString()}};
+  meta:{...secondary.meta,...primary.meta,updatedAt:primary.meta?.updatedAt||secondary.meta?.updatedAt||new Date().toISOString()}};
 }
 export async function pullCloudState(){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return null;setActiveUser(session.user.id);
@@ -75,14 +75,14 @@ export async function pushCloudState(){
    const result=await sb.rpc("save_student_state_cas",{p_state:candidate,p_expected_updated_at:expected});
    if(result.error)throw result.error;
    const row=Array.isArray(result.data)?result.data[0]:result.data;
-   if(row?.saved){saved=true;break}
+   if(row?.saved){saved=true;candidate=mergeStudentStates(row.cloud_state||candidate,candidate);break}
    if(!row?.cloud_state)throw new Error("Resposta de sincronização inválida.");
    candidate=mergeStudentStates(row.cloud_state,candidate);
    expectedVersion=row.cloud_updated_at;
    const retry=await sb.rpc("save_student_state_cas",{p_state:candidate,p_expected_updated_at:row.cloud_updated_at});
    if(retry.error)throw retry.error;
    const retried=Array.isArray(retry.data)?retry.data[0]:retry.data;
-   if(retried?.saved){saved=true;break}
+   if(retried?.saved){saved=true;candidate=mergeStudentStates(retried.cloud_state||candidate,candidate);break}
    candidate=mergeStudentStates(retried?.cloud_state,candidate);
    expectedVersion=retried?.cloud_updated_at;
   }
