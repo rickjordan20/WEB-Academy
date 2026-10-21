@@ -27,4 +27,4 @@ function render(){
  root.querySelector("#remoteSearch")?.addEventListener("input",e=>{const caret=e.target.selectionStart;remoteSearch=e.target.value.toLocaleLowerCase("pt-BR");render();const field=root.querySelector("#remoteSearch");field.focus();field.setSelectionRange(caret,caret)});
  root.querySelectorAll("[data-remote-filter]").forEach(b=>b.addEventListener("click",()=>{remoteFilter=b.dataset.remoteFilter;render()}));
 }
-await Promise.all(EXTRA_MISSIONS.map(async m=>applyEditedMissionContent(m.id,await loadEditedMissionContent(m.id))));render();Promise.all([loadRemoteSchedule(),refreshRemoteAccess()]);
+await Promise.all(EXTRA_MISSIONS.map(async m=>applyEditedMissionContent(m.id,await loadEditedMissionContent(m.id))));render();Promise.all([loadRemoteSchedule(),refreshRemoteAccess()]);setInterval(()=>{refreshRemoteAccess().catch(error=>console.warn("Acesso remoto:",error))},90000);
