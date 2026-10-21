@@ -1,5 +1,5 @@
 import { JOURNEY } from "../data/journey.js";
-import { MISSIONS,getMission,getPhaseMissions } from "../data/missions.js";
+import { MISSIONS,EXTRA_MISSIONS,getMission,getPhaseMissions } from "../data/missions.js";
 import { FUNDAMENTALS,getFundamental } from "../data/fundamentals.js";
 import { getState,saveState } from "./storage.js";
 import { rewardMission } from "./gamification.js";
@@ -8,7 +8,7 @@ export const STATUS={LOCKED:"locked",AVAILABLE:"available",IN_PROGRESS:"in-progr
 const fId=phase=>`F${phase}`;
 const verifiedWindows=new Map();
 export function setVerifiedMissionWindow(id,access){
- if(!getMission(id))return;
+ if(!getMission(id)&&!EXTRA_MISSIONS.some(m=>m.id===id))return;
  if(access?.state==="open"||access?.state==="closed")verifiedWindows.set(id,{checkedAt:Date.now(),opensAt:access.opensAt});
  else verifiedWindows.delete(id);
 }
