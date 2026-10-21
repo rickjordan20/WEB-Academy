@@ -2,14 +2,15 @@ import {calculatePublishedXp} from "./mission-xp-allocation.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {mountMissionParticipation} from "./mission-participation.js";
 import {getMission,getFundamental} from "./mission-engine.js";
+import {EXTRA_MISSIONS} from "../data/missions.js";
 import {missionMaxXp,estimateMissionXp} from "./mission-assessment-utils.js";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=d=>d?new Date(d).toLocaleString("pt-BR"):"—";
 const statuses={submitted:"Aguardando avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
 let rows=[],names=new Map(),classes=[],overrides=new Map(),current=null,filter="submitted",search="",missionFilter="";
-function missionOf(id){return getMission(id)}
+function missionOf(id){return getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id)}
 function effectiveDefinition(r,m,fundamental){
- const content=overrides.get(r.class_id+":"+r.mission_id)||{};
+ const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=stored.steps?stored:stored.draft?.steps?stored.draft:{};
  return {steps:content.steps||m?.steps||[],fundamental:fundamental?{steps:content.fundamental?.steps||fundamental.steps||[]}:null};
 }
 function blockKey(unit,step){return unit+":"+step.id}
@@ -37,7 +38,7 @@ function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const answer=(r.answers||{})[unitId+":"+step.id];
  const attempts=r.progress_snapshot?.codeAttempts?.[unitId+":"+step.id];
  const hasAnswer=answer!==undefined&&answer!==null&&answer!=="";
- const checked=completed.includes(step.id);
+ const checked=completed.includes(step.id);const auto=r.grades?.objectiveAuto?.results?.[step.id];const autoSummary=step.type==="checkpoint"&&auto?'<p class="eval-check-status"><strong>Correção automática: '+(auto.correct?"✓ Correta":"✗ Incorreta")+'</strong> · Resposta selecionada: '+esc(Number(auto.selected)+1)+' · Gabarito: '+esc(Number(auto.correctAnswer)+1)+'</p>':"";
  const hasSnapshot=Number(r.progress_snapshot?.version)>0;
  const informational=["content","visual-summary"].includes(step.type);
  const suggestions=checked?["Etapa concluída conforme o registro da plataforma. Continue aplicando o que aprendeu nas próximas atividades.","A conclusão da etapa foi registrada. Recomendo revisar os procedimentos e manter as evidências organizadas.","Registro de conclusão identificado. A compreensão e a aplicação prática serão consideradas em conjunto com as demais evidências."]:["Ainda não há conclusão registrada para esta etapa. Revise as orientações e finalize a atividade.","Há registros parciais nesta etapa. Continue o desenvolvimento e apresente as evidências solicitadas.","Revise o conteúdo deste bloco e procure esclarecer as dúvidas antes de prosseguir."];
@@ -50,7 +51,7 @@ function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const xpConfigured=Number(step.xp)||0;
  const awardControl='<label class="eval-xp-check"><input type="checkbox" data-eval-block-check="'+esc(blockKeyValue)+'" '+(checked?'':'disabled ')+(existingCheck&&checked?'checked':'')+'> Confirmar conclusão para XP ('+xpConfigured+' XP)</label>';
  const label=hasSnapshot?(checked?"✓ Check registrado":hasAnswer?"Resposta registrada, sem check":"Pendente: check não registrado"):"Entrega anterior ao registro de checks";
- return '<section class="eval-block"><div class="eval-block-head"><strong>'+(idx+1)+'. '+esc(step.title||step.id)+'</strong><span>'+esc(step.type||"Etapa")+'</span></div>'+(step.goal?'<p class="muted">'+esc(step.goal)+'</p>':"")+'<p class="eval-check-status">'+esc(label)+'</p>'+(hasAnswer?'<div class="eval-submitted"><small>Resposta enviada</small>'+answerHTML(answer)+'</div>':informational?'<p class="muted">Bloco informativo, sem resposta textual obrigatória.</p>':checked?'<p class="muted">Conclusão registrada por check. Esta etapa não contém resposta textual salva.</p>':'<p class="muted">Não há resposta textual nesta entrega.</p>')+(attempts?'<p class="muted">Verificações de código: '+esc(attempts.count||0)+' · Aprovadas: '+esc(attempts.passed||0)+'</p>':"")+progress.map(x=>'<div class="eval-submitted">'+answerHTML(x)+'</div>').join("")+blockAssessment+'<div class="eval-feedback-tools"><label>Modelo de feedback<select class="admin-input" data-feedback-template="'+esc(unitId+":"+step.id)+'"><option value="">Escolher sugestão (opcional)</option>'+suggestions.map((s,i)=>'<option value="'+i+'">'+esc(s)+'</option>').join("")+'</select></label><label class="eval-comment-label">Feedback deste bloco<textarea class="admin-input" rows="2" data-block-comment="'+esc(unitId+":"+step.id)+'" placeholder="Edite ou escreva uma orientação personalizada"></textarea></label></div></section>'
+ return '<section class="eval-block"><div class="eval-block-head"><strong>'+(idx+1)+'. '+esc(step.title||step.id)+'</strong><span>'+esc(step.type||"Etapa")+'</span></div>'+(step.goal?'<p class="muted">'+esc(step.goal)+'</p>':"")+'<p class="eval-check-status">'+esc(label)+'</p>' +autoSummary+(hasAnswer?'<div class="eval-submitted"><small>Resposta enviada</small>'+answerHTML(answer)+'</div>':informational?'<p class="muted">Bloco informativo, sem resposta textual obrigatória.</p>':checked?'<p class="muted">Conclusão registrada por check. Esta etapa não contém resposta textual salva.</p>':'<p class="muted">Não há resposta textual nesta entrega.</p>')+(attempts?'<p class="muted">Verificações de código: '+esc(attempts.count||0)+' · Aprovadas: '+esc(attempts.passed||0)+'</p>':"")+progress.map(x=>'<div class="eval-submitted">'+answerHTML(x)+'</div>').join("")+blockAssessment+'<div class="eval-feedback-tools"><label>Modelo de feedback<select class="admin-input" data-feedback-template="'+esc(unitId+":"+step.id)+'"><option value="">Escolher sugestão (opcional)</option>'+suggestions.map((s,i)=>'<option value="'+i+'">'+esc(s)+'</option>').join("")+'</select></label><label class="eval-comment-label">Feedback deste bloco<textarea class="admin-input" rows="2" data-block-comment="'+esc(unitId+":"+step.id)+'" placeholder="Edite ou escreva uma orientação personalizada"></textarea></label></div></section>'
 }
 
 function openReview(box,id){
