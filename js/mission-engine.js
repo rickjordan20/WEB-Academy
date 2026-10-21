@@ -9,7 +9,7 @@ const fId=phase=>`F${phase}`;
 const verifiedWindows=new Map();
 export function setVerifiedMissionWindow(id,access){
  if(!getMission(id)&&!EXTRA_MISSIONS.some(m=>m.id===id))return;
- if(access?.state==="open"||access?.state==="closed")verifiedWindows.set(id,{checkedAt:Date.now(),opensAt:access.opensAt});
+ if(access?.state==="open")verifiedWindows.set(id,{checkedAt:Date.now(),opensAt:access.opensAt});
  else verifiedWindows.delete(id);
 }
 export function canRecordMissionProgress(id){
