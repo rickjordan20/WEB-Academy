@@ -45,3 +45,15 @@ body.journey-page:has(#extrasRoot) .journey-container{width:min(1380px,calc(100%
 @media(max-width:700px){body.journey-page:has(#extrasRoot) .journey-container{width:calc(100% - 28px)}.remote-explorer{padding:17px}.remote-explorer-top{align-items:flex-start;flex-wrap:wrap}.remote-quest-card{padding:19px}.remote-quest-content{grid-template-columns:48px minmax(0,1fr);column-gap:12px}.remote-quest-symbol{width:42px;height:42px;border-radius:12px;font-size:1.3rem}.remote-quest-content h2{font-size:1.2rem}}
 @media(max-width:420px){.remote-quest-content{display:block}.remote-quest-symbol{float:left;margin:0 12px 10px 0}.remote-quest-content h2{margin-top:8px}.remote-open-hint{clear:both}}
 @media(prefers-reduced-motion:reduce){.remote-card-link:hover .remote-quest-card{transform:none}}
+
+/* Navegação por etapas das missões remotas */
+.remote-step-navigation{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 20px;padding:16px 20px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(135deg,rgba(21,38,59,.92),rgba(12,26,44,.92))}
+.remote-step-counter{font-size:.88rem;font-weight:800;color:var(--text)}
+.remote-step-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.remote-step-actions .btn{min-height:42px;padding:10px 20px;border-radius:12px;font-weight:750;cursor:pointer}
+.remote-step-actions .btn:disabled{opacity:.4;cursor:not-allowed}
+.remote-step-hint{flex-basis:100%;margin:0;color:var(--accent);font-size:.86rem;font-weight:650}
+.remote-step-hint:empty{display:none}
+.remote-delivery{padding:22px;display:grid;gap:12px}
+.remote-delivery [data-submit-remote]{justify-self:start;padding:12px 22px;border:0;border-radius:12px;background:var(--primary);color:white;font-weight:800;cursor:pointer}
+@media(max-width:520px){.remote-step-navigation{padding:14px}.remote-step-actions{width:100%}.remote-step-actions .btn{flex:1;padding:10px}}
