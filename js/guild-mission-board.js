@@ -64,11 +64,9 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
     if(savedForm){const mode=createForm.querySelector(`input[name="mode"][value="${savedForm.mode}"]`);if(mode){mode.checked=true;updateMode()}if(savedForm.block)blockSelect.value=savedForm.block;titleInput.value=savedForm.title||"";descriptionInput.value=savedForm.description||"";createForm.querySelector('[name="responsible"]').value=savedForm.responsible||"";}
     createForm.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(createForm),isBlock=fd.get("mode")==="block",b=blocks.find(x=>x.id===fd.get("block"));if(isBlock&&!b)return;const title=String(fd.get("title")||"").trim(),description=String(fd.get("description")||"").trim();if(!title||description.length<10)return;run(async()=>{
       const prefix=isBlock?"[Bloco: "+b.id+"] ":"";
-      const result=await sb.rpc("create_guild_manual_task",{p_guild_id:guildId,p_title:title,p_description:prefix+description,p_phase:mission.phase,p_responsible_user_id:fd.get("responsible")||null});
+      const result=await sb.rpc("create_guild_mission_task",{p_guild_id:guildId,p_mission_id:mission.id,p_title:title,p_description:prefix+description,p_phase:mission.phase,p_responsible_user_id:fd.get("responsible")||null});
       if(result.error)throw result.error;
       const id=result.data?.id;if(!id)throw new Error("Servidor não retornou a tarefa criada");
-      const update=await sb.from("guild_tasks").update({mission_id:mission.id,source:"mission"}).eq("id",id).eq("guild_id",guildId).select("id").single();
-      if(update.error)throw update.error;
       await logAction(id,`Criou ${isBlock?"a tarefa vinculada ao bloco "+b.title:"uma tarefa personalizada"}: ${title}.`);
     })});
    }
