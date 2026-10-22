@@ -22,3 +22,22 @@ export function windowNotice(info,returnHref="missions.html"){
  const title=info.state==="unpublished"?"🔒 Aguardando publicação":info.state==="upcoming"?"🔒 Missão ainda não liberada":info.state==="closed"?"🔒 Prazo encerrado":"🔒 Acesso indisponível";
  const section=document.createElement("section");section.className="card current-mission";const h=document.createElement("h1");h.textContent=title;const p=document.createElement("p");p.textContent=info.message;const a=document.createElement("a");a.className="btn btn-secondary";a.href=returnHref;a.textContent="Voltar às missões";section.append(h,p,a);return section;
 }
+
+/** Consulta as janelas de todas as missões em uma única chamada ao Supabase. */
+export async function missionWindowsBatch(){
+ const sb=await getSupabase();if(!sb)throw new Error("Conexão indisponível");
+ const {data:auth,error:authError}=await sb.auth.getUser();if(authError||!auth?.user)throw new Error("Faça login para consultar as missões");
+ const {data:members,error:memberError}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active");
+ if(memberError||!members?.length)throw new Error("Matrícula ativa não encontrada");
+ const preferred=localStorage.getItem("webacademy.student.activeClass");
+ const chosen=members.find(m=>m.class_id===preferred)||members[0];
+ const {data,error}=await sb.rpc("student_mission_access_windows",{p_class_id:chosen.class_id});
+ if(error)throw error;
+ const windows=new Map();
+ for(const row of data||[]){
+  const access={state:row.access_state,opensAt:row.opens_at,closesAt:row.closes_at,
+   message:row.access_state==="unpublished"?"Aguardando publicação pelo instrutor.":row.access_state==="upcoming"?"Disponível a partir de "+fmt(row.opens_at):row.access_state==="closed"?"Prazo encerrado em "+fmt(row.closes_at):row.access_state==="unconfigured"?"Horário ainda não configurado pelo instrutor.":"Disponível até "+fmt(row.closes_at)};
+  windows.set(row.mission_id,access);setVerifiedMissionWindow(row.mission_id,access);
+ }
+ return windows;
+}
