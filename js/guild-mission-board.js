@@ -1,10 +1,14 @@
 import {getSupabase,getSession} from "./supabase-client.js";
+const activeBoards=new WeakMap();
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const statuses=[["todo","A fazer"],["doing","Em andamento"],["review","Em revisão"],["done","Concluído"]];
 const labelStatus=s=>statuses.find(x=>x[0]===s)?.[1]||s;
 export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
  if(mission.type!=="guild")return;
  const host=root.querySelector("#guildMissionBoard");if(!host)return;
+ const previous=activeBoards.get(root);if(previous){previous();activeBoards.delete(root)}
+ let stopped=false,cleanup=()=>{stopped=true};
+ activeBoards.set(root,()=>cleanup());
  host.innerHTML='<p class="gm-loading">Carregando organização da Guilda...</p>';
  try{
   const sb=await getSupabase(),session=await getSession();if(!sb||!session){host.textContent="Entre na sua conta para consultar a equipe.";return}
@@ -23,11 +27,11 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
   const blockTitle=t=>{const found=blocks.find(b=>t.description?.includes(`[Bloco: ${b.id}]`));return found?.title||"Tarefa da missão"};
   let tasks=[],contributions=[],busy=false,refreshing=false;
   async function load(){
-   if(refreshing)return;refreshing=true;
+   if(stopped||!host.isConnected||refreshing)return;refreshing=true;
    try{const a=await sb.from("guild_tasks").select("id,title,description,status,responsible_user_id,created_by,mission_id,phase").eq("guild_id",guildId).eq("mission_id",mission.id).order("created_at");
    if(a.error)throw a.error;tasks=a.data||[];
    if(tasks.length){const b=await sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",tasks.map(t=>t.id)).order("created_at",{ascending:false});if(b.error)throw b.error;contributions=b.data||[]}else contributions=[];
-   render();}finally{refreshing=false}
+   if(!stopped&&host.isConnected)render();}finally{refreshing=false}
   }
   function render(){
    host.innerHTML=`<div class="gm-heading"><div><p class="eyebrow">Trabalho colaborativo · ${esc(mission.id)}</p><h2>Quadro da Guilda · ${esc(name(session.user.id))}</h2><p>Equipe identificada automaticamente. Distribua as atividades, registre sua participação e acompanhe as evidências da equipe.</p></div><a class="btn btn-secondary" href="guild.html">Abrir Guilda →</a></div>
@@ -42,13 +46,16 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
    host.querySelectorAll("[data-contribute]").forEach(form=>form.onsubmit=e=>{e.preventDefault();const fd=new FormData(form);run(async()=>{const result=await sb.from("guild_task_contributions").insert({task_id:form.dataset.contribute,guild_id:guildId,author_id:session.user.id,summary:String(fd.get("summary")).trim(),evidence_url:String(fd.get("url")).trim()||null});if(result.error)throw result.error})});
   }
   await load();
-  // A fonte dos registros é o banco; outros integrantes recebem atualizações sem limpar cache.
-  const channel=sb.channel("guild-mission-"+guildId+"-"+mission.id)
-   .on("postgres_changes",{event:"*",schema:"public",table:"guild_tasks",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn))
-   .on("postgres_changes",{event:"*",schema:"public",table:"guild_task_contributions",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn))
-   .subscribe();
-  const focus=()=>{if(!document.hidden&&host.isConnected)load().catch(console.warn)};
+  // Canal exclusivo por montagem: evita reutilizar um canal já inscrito em outro render.
+  const channel=sb.channel("guild-mission-"+guildId+"-"+mission.id+"-"+Math.random().toString(36).slice(2));
+  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_tasks",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn));
+  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_task_contributions",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn));
+  channel.subscribe();
+  const focus=()=>{if(!document.hidden)load().catch(console.warn)};
   window.addEventListener("focus",focus);
-  const timer=setInterval(()=>{if(host.isConnected&&!document.hidden)load().catch(console.warn);else if(!host.isConnected){clearInterval(timer);window.removeEventListener("focus",focus);sb.removeChannel(channel)}},15000);
+  const timer=setInterval(()=>{if(stopped||!host.isConnected){cleanup();return}if(!document.hidden)load().catch(console.warn)},15000);
+  cleanup=()=>{if(stopped)return;stopped=true;clearInterval(timer);window.removeEventListener("focus",focus);sb.removeChannel(channel)};
+  if(activeBoards.get(root))activeBoards.set(root,cleanup);
+
  }catch(e){console.error("Kanban da missão:",e);host.innerHTML='<p>Não foi possível carregar o quadro da Guilda. Consulte as tarefas em <a href="guild.html">Guildas</a>.</p>'}
 }
