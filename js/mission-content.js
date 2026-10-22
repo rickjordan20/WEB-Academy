@@ -19,6 +19,11 @@ export function applyEditedMissionContent(missionId,content){
  if(typeof content.title==="string")mission.title=content.title;
  if(typeof content.subtitle==="string")mission.subtitle=content.subtitle;
  if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0))mission.steps=content.steps;
+ // Infográfico original aprovado no construtor: mostrar também na revisão da primeira aula.
+ if(missionId==="1A"){
+  const image=content.draft?.fundamental?.steps?.find(step=>step.type==="image-review"&&typeof step.imageData==="string"&&step.imageData.startsWith("data:image/jpeg;base64,"));
+  if(image&&!mission.steps.some(step=>step.id==="retro-1-infographic"))mission.steps=[{...image,id:"retro-1-infographic",title:"Infográfico da aula · Pastas, VS Code, Git e GitHub",summary:"Observe a imagem original utilizada em sala antes de responder às questões."},...mission.steps];
+ }
 }
 
 /** Atualiza o conteúdo da missão diretamente do Supabase quando o instrutor publicar mudanças. */
