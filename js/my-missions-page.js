@@ -2,7 +2,7 @@ import {loadStudentMissionCatalog,studentMissionDescription} from "./student-mis
 import "./cloud-bootstrap.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
-import {missionWindow} from "./mission-window.js";
+import {missionWindowsBatch} from "./mission-window.js";
 import {MISSIONS,getFundamental} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
 const root=document.querySelector("#myMissions");
@@ -102,15 +102,14 @@ async function load(){
   const classId=members?.[0]?.class_id;if(!classId){loadError="Nenhuma turma ativa encontrada para sua conta.";render();return}
   const {data,error}=await sb.from("mission_submissions").select("id,mission_id,status,submitted_at,is_late,feedback,grades,answers,evidence,progress_snapshot").eq("student_id",session.user.id).eq("class_id",classId).order("submitted_at",{ascending:false});
   if(error)throw error;
-  const xpResult=await sb.rpc("uc7_verified_xp");
-  if(!xpResult.error)verifiedXp=Array.isArray(xpResult.data)?xpResult.data[0]:xpResult.data;
+  sb.rpc("uc7_verified_xp").then(xpResult=>{if(!xpResult.error){verifiedXp=Array.isArray(xpResult.data)?xpResult.data[0]:xpResult.data;render()}}).catch(error=>console.warn("XP oficial:",error));
   const latest=new Map();for(const sub of data||[])if(!latest.has(sub.mission_id))latest.set(sub.mission_id,sub);
   rows.forEach(r=>r.submission=latest.get(r.mission.id)||null);
  }catch(e){loadError="Não foi possível consultar as entregas na nuvem: "+e.message}
- await refreshAccess();
+ try{await refreshAccess()}catch(error){loadError=loadError||"Não foi possível verificar o cronograma: "+error.message}
  render();
 }
-async function refreshAccess(){const result=await Promise.all(rows.map(async r=>{try{return await missionWindow(r.mission.id)}catch{return {state:"error",message:"Acesso indisponível"}}}));rows.forEach((r,i)=>r.access=result[i]);}
-load();
+async function refreshAccess(){const access=await missionWindowsBatch();rows.forEach(r=>r.access=access.get(r.mission.id)||{state:"unconfigured",message:"Missão não vinculada ao cronograma"});}
+render();load();
 setInterval(async()=>{if(document.hidden)return;await refreshAccess();render()},60000);
 document.addEventListener("visibilitychange",async()=>{if(!document.hidden){await refreshAccess();render()}});
