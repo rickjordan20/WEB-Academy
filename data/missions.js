@@ -231,6 +231,30 @@ const originalMissions=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>
 {id:`${phase}A`,number:(phase-1)*2+1,lesson:(phase-1)*2+1,phase,type:"training",title:topic,subtitle:phaseDescriptions[phase-1]?.[0]||a,project:"edutech",hours:4,structure:[{kind:"fundamentals",label:"Fundamentos",hours:1.5},{kind:"guided",label:"Prática Guiada EduTech",hours:2},{kind:"report",label:"Relatório Individual",hours:.5}],competencies,requirements:phaseRequirementMap[phase].edutech,steps:[]},
 {id:`${phase}B`,number:(phase-1)*2+2,lesson:(phase-1)*2+2,phase,type:"guild",title:topic,subtitle:phaseDescriptions[phase-1]?.[1]||b,project:"restaurante",hours:4,structure:[{kind:"guild",label:"Missão da Guilda",hours:4}],competencies,requirements:phaseRequirementMap[phase].restaurante,steps:phase===1?structuredClone(MISSION_1B_STEPS):[]}
 ]);
+// Regularização das três aulas já ministradas: registros curtos, sem repetição obrigatória da prática.
+const retrospectiveSteps=[
+[
+{id:"retro-1-overview",type:"content",title:"Aula 1 · Revise o que foi feito",summary:"Use os infográficos da aula como apoio.",body:["Sequência: organizar pastas e arquivos no Windows 11; abrir o projeto no VS Code; usar terminal; configurar e iniciar Git; registrar commit; conectar e publicar no GitHub.","Depois, a turma clonou o repositório do professor, criou um arquivo NOME.md, trabalhou em uma branch própria, fez push e abriu um pull request.","Esta missão registra a aula já realizada. Não é necessário refazer tudo; indique o que conseguiu realizar."]},
+{id:"retro-1-q1",type:"quiz",title:"1 · Organização do projeto",question:"Antes de iniciar o Git, o que devemos organizar?",options:["A pasta principal e os arquivos do projeto","Um pull request no GitHub","Um banco de dados"],answer:0,feedback:"Primeiro organizamos a pasta do projeto e seus arquivos."},
+{id:"retro-1-q2",type:"quiz",title:"2 · Git e GitHub",question:"Qual alternativa diferencia Git e GitHub?",options:["Git registra versões; GitHub hospeda repositórios","GitHub substitui o VS Code","Git só funciona na internet"],answer:0,feedback:"Git funciona localmente; GitHub é um serviço remoto."},
+{id:"retro-1-q3",type:"quiz",title:"3 · Colaboração",question:"Para sugerir uma alteração feita em uma branch ao repositório do professor, o que foi aberto?",options:["Pull request","git init","Uma pasta de imagens"],answer:0,feedback:"O pull request permite propor e revisar alterações antes da integração."},
+{id:"retro-1-evidence",type:"evidence",title:"Registro da Aula 1",summary:"Conte o que já fez; não é necessário repetir a prática.",fields:["Link do repositório individual do Projeto X, se disponível.","Quais atividades realizou: pastas/arquivos, Git, commit, push, clone, arquivo NOME.md, branch e pull request? Indique as pendentes.","Link do pull request ou outra evidência, se houver; se não tiver, explique brevemente."]}
+],
+[
+{id:"retro-2-overview",type:"content",title:"Aula 2 · Retomada e aprofundamento",summary:"Continuação da Aula 1 no projeto TechEduca.",body:["Revise os dois infográficos utilizados em sala: panorama da UC7 e introdução ao Git e GitHub.","A aula retomou a sequência da primeira aula, com explicações mais detalhadas e prática guiada na TechEduca. Não houve prática coletiva obrigatória na Café Central.","Registre o que já realizou e indique dificuldades ou pendências. Não é preciso criar outro repositório caso já esteja cadastrado."]},
+{id:"retro-2-q1",type:"quiz",title:"1 · Estrutura",question:"Em qual arquivo normalmente fica o conteúdo inicial da página web?",options:["index.html","style.css","app.js"],answer:0,feedback:"O index.html costuma ser a entrada da página."},
+{id:"retro-2-q2",type:"quiz",title:"2 · Versionamento",question:"Qual comando registra uma versão local depois de preparar as alterações?",options:["git commit","git clone","git pull"],answer:0,feedback:"O commit registra uma versão no histórico local."},
+{id:"retro-2-q3",type:"quiz",title:"3 · Publicação",question:"Qual comando envia commits locais para o remoto configurado?",options:["git push","git status","git init"],answer:0,feedback:"O push envia commits para o repositório remoto."},
+{id:"retro-2-evidence",type:"evidence",title:"Registro da Aula 2",summary:"Aproveite o repositório TechEduca já cadastrado.",fields:["O link do repositório TechEduca já está cadastrado? Se não, informe o link disponível ou explique.","Quais partes da prática guiada você realizou ou retomou?","O que compreendeu melhor nesta aula e o que ainda precisa revisar?"]}
+],
+[
+{id:"retro-3-overview",type:"content",title:"Aula 3 · Organização da Guilda Café Central",summary:"Primeiro registro do projeto colaborativo.",body:["A turma conheceu a WEB-Academy, consultou o cronograma, criou grupos e cadastrou links dos repositórios.","O líder iniciou o repositório da Café Central e a equipe começou a distribuir responsabilidades no Kanban.","Não foram exigidas branches ou pull requests individuais nesta aula. Aproveite os dados já cadastrados na plataforma."]},
+{id:"retro-3-q1",type:"quiz",title:"1 · Organização",question:"Para que serve o Kanban da equipe?",options:["Distribuir e acompanhar tarefas","Substituir o Git","Criar automaticamente o site"],answer:0,feedback:"O Kanban ajuda a organizar responsáveis e andamento."},
+{id:"retro-3-q2",type:"quiz",title:"2 · Repositório",question:"Quem ficou responsável por publicar inicialmente o projeto Café Central?",options:["O líder da equipe","Cada integrante em uma branch obrigatória","Somente o instrutor"],answer:0,feedback:"Nesta aula o líder realizou a publicação inicial."},
+{id:"retro-3-q3",type:"quiz",title:"3 · Contribuição",question:"Como demonstrar a participação individual na equipe?",options:["Registrar tarefas e contribuições no Kanban","Apenas informar o nome do grupo","Criar outro grupo"],answer:0,feedback:"O registro das tarefas ajuda a identificar a contribuição de cada integrante."},
+{id:"retro-3-evidence",type:"evidence",title:"Registro da Aula 3",summary:"Não duplique cadastros já realizados.",fields:["Qual é sua Guilda na WEB-Academy?","O repositório Café Central já foi cadastrado? Se não, informe a situação.","Qual responsabilidade foi combinada para você ou quais tarefas foram registradas no Kanban?","O que a equipe já conseguiu organizar e o que ficou pendente?"]}
+]
+];
 export const MISSIONS=originalMissions.map((original,index)=>{
  const sourceIndex=index<3?0:index===27?27:index-1;
  const source=originalMissions[sourceIndex];
@@ -240,7 +264,7 @@ export const MISSIONS=originalMissions.map((original,index)=>{
  index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:{};
  return {...original,...source,id:original.id,number:index+1,lesson:index+1,phase,displayId,...special,
   // Os blocos personalizados continuam vinculados ao identificador interno original.
-  steps:original.steps};
+  steps:index<3?retrospectiveSteps[index]:original.steps};
 });
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
