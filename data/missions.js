@@ -231,6 +231,43 @@ const originalMissions=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>
 {id:`${phase}A`,number:(phase-1)*2+1,lesson:(phase-1)*2+1,phase,type:"training",title:topic,subtitle:phaseDescriptions[phase-1]?.[0]||a,project:"edutech",hours:4,structure:[{kind:"fundamentals",label:"Fundamentos",hours:1.5},{kind:"guided",label:"Prática Guiada EduTech",hours:2},{kind:"report",label:"Relatório Individual",hours:.5}],competencies,requirements:phaseRequirementMap[phase].edutech,steps:[]},
 {id:`${phase}B`,number:(phase-1)*2+2,lesson:(phase-1)*2+2,phase,type:"guild",title:topic,subtitle:phaseDescriptions[phase-1]?.[1]||b,project:"restaurante",hours:4,structure:[{kind:"guild",label:"Missão da Guilda",hours:4}],competencies,requirements:phaseRequirementMap[phase].restaurante,steps:phase===1?structuredClone(MISSION_1B_STEPS):[]}
 ]);
+// Aula 4 presencial (08h–12h): fundamentos antes do desafio autônomo da Guilda.
+const MISSION_2B_STEPS=[
+{id:"2b-fund-01",type:"visual-summary",title:"01 · O que existe por trás de um site?",summary:"Fundamentos · 5 min · Observe e descubra",idea:"Missão: criar a primeira página do Projeto Restaurante. Antes de programar, descubra como o navegador entende o conteúdo.",sections:[
+{title:"Observe a página do restaurante",items:["Que informações uma página de restaurante precisa mostrar? Nome, apresentação, pratos e contato são um bom começo.","HTML organiza e dá significado ao conteúdo; CSS cuida da aparência; JavaScript acrescenta comportamentos.","Nesta missão o foco é HTML. Não é necessário criar estilos ou interações em JavaScript."]},
+{title:"Como funciona uma tag?",items:["Uma tag como <h1> inicia um título; </h1> encerra esse elemento. Entre elas fica o texto.","Um atributo acrescenta informações: <a href=\"contato.html\">Contato</a> informa o destino do link.","A tag <img> não envolve texto nem usa fechamento: seus atributos src e alt indicam a imagem e sua descrição."]}]},
+{id:"2b-fund-02",type:"visual-summary",title:"02 · Anatomia do HTML5",summary:"Fundamentos · 10 min · Entenda a estrutura",idea:"A estrutura do documento é como a planta de um restaurante: cada parte tem sua função.",sections:[
+{title:"Documento e idioma",items:["<!DOCTYPE html> indica o padrão HTML5.","<html lang=\"pt-BR\"> envolve o documento e informa seu idioma.","<head> contém informações sobre a página; <body> contém o que aparece na tela."]},
+{title:"Informações do head",items:["<meta charset=\"UTF-8\"> permite representar corretamente os caracteres do português.","<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> orienta a adaptação inicial a telas menores.","<title>Projeto Restaurante</title> define o texto da aba do navegador, não o título visível na página."]},
+{title:"Atenção à organização",items:["O arquivo index.html fica na pasta principal do projeto.","Indentação facilita a leitura e ajuda a encontrar elementos que não foram fechados.","Salve o arquivo e abra-o no navegador para conferir o resultado."]}]},
+{id:"2b-fund-03",type:"guided",title:"03 · Reconheça as tags e os caminhos",summary:"Fundamentos · 10 min · Exemplo comentado",goal:"Identificar elementos e atributos usados em uma página de restaurante.",instructions:[
+"Observe o exemplo de HTML abaixo. Localize o título principal h1 e o subtítulo h2. Evite usar vários h1 apenas para aumentar o tamanho do texto.",
+"Encontre o parágrafo p, a lista ul com itens li, o link a com href e a imagem img com src e alt.",
+"Compare ul (lista sem ordem) com ol (lista numerada). O elemento br faz uma quebra de linha, mas não deve substituir parágrafos.",
+"Confira o caminho relativo assets/images/prato.jpg: a imagem precisa existir nessa pasta dentro do projeto. O atributo alt descreve a imagem para quem não consegue vê-la."
+],code:"<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Projeto Restaurante</title>\n</head>\n<body>\n  <h1>Restaurante da Guilda</h1>\n  <p>Comida preparada com carinho.</p>\n  <h2>Cardápio</h2>\n  <ul>\n    <li>Prato do dia</li>\n    <li>Suco natural</li>\n  </ul>\n  <img src=\"assets/images/prato.jpg\" alt=\"Prato servido pelo restaurante\">\n  <p><a href=\"contato.html\">Fale conosco</a></p>\n</body>\n</html>",tip:"A imagem e o link só funcionarão se os arquivos indicados existirem nos caminhos informados.",outcome:"Você consegue explicar para que servem h1, h2, p, ul, li, a, img, href, src e alt."},
+{id:"2b-fund-04",type:"editor",title:"04 · Laboratório: veja o HTML ganhar vida",summary:"Fundamentos · 10 min · Edite e execute",starter:"<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Meu Restaurante</title>\n</head>\n<body>\n  <h1>Restaurante da Guilda</h1>\n  <p>Bem-vindo ao nosso restaurante!</p>\n  <h2>Cardápio</h2>\n  <ul><li>Prato do dia</li></ul>\n</body>\n</html>",starterCss:"",starterJs:"",goal:"Mude o nome do restaurante, acrescente dois pratos com li e execute para visualizar o resultado.",checks:[]},
+{id:"2b-fund-05",type:"guided",title:"05 · Detetive HTML: encontre os erros",summary:"Fundamentos · 5 min · Diagnóstico guiado",goal:"Identificar problemas simples antes de trabalhar no repositório da Guilda.",instructions:[
+"Leia o exemplo e localize três problemas: falta a tag de fechamento do título, um item de lista não está dentro de li e o caminho da imagem aponta para uma pasta inexistente.",
+"Corrija o fechamento do h1, envolva o prato em li e substitua o src pelo caminho real do arquivo de imagem do seu projeto.",
+"Abra a página no navegador e confira se o título, a lista e a imagem aparecem como esperado."
+],code:"<h1>Restaurante da Guilda\n<ul>\n  Prato do dia\n</ul>\n<img src=\"imagens-que-nao-existem/prato.jpg\" alt=\"Prato do dia\">",tip:"O navegador pode tentar corrigir HTML malformado, mas isso não significa que a estrutura esteja correta.",outcome:"Você sabe reconhecer um fechamento ausente, um item de lista incorreto e um caminho inválido."},
+{id:"2b-fund-06",type:"flashcards",title:"06 · Flashcards: você lembra?",summary:"Fundamentos · 5 min · Revele as respostas",pairs:[
+["HTML, CSS e JavaScript são iguais?","Não. HTML estrutura, CSS estiliza e JavaScript adiciona comportamentos."],
+["O que fica no head e no body?","Head guarda metadados e título da aba; body guarda o conteúdo visível."],
+["Para que servem h1 e p?","h1 é o título principal; p é um parágrafo."],
+["Como montar o cardápio?","Use ul ou ol para a lista e li para cada prato."],
+["O que significam href, src e alt?","href é o destino do link; src é a origem da imagem; alt é seu texto alternativo."],
+["O que é um caminho relativo?","É o endereço de um arquivo em relação à localização da página HTML."]]},
+{id:"2b-fund-07",type:"quiz",title:"Checkpoint 1 · Conteúdo visível",question:"Qual elemento contém os textos e as imagens que aparecem na página?",options:["<head>","<body>","<title>"],answer:1,feedback:"O body contém o conteúdo visível; o head reúne informações do documento."},
+{id:"2b-fund-08",type:"quiz",title:"Checkpoint 2 · Cardápio",question:"Qual combinação cria uma lista de pratos sem ordem numérica?",options:["<ul> e <li>","<title> e <meta>","<html> e <head>"],answer:0,feedback:"ul cria a lista não ordenada e li representa cada prato."},
+{id:"2b-fund-09",type:"quiz",title:"Checkpoint 3 · Link",question:"Qual atributo define o destino de um link?",options:["src","alt","href"],answer:2,feedback:"O atributo href define o destino de um link."},
+{id:"2b-guild-brief",type:"visual-summary",title:"07 · Desafio da Guilda: primeira página do restaurante",summary:"Prática autônoma · organize e desenvolva em equipe",idea:"Sua Guilda vai entregar a primeira versão HTML do Projeto Restaurante. O foco é a estrutura, não o design.",sections:[
+{title:"Planeje no Kanban",items:["O líder distribui tarefas personalizadas ou vinculadas aos blocos; uma tarefa pode ter responsável principal e colaboradores.","Cada integrante registra o que fez, onde fez e suas evidências. Consulte o quadro compartilhado no início da missão."]},
+{title:"Entrega mínima",items:["index.html com estrutura HTML5, idioma pt-BR, charset, viewport e title.","Nome e apresentação do restaurante, cardápio em lista e informações de contato.","Ao menos um link funcional; se usar imagem, indique o caminho correto e escreva alt."]},
+{title:"Qualidade e colaboração",items:["Organize os arquivos e mantenha indentação legível.","Teste a página no navegador e corrija erros simples.","Registre commits no GitHub e identifique a participação individual."]}]},
+{id:"2b-guild-evidence",type:"evidence",title:"08 · Evidências e fechamento",summary:"Registre a entrega e a sua contribuição pessoal.",fields:["Link do repositório do Projeto Restaurante e, se possível, do commit desta aula.","Quais partes da página HTML a Guilda concluiu?","Qual tarefa você realizou, em quais arquivos e com quem colaborou?","Que problema encontrou e como tentou resolver?"]}
+];
 // Regularização das três aulas já ministradas: registros curtos, sem repetição obrigatória da prática.
 const retrospectiveSteps=[
 [
@@ -280,7 +317,7 @@ export const MISSIONS=originalMissions.map((original,index)=>{
  index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:{};
  return {...original,...source,id:original.id,number:index+1,lesson:index+1,phase,displayId,...special,
   // Os blocos personalizados continuam vinculados ao identificador interno original.
-  steps:index<3?retrospectiveSteps[index]:original.steps};
+  steps:index<3?retrospectiveSteps[index]:original.id==="2B"?MISSION_2B_STEPS:original.steps};
 });
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
