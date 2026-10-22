@@ -241,6 +241,14 @@ const retrospectiveSteps=[
 {title:"4 · Publique no GitHub",items:["Git é a ferramenta de versionamento; GitHub é a plataforma que hospeda repositórios.","Depois de conectar o repositório remoto, git push envia os commits.","Assim, o projeto pode ser compartilhado e acompanhado."]},
 {title:"5 · Colabore com o professor",items:["Clone o repositório para obter uma cópia.","Crie o arquivo NOME.md e trabalhe na branch individual.","Envie a contribuição com push e abra um pull request para revisão."]}
 ]},
+{id:"retro-1-flashcards",type:"match-cards",title:"Flashcards · Você lembra?",summary:"Clique em cada cartão para revelar a resposta. Revise os conceitos antes dos checkpoints.",pairs:[
+["Pasta ou arquivo?","Pasta organiza os itens; arquivo guarda conteúdo ou código."],
+["Para que serve o VS Code?","Para abrir a pasta do projeto e editar seus arquivos."],
+["O que faz o Git?","Controla as versões e o histórico de alterações do projeto."],
+["O que faz um commit?","Registra uma versão das alterações no repositório local."],
+["GitHub e git push","GitHub hospeda o repositório; git push envia os commits."],
+["Para que serve um pull request?","Para propor uma contribuição e solicitar sua revisão."]
+]},
 {id:"retro-1-q1",type:"quiz",title:"1 · Organização do projeto",question:"Antes de iniciar o Git, o que devemos organizar?",options:["A pasta principal e os arquivos do projeto","Um pull request no GitHub","Um banco de dados"],answer:0,feedback:"Primeiro organizamos a pasta do projeto e seus arquivos."},
 {id:"retro-1-q2",type:"quiz",title:"2 · Git e GitHub",question:"Qual alternativa diferencia Git e GitHub?",options:["Git registra versões; GitHub hospeda repositórios","GitHub substitui o VS Code","Git só funciona na internet"],answer:0,feedback:"Git funciona localmente; GitHub é um serviço remoto."},
 {id:"retro-1-q3",type:"quiz",title:"3 · Colaboração",question:"Para sugerir uma alteração feita em uma branch ao repositório do professor, o que foi aberto?",options:["Pull request","git init","Uma pasta de imagens"],answer:0,feedback:"O pull request permite propor e revisar alterações antes da integração."},
