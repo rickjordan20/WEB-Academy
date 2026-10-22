@@ -233,40 +233,346 @@ const originalMissions=phaseData.flatMap(([phase,topic,a,b,axis,competencies])=>
 ]);
 // Aula 4 presencial (08h–12h): fundamentos antes do desafio autônomo da Guilda.
 const MISSION_2B_STEPS=[
-{id:"2b-fund-01",type:"visual-summary",title:"01 · O que existe por trás de um site?",summary:"Fundamentos · 5 min · Observe e descubra",idea:"Missão: criar a primeira página do Projeto Restaurante. Antes de programar, descubra como o navegador entende o conteúdo.",sections:[
-{title:"Observe a página do restaurante",items:["Que informações uma página de restaurante precisa mostrar? Nome, apresentação, pratos e contato são um bom começo.","HTML organiza e dá significado ao conteúdo; CSS cuida da aparência; JavaScript acrescenta comportamentos.","Nesta missão o foco é HTML. Não é necessário criar estilos ou interações em JavaScript."]},
-{title:"Como funciona uma tag?",items:["Uma tag como <h1> inicia um título; </h1> encerra esse elemento. Entre elas fica o texto.","Um atributo acrescenta informações: <a href=\"contato.html\">Contato</a> informa o destino do link.","A tag <img> não envolve texto nem usa fechamento: seus atributos src e alt indicam a imagem e sua descrição."]}]},
-{id:"2b-fund-02",type:"visual-summary",title:"02 · Anatomia do HTML5",summary:"Fundamentos · 10 min · Entenda a estrutura",idea:"A estrutura do documento é como a planta de um restaurante: cada parte tem sua função.",sections:[
-{title:"Documento e idioma",items:["<!DOCTYPE html> indica o padrão HTML5.","<html lang=\"pt-BR\"> envolve o documento e informa seu idioma.","<head> contém informações sobre a página; <body> contém o que aparece na tela."]},
-{title:"Informações do head",items:["<meta charset=\"UTF-8\"> permite representar corretamente os caracteres do português.","<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> orienta a adaptação inicial a telas menores.","<title>Projeto Restaurante</title> define o texto da aba do navegador, não o título visível na página."]},
-{title:"Atenção à organização",items:["O arquivo index.html fica na pasta principal do projeto.","Indentação facilita a leitura e ajuda a encontrar elementos que não foram fechados.","Salve o arquivo e abra-o no navegador para conferir o resultado."]}]},
-{id:"2b-fund-03",type:"guided",title:"03 · Reconheça as tags e os caminhos",summary:"Fundamentos · 10 min · Exemplo comentado",goal:"Identificar elementos e atributos usados em uma página de restaurante.",instructions:[
-"Observe o exemplo de HTML abaixo. Localize o título principal h1 e o subtítulo h2. Evite usar vários h1 apenas para aumentar o tamanho do texto.",
-"Encontre o parágrafo p, a lista ul com itens li, o link a com href e a imagem img com src e alt.",
-"Compare ul (lista sem ordem) com ol (lista numerada). O elemento br faz uma quebra de linha, mas não deve substituir parágrafos.",
-"Confira o caminho relativo assets/images/prato.jpg: a imagem precisa existir nessa pasta dentro do projeto. O atributo alt descreve a imagem para quem não consegue vê-la."
-],code:"<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Projeto Restaurante</title>\n</head>\n<body>\n  <h1>Restaurante da Guilda</h1>\n  <p>Comida preparada com carinho.</p>\n  <h2>Cardápio</h2>\n  <ul>\n    <li>Prato do dia</li>\n    <li>Suco natural</li>\n  </ul>\n  <img src=\"assets/images/prato.jpg\" alt=\"Prato servido pelo restaurante\">\n  <p><a href=\"contato.html\">Fale conosco</a></p>\n</body>\n</html>",tip:"A imagem e o link só funcionarão se os arquivos indicados existirem nos caminhos informados.",outcome:"Você consegue explicar para que servem h1, h2, p, ul, li, a, img, href, src e alt."},
-{id:"2b-fund-04",type:"editor",title:"04 · Laboratório: veja o HTML ganhar vida",summary:"Fundamentos · 10 min · Edite e execute",starter:"<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Meu Restaurante</title>\n</head>\n<body>\n  <h1>Restaurante da Guilda</h1>\n  <p>Bem-vindo ao nosso restaurante!</p>\n  <h2>Cardápio</h2>\n  <ul><li>Prato do dia</li></ul>\n</body>\n</html>",starterCss:"",starterJs:"",goal:"Mude o nome do restaurante, acrescente dois pratos com li e execute para visualizar o resultado.",checks:[]},
-{id:"2b-fund-05",type:"guided",title:"05 · Detetive HTML: encontre os erros",summary:"Fundamentos · 5 min · Diagnóstico guiado",goal:"Identificar problemas simples antes de trabalhar no repositório da Guilda.",instructions:[
-"Leia o exemplo e localize três problemas: falta a tag de fechamento do título, um item de lista não está dentro de li e o caminho da imagem aponta para uma pasta inexistente.",
-"Corrija o fechamento do h1, envolva o prato em li e substitua o src pelo caminho real do arquivo de imagem do seu projeto.",
-"Abra a página no navegador e confira se o título, a lista e a imagem aparecem como esperado."
-],code:"<h1>Restaurante da Guilda\n<ul>\n  Prato do dia\n</ul>\n<img src=\"imagens-que-nao-existem/prato.jpg\" alt=\"Prato do dia\">",tip:"O navegador pode tentar corrigir HTML malformado, mas isso não significa que a estrutura esteja correta.",outcome:"Você sabe reconhecer um fechamento ausente, um item de lista incorreto e um caminho inválido."},
-{id:"2b-fund-06",type:"flashcards",title:"06 · Flashcards: você lembra?",summary:"Fundamentos · 5 min · Revele as respostas",pairs:[
-["HTML, CSS e JavaScript são iguais?","Não. HTML estrutura, CSS estiliza e JavaScript adiciona comportamentos."],
-["O que fica no head e no body?","Head guarda metadados e título da aba; body guarda o conteúdo visível."],
-["Para que servem h1 e p?","h1 é o título principal; p é um parágrafo."],
-["Como montar o cardápio?","Use ul ou ol para a lista e li para cada prato."],
-["O que significam href, src e alt?","href é o destino do link; src é a origem da imagem; alt é seu texto alternativo."],
-["O que é um caminho relativo?","É o endereço de um arquivo em relação à localização da página HTML."]]},
-{id:"2b-fund-07",type:"quiz",title:"Checkpoint 1 · Conteúdo visível",question:"Qual elemento contém os textos e as imagens que aparecem na página?",options:["<head>","<body>","<title>"],answer:1,feedback:"O body contém o conteúdo visível; o head reúne informações do documento."},
-{id:"2b-fund-08",type:"quiz",title:"Checkpoint 2 · Cardápio",question:"Qual combinação cria uma lista de pratos sem ordem numérica?",options:["<ul> e <li>","<title> e <meta>","<html> e <head>"],answer:0,feedback:"ul cria a lista não ordenada e li representa cada prato."},
-{id:"2b-fund-09",type:"quiz",title:"Checkpoint 3 · Link",question:"Qual atributo define o destino de um link?",options:["src","alt","href"],answer:2,feedback:"O atributo href define o destino de um link."},
-{id:"2b-guild-brief",type:"visual-summary",title:"07 · Desafio da Guilda: primeira página do restaurante",summary:"Prática autônoma · organize e desenvolva em equipe",idea:"Sua Guilda vai entregar a primeira versão HTML do Projeto Restaurante. O foco é a estrutura, não o design.",sections:[
-{title:"Planeje no Kanban",items:["O líder distribui tarefas personalizadas ou vinculadas aos blocos; uma tarefa pode ter responsável principal e colaboradores.","Cada integrante registra o que fez, onde fez e suas evidências. Consulte o quadro compartilhado no início da missão."]},
-{title:"Entrega mínima",items:["index.html com estrutura HTML5, idioma pt-BR, charset, viewport e title.","Nome e apresentação do restaurante, cardápio em lista e informações de contato.","Ao menos um link funcional; se usar imagem, indique o caminho correto e escreva alt."]},
-{title:"Qualidade e colaboração",items:["Organize os arquivos e mantenha indentação legível.","Teste a página no navegador e corrija erros simples.","Registre commits no GitHub e identifique a participação individual."]}]},
-{id:"2b-guild-evidence",type:"evidence",title:"08 · Evidências e fechamento",summary:"Registre a entrega e a sua contribuição pessoal.",fields:["Link do repositório do Projeto Restaurante e, se possível, do commit desta aula.","Quais partes da página HTML a Guilda concluiu?","Qual tarefa você realizou, em quais arquivos e com quem colaborou?","Que problema encontrou e como tentou resolver?"]}
+  {
+    "id": "2b-f1",
+    "type": "visual-summary",
+    "title": "Fundamentos 01 · O que vamos construir?",
+    "summary": "8h00–8h10 · Objetivo e arquitetura",
+    "idea": "Missão: montar a estrutura navegável de quatro páginas HTML antes de aprofundar seus conteúdos.",
+    "sections": [
+      {
+        "title": "Duas situações de aprendizagem",
+        "items": [
+          "EduTech: desenvolvimento guiado com o instrutor.",
+          "Projeto Restaurante: aplicação autônoma da Guilda com tarefas e evidências no Kanban."
+        ]
+      },
+      {
+        "title": "Resultado esperado",
+        "items": [
+          "index.html na raiz; sobre.html, cursos.html e contato.html dentro de pages/ (EduTech).",
+          "No Restaurante, trocar cursos.html por cardapio.html.",
+          "Hoje: estrutura HTML, cabeçalho, navegação, main, rodapé e testes. Conteúdo completo, CSS e JavaScript ficam para depois."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f2",
+    "type": "visual-summary",
+    "title": "Fundamentos 02 · HTML, tags e atributos",
+    "summary": "8h10–8h20 · Conceitos dos slides",
+    "idea": "HTML é a linguagem de marcação que organiza o conteúdo; CSS cuida da aparência; JavaScript acrescenta comportamento.",
+    "sections": [
+      {
+        "title": "Elementos HTML",
+        "items": [
+          "<p>Texto</p> possui abertura, conteúdo e fechamento; <img> e <br> são elementos vazios, sem tag de fechamento.",
+          "Tags estruturam conteúdo; atributos fornecem informações adicionais dentro da abertura."
+        ]
+      },
+      {
+        "title": "Atributos na prática",
+        "items": [
+          "<a href=\"pages/sobre.html\">Sobre</a> aponta para outra página.",
+          "<img src=\"imagens/curso.jpg\" alt=\"Estudante programando\" width=\"250\"> referencia imagem, descreve-a e informa largura.",
+          "class identifica elementos para futura estilização; o HTML funciona mesmo sem CSS."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f3",
+    "type": "visual-summary",
+    "title": "Fundamentos 03 · Esqueleto de um documento HTML5",
+    "summary": "8h20–8h30 · Entenda cada parte",
+    "idea": "O navegador precisa reconhecer o documento, seu idioma, metadados e o conteúdo visível.",
+    "sections": [
+      {
+        "title": "Estrutura",
+        "items": [
+          "<!DOCTYPE html> declara HTML5; <html lang=\"pt-BR\"> identifica o idioma.",
+          "<head> guarda metadados e título da aba; <body> contém a página visível."
+        ]
+      },
+      {
+        "title": "Metadados",
+        "items": [
+          "<meta charset=\"UTF-8\"> permite acentuação; viewport orienta a exibição em dispositivos móveis.",
+          "<meta name=\"description\"> descreve o conteúdo; <title> é diferente de <h1>.",
+          "<link rel=\"stylesheet\"> e <script src=\"...\"> conectam CSS e JS quando seus arquivos estiverem prontos."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f4",
+    "type": "visual-summary",
+    "title": "Fundamentos 04 · Cabeçalho, navegação e rodapé",
+    "summary": "8h30–8h40 · Estrutura reutilizável",
+    "idea": "O cabeçalho e o rodapé serão copiados entre páginas; cada página terá conteúdo próprio dentro de main.",
+    "sections": [
+      {
+        "title": "Cabeçalho",
+        "items": [
+          "<header> identifica o topo; <nav> agrupa links; <a href> permite navegação.",
+          "<div> agrupa elementos; <span> marca parte de um texto. class=\"ativo\" pode ajudar na futura estilização.",
+          "Atributo aria-current=\"page\" identifica a página atual."
+        ]
+      },
+      {
+        "title": "Conteúdo e rodapé",
+        "items": [
+          "<main> delimita o conteúdo principal; <section> organiza seções; <article> representa conteúdo independente.",
+          "<h1>, <h2>, <h3>, <p>, <ul>, <li> e <strong> organizam títulos, textos, listas e destaques.",
+          "<footer> contém informações fixas e links de contato."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f5",
+    "type": "visual-summary",
+    "title": "Fundamentos 05 · Pastas e caminhos relativos",
+    "summary": "8h40–8h50 · Navegação sem links quebrados",
+    "idea": "O endereço de um link depende da pasta onde está o arquivo HTML que o contém.",
+    "sections": [
+      {
+        "title": "EduTech/",
+        "items": [
+          "Raiz: index.html; pasta pages/: sobre.html, cursos.html, contato.html.",
+          "Pastas de apoio na raiz: css/, js/ e imagens/."
+        ]
+      },
+      {
+        "title": "No index.html",
+        "items": [
+          "Use pages/sobre.html, pages/cursos.html e pages/contato.html.",
+          "Para recursos na raiz: css/style.css, js/script.js e imagens/foto.jpg."
+        ]
+      },
+      {
+        "title": "Dentro de pages/",
+        "items": [
+          "Use ../index.html para voltar à página inicial; sobre.html, cursos.html e contato.html para navegar entre páginas irmãs.",
+          "Para recursos da raiz: ../css/style.css, ../js/script.js e ../imagens/foto.jpg.",
+          "O símbolo ../ significa subir um nível de pasta."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f6",
+    "type": "visual-summary",
+    "title": "Fundamentos 06 · Comentários e próximos conteúdos",
+    "summary": "8h50–9h00 · Organização profissional",
+    "idea": "Comentários ajudam a compreender e manter o HTML, mas não escondem informações sensíveis.",
+    "sections": [
+      {
+        "title": "Sintaxe",
+        "items": [
+          "<!-- INÍCIO DO CABEÇALHO --> e <!-- FIM DO CABEÇALHO --> delimitam blocos.",
+          "Comentários não aparecem na página, mas podem ser vistos no código-fonte."
+        ]
+      },
+      {
+        "title": "Conteúdos das próximas etapas",
+        "items": [
+          "index.html: hero e cards com destaques; sobre.html: história, missão e valores.",
+          "cursos.html/cardapio.html: artigos, descrições, imagens e preços/carga horária.",
+          "contato.html: form, label, input, textarea e button; type, required, placeholder, for e id.",
+          "Nesta aula apenas preparar as áreas e títulos: os exemplos completos dos slides serão aplicados ao preencher o conteúdo."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f7",
+    "type": "flashcards",
+    "title": "Checkpoint · Revise os fundamentos",
+    "summary": "Revisão rápida antes da prática",
+    "pairs": [
+      [
+        "O que HTML, CSS e JavaScript fazem?",
+        "HTML estrutura; CSS estiliza; JavaScript acrescenta comportamentos."
+      ],
+      [
+        "Qual a diferença entre head e header?",
+        "head contém metadados; header é um cabeçalho visível dentro de body."
+      ],
+      [
+        "Para que serve nav?",
+        "Agrupar os links de navegação."
+      ],
+      [
+        "O que significa ../index.html?",
+        "Subir uma pasta e abrir index.html."
+      ],
+      [
+        "O que é compartilhado entre páginas?",
+        "A estrutura do cabeçalho e do rodapé, copiada e adaptada conforme os caminhos."
+      ],
+      [
+        "Onde entra o conteúdo exclusivo?",
+        "Dentro de main, com título e seções próprias de cada página."
+      ]
+    ]
+  },
+  {
+    "id": "2b-f8",
+    "type": "quiz",
+    "title": "Checkpoint · Caminhos",
+    "question": "Dentro de pages/sobre.html, qual link volta ao index.html da raiz?",
+    "options": [
+      "index.html",
+      "../index.html",
+      "pages/index.html"
+    ],
+    "answer": 1,
+    "feedback": "../ sobe de pages/ para a raiz do projeto."
+  },
+  {
+    "id": "2b-p1",
+    "type": "guided",
+    "title": "Prática guiada 01 · Crie o index.html da EduTech",
+    "summary": "9h00–9h35 · Faça com o instrutor",
+    "goal": "Criar a página modelo com cabeçalho, menu, conteúdo provisório e rodapé.",
+    "instructions": [
+      "Crie a pasta EduTech e, dentro dela, o arquivo index.html. Abra a pasta no VS Code.",
+      "Digite o documento HTML5 e compreenda DOCTYPE, html lang, head, metas, title e body.",
+      "Monte o header com o nome EduTech e os quatro links do menu. Os destinos internos ficarão na pasta pages/.",
+      "Crie main com h1 e parágrafo provisório; depois footer com identificação e link de contato.",
+      "Salve e abra index.html no navegador. Os links internos funcionarão depois de criar os arquivos de destino."
+    ],
+    "code": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <meta name=\"description\" content=\"Cursos e formação em tecnologia.\">\n  <title>Início | EduTech</title>\n</head>\n<body>\n  <!-- CABEÇALHO COMPARTILHADO -->\n  <header class=\"topo\">\n    <div class=\"logo\"><a href=\"index.html\">EduTech</a></div>\n    <nav class=\"menu\" aria-label=\"Menu principal\">\n      <a href=\"index.html\" aria-current=\"page\">Início</a>\n      <a href=\"pages/sobre.html\">Sobre</a>\n      <a href=\"pages/cursos.html\">Cursos</a>\n      <a href=\"pages/contato.html\">Contato</a>\n    </nav>\n  </header>\n  <!-- CONTEÚDO ESPECÍFICO DA PÁGINA -->\n  <main>\n    <section>\n      <h1>Bem-vindo à EduTech</h1>\n      <p>Em breve, mais informações sobre nossos cursos.</p>\n    </section>\n  </main>\n  <!-- RODAPÉ COMPARTILHADO -->\n  <footer class=\"rodape\">\n    <p>&copy; 2026 EduTech.</p>\n    <p><a href=\"pages/contato.html\">Entre em contato</a></p>\n  </footer>\n</body>\n</html>",
+    "tip": "Não cole CSS ou JavaScript inexistentes. A estrutura de hoje deve funcionar apenas com HTML.",
+    "outcome": "O index.html tem estrutura completa, cabeçalho, main e rodapé."
+  },
+  {
+    "id": "2b-p2",
+    "type": "guided",
+    "title": "Prática guiada 02 · Crie as páginas internas",
+    "summary": "9h35–10h00 · Reaproveite a base",
+    "goal": "Copiar a estrutura do index para a pasta pages e ajustar os caminhos.",
+    "instructions": [
+      "Crie pages/ na raiz de EduTech e copie index.html três vezes: sobre.html, cursos.html e contato.html.",
+      "Em cada página interna, ajuste title e h1 para Sobre, Cursos ou Contato.",
+      "Troque o link Início para ../index.html; os links para páginas irmãs passam a ser sobre.html, cursos.html e contato.html.",
+      "Atualize também o link do rodapé para contato.html e mova aria-current=\"page\" para o link correspondente.",
+      "Mantenha header e footer iguais na estrutura. Deixe apenas um texto provisório dentro de main.",
+      "Se adicionar CSS, JS ou imagens no futuro, use ../ para referenciar recursos que ficam na raiz."
+    ],
+    "code": "<!-- Exemplo: trecho de pages/sobre.html -->\n<title>Sobre | EduTech</title>\n<header>\n  <nav aria-label=\"Menu principal\">\n    <a href=\"../index.html\">Início</a>\n    <a href=\"sobre.html\" aria-current=\"page\">Sobre</a>\n    <a href=\"cursos.html\">Cursos</a>\n    <a href=\"contato.html\">Contato</a>\n  </nav>\n</header>\n<main>\n  <h1>Sobre a EduTech</h1>\n  <p>Conteúdo será desenvolvido na próxima etapa.</p>\n</main>\n<footer>\n  <p>&copy; 2026 EduTech.</p>\n  <a href=\"contato.html\">Entre em contato</a>\n</footer>",
+    "tip": "Copiar HTML não cria componentes automáticos: alterações futuras no cabeçalho e rodapé precisam ser repetidas nos quatro arquivos.",
+    "outcome": "Quatro páginas HTML existem e os links foram adaptados às pastas."
+  },
+  {
+    "id": "2b-p3",
+    "type": "guided",
+    "title": "Prática guiada 03 · Teste a navegação",
+    "summary": "10h00–10h15 · Valide antes de seguir",
+    "goal": "Verificar a navegação e a consistência do modelo.",
+    "instructions": [
+      "Abra index.html e visite Sobre, Cursos e Contato usando o menu.",
+      "Em cada página interna, clique em Início para voltar à raiz e teste os links entre páginas irmãs.",
+      "Confira o texto da aba (title), o título visível (h1), o cabeçalho e o rodapé de cada página.",
+      "Se aparecer página não encontrada, confira a pasta e o href: pages/ a partir da raiz, ../ para voltar.",
+      "Registre as correções e mantenha o código legível com indentação e comentários."
+    ],
+    "code": "EduTech/\n├── index.html\n├── pages/\n│   ├── sobre.html\n│   ├── cursos.html\n│   └── contato.html\n├── css/\n├── js/\n└── imagens/",
+    "tip": "Pastas css/, js/ e imagens/ podem ser preparadas sem implementar arquivos funcionais nesta aula.",
+    "outcome": "O projeto guiado possui quatro páginas navegáveis."
+  },
+  {
+    "id": "2b-p4",
+    "type": "visual-summary",
+    "title": "Prática autônoma · Desafio da Guilda",
+    "summary": "10h15–11h25 · Projeto Restaurante",
+    "idea": "Agora a Guilda aplica sem copiar os textos da EduTech: a estrutura é a mesma, mas a identidade é do restaurante.",
+    "sections": [
+      {
+        "title": "Organização",
+        "items": [
+          "O líder distribui tarefas no Kanban fixo no início da missão; cada tarefa pode ter responsável principal e colaboradores.",
+          "Cada integrante registra suas contribuições e evidências."
+        ]
+      },
+      {
+        "title": "Arquivos obrigatórios",
+        "items": [
+          "ProjetoRestaurante/index.html na raiz.",
+          "ProjetoRestaurante/pages/sobre.html, cardapio.html e contato.html.",
+          "Cabeçalho, menu, main e rodapé em todas as páginas; titles e h1 específicos; conteúdo provisório."
+        ]
+      },
+      {
+        "title": "Navegação",
+        "items": [
+          "No index: pages/sobre.html, pages/cardapio.html, pages/contato.html.",
+          "Nas páginas internas: ../index.html e links entre arquivos da própria pasta pages/.",
+          "Teste todas as rotas. Não é necessário implementar cardápio completo, formulário, CSS ou JS hoje."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-p5",
+    "type": "guided",
+    "title": "Desafio diagnóstico · Conserte os links",
+    "summary": "11h25–11h35 · Teste final",
+    "goal": "Corrigir os caminhos errados de uma página interna.",
+    "instructions": [
+      "Imagine que este menu está dentro de pages/cardapio.html.",
+      "Identifique por que os links para Início e Contato estão incorretos.",
+      "Corrija para ../index.html e contato.html, respectivamente.",
+      "Confirme no navegador antes de registrar a entrega."
+    ],
+    "code": "<!-- ERRADO em pages/cardapio.html -->\n<a href=\"index.html\">Início</a>\n<a href=\"pages/contato.html\">Contato</a>\n\n<!-- CORRETO em pages/cardapio.html -->\n<a href=\"../index.html\">Início</a>\n<a href=\"contato.html\">Contato</a>",
+    "tip": "O navegador resolve os caminhos a partir do arquivo HTML atual.",
+    "outcome": "Você consegue explicar e corrigir caminhos relativos."
+  },
+  {
+    "id": "2b-p6",
+    "type": "visual-summary",
+    "title": "Entrega · GitHub e evidências individuais",
+    "summary": "11h35–11h50 · Consolide o trabalho",
+    "idea": "Entregar a estrutura navegável e demonstrar a participação de cada integrante.",
+    "sections": [
+      {
+        "title": "Checklist da Guilda",
+        "items": [
+          "Quatro arquivos HTML criados, com index na raiz e os outros em pages/.",
+          "Cabeçalho e rodapé replicados; title e h1 corretos em cada página.",
+          "Todos os links do menu e rodapé testados; conteúdo interno pode ser provisório."
+        ]
+      },
+      {
+        "title": "Evidências",
+        "items": [
+          "Registre commits no repositório do projeto e indique o link da versão.",
+          "Cada estudante registra no Kanban a tarefa, os arquivos modificados, a contribuição e evidências.",
+          "Se houver dificuldades, registre o problema e a tentativa de solução para receber orientação."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-p7",
+    "type": "visual-summary",
+    "title": "Fechamento · O que vem depois?",
+    "summary": "11h50–12h00 · Compartilhe e reflita",
+    "idea": "A estrutura está pronta para receber os conteúdos dos slides nas próximas missões.",
+    "sections": [
+      {
+        "title": "Próximas implementações",
+        "items": [
+          "EduTech: hero e destaques no index; história e valores em Sobre; artigos de cursos em Cursos; formulário em Contato.",
+          "Restaurante: apresentação e destaques, história, pratos e bebidas, contato e formulário.",
+          "CSS e JavaScript serão conectados quando forem estudados; não são requisitos desta missão."
+        ]
+      }
+    ]
+  }
 ];
 // Regularização das três aulas já ministradas: registros curtos, sem repetição obrigatória da prática.
 const retrospectiveSteps=[
