@@ -1,4 +1,4 @@
-import {loadEditedMissionContent,applyEditedMissionContent} from "./mission-content.js";
+import {loadEditedMissionContent,applyEditedMissionContent,watchMissionContent} from "./mission-content.js";
 import {missionWindow,windowNotice} from "./mission-window.js";
 import {getSupabase} from "./supabase-client.js";
 import {mountGuildMissionBoard} from "./guild-mission-board.js";
@@ -16,7 +16,7 @@ const initialAccess=await missionWindow(id);
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
 if(!mission){root.innerHTML='<section class="card current-mission"><h1>Missão não disponível</h1><a class="btn btn-primary" href="missions.html">Voltar às missões</a></section>';}
 else if(initialAccess.state==="closed"||initialAccess.state==="unpublished"||initialAccess.state==="upcoming"||initialAccess.state==="unconfigured"||initialAccess.state==="error"){root.replaceChildren(windowNotice(initialAccess));startWindowWatch(id);}
-else{try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';missionAccess=initialAccess;missionReadOnly=false;startMission(id);projectContext=await getMissionProjectContext(mission);render(false,initialAccess);refreshMissionSchedule();startWindowWatch(id);}
+else{try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';missionAccess=initialAccess;missionReadOnly=false;startMission(id);projectContext=await getMissionProjectContext(mission);render(false,initialAccess);refreshMissionSchedule();startWindowWatch(id);watchMissionContent(id,async content=>{applyEditedMissionContent(id,content);const access=await missionWindow(id);missionAccess=access;if(access.state==="open"){render(false,access)}else{root.replaceChildren(windowNotice(access))}}).catch(error=>console.warn("Escuta de missão:",error));}
 
 function render(readOnly=false,access=null){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
