@@ -18,22 +18,27 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
   const membersResult=await sb.from("guild_members").select("user_id,role").eq("guild_id",guildId);
   if(membersResult.error)throw membersResult.error;
   const members=membersResult.data||[];
-  const profiles=await sb.from("profiles").select("id,full_name").in("id",members.map(x=>x.user_id));
+  const profiles=members.length?await sb.from("profiles").select("id,full_name").in("id",members.map(x=>x.user_id)):{data:[]};
+  if(profiles.error)console.warn("Nomes dos integrantes:",profiles.error);
   const names=new Map((profiles.data||[]).map(p=>[p.id,p.full_name||"Integrante"]));
-  const name=id=>names.get(id)||"Integrante";
+  const name=id=>names.get(id)|| (id===session.user.id?"Você":"Integrante da Guilda");
   const stamp=value=>new Date(value).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo",dateStyle:"short",timeStyle:"medium"});
   const logAction=async(taskId,summary)=>{const result=await sb.from("guild_task_contributions").insert({task_id:taskId,guild_id:guildId,author_id:session.user.id,summary});if(result.error)throw result.error};
   const blocks=(mission.steps||[]).map((step,i)=>({id:step.id,title:step.title||step.label||`Bloco ${i+1}`}));
   const blockTitle=t=>{const found=blocks.find(b=>t.description?.includes(`[Bloco: ${b.id}]`));return found?.title||"Tarefa da missão"};
-  let tasks=[],contributions=[],busy=false,refreshing=false;
+  let tasks=[],contributions=[],busy=false,refreshing=false,lastSnapshot="";
   async function load(){
    if(stopped||!host.isConnected||refreshing)return;refreshing=true;
    try{const a=await sb.from("guild_tasks").select("id,title,description,status,responsible_user_id,created_by,mission_id,phase").eq("guild_id",guildId).eq("mission_id",mission.id).order("created_at");
    if(a.error)throw a.error;tasks=a.data||[];
    if(tasks.length){const b=await sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",tasks.map(t=>t.id)).order("created_at",{ascending:false});if(b.error)throw b.error;contributions=b.data||[]}else contributions=[];
-   if(!stopped&&host.isConnected)render();}finally{refreshing=false}
+   const snapshot=JSON.stringify({tasks,contributions});
+   if(!stopped&&host.isConnected&&snapshot!==lastSnapshot){lastSnapshot=snapshot;render()}
+   }finally{refreshing=false}
   }
   function render(){
+   const editing=host.querySelector("#gmCreate");
+   const savedForm=editing?{mode:editing.querySelector('input[name="mode"]:checked')?.value,title:editing.querySelector('[name="title"]')?.value,description:editing.querySelector('[name="description"]')?.value,responsible:editing.querySelector('[name="responsible"]')?.value,block:editing.querySelector('[name="block"]')?.value,focus:document.activeElement?.name}:null;
    host.innerHTML=`<div class="gm-heading"><div><p class="eyebrow">Trabalho colaborativo · ${esc(mission.id)}</p><h2>Quadro da Guilda · ${esc(name(session.user.id))}</h2><p>Equipe identificada automaticamente. Distribua as atividades, registre sua participação e acompanhe as evidências da equipe.</p></div><a class="btn btn-secondary" href="guild.html">Abrir Guilda →</a></div>
    ${isLeader&&!readOnly?`<form id="gmCreate" class="gm-create" style="display:grid;gap:12px"><div style="display:flex;gap:16px;flex-wrap:wrap"><label><input type="radio" name="mode" value="custom" checked> Nova tarefa personalizada</label><label><input type="radio" name="mode" value="block"> A partir de um bloco da missão</label></div><label data-gm-block hidden>Bloco de referência<select name="block">${blocks.map(b=>`<option value="${esc(b.id)}">${esc(b.title)}</option>`).join("")}</select></label><label>Título da tarefa<input name="title" maxlength="160" required placeholder="Ex.: Organizar a estrutura inicial do Projeto Restaurante"></label><label>Descrição e resultado esperado<textarea name="description" rows="3" minlength="10" maxlength="3000" required placeholder="Descreva o que será feito, onde e como verificar a conclusão."></textarea></label><label>Responsável<select name="responsible"><option value="">Não atribuído</option>${members.map(m=>`<option value="${esc(m.user_id)}">${esc(name(m.user_id))}</option>`).join("")}</select></label><button class="btn btn-primary" type="submit">Criar tarefa</button><p class="gm-footnote">A tarefa será compartilhada com todos os integrantes da Guilda nesta missão.</p></form>`:""}
 
@@ -56,6 +61,7 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
     modeInputs.forEach(input=>input.onchange=updateMode);
     blockSelect.onchange=()=>{if(createForm.querySelector('input[name="mode"]:checked')?.value==="block"){const b=blocks.find(x=>x.id===blockSelect.value);if(b){titleInput.value=b.title;descriptionInput.value="Atividade relacionada ao bloco: "+b.title+". Descreva aqui a entrega esperada."}}};
     updateMode();
+    if(savedForm){const mode=createForm.querySelector(`input[name="mode"][value="${savedForm.mode}"]`);if(mode){mode.checked=true;updateMode()}if(savedForm.block)blockSelect.value=savedForm.block;titleInput.value=savedForm.title||"";descriptionInput.value=savedForm.description||"";createForm.querySelector('[name="responsible"]').value=savedForm.responsible||"";}
     createForm.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(createForm),isBlock=fd.get("mode")==="block",b=blocks.find(x=>x.id===fd.get("block"));if(isBlock&&!b)return;const title=String(fd.get("title")||"").trim(),description=String(fd.get("description")||"").trim();if(!title||description.length<10)return;run(async()=>{
       const prefix=isBlock?"[Bloco: "+b.id+"] ":"";
       const result=await sb.rpc("create_guild_manual_task",{p_guild_id:guildId,p_title:title,p_description:prefix+description,p_phase:mission.phase,p_responsible_user_id:fd.get("responsible")||null});
@@ -74,12 +80,12 @@ export async function mountGuildMissionBoard(root,mission,{readOnly=false}={}){
   await load();
   // Canal exclusivo por montagem: evita reutilizar um canal já inscrito em outro render.
   const channel=sb.channel("guild-mission-"+guildId+"-"+mission.id+"-"+Math.random().toString(36).slice(2));
-  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_tasks",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn));
-  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_task_contributions",filter:"guild_id=eq."+guildId},()=>load().catch(console.warn));
+  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_tasks",filter:"guild_id=eq."+guildId},()=>{if(!busy)load().catch(console.warn)});
+  channel.on("postgres_changes",{event:"*",schema:"public",table:"guild_task_contributions",filter:"guild_id=eq."+guildId},()=>{if(!busy)load().catch(console.warn)});
   channel.subscribe();
-  const focus=()=>{if(!document.hidden)load().catch(console.warn)};
+  const focus=()=>{if(!document.hidden&&!busy)load().catch(console.warn)};
   window.addEventListener("focus",focus);
-  const timer=setInterval(()=>{if(stopped||!host.isConnected){cleanup();return}if(!document.hidden)load().catch(console.warn)},15000);
+  const timer=setInterval(()=>{if(stopped||!host.isConnected){cleanup();return}if(!document.hidden&&!busy&&!host.querySelector("#gmCreate:focus-within"))load().catch(console.warn)},45000);
   cleanup=()=>{if(stopped)return;stopped=true;clearInterval(timer);window.removeEventListener("focus",focus);sb.removeChannel(channel)};
   if(activeBoards.get(root))activeBoards.set(root,cleanup);
 
