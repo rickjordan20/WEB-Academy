@@ -583,5 +583,205 @@ const phase1Steps=[
  }
 ];
 
-export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:1.5,steps:[]}));
+const PHASE_2_FOUNDATIONS=[
+  {
+    "id": "2b-f1",
+    "type": "visual-summary",
+    "title": "Fundamentos 01 · O que vamos construir?",
+    "summary": "8h00–8h10 · Objetivo e arquitetura",
+    "idea": "Missão: montar a estrutura navegável de quatro páginas HTML antes de aprofundar seus conteúdos.",
+    "sections": [
+      {
+        "title": "Duas situações de aprendizagem",
+        "items": [
+          "EduTech: desenvolvimento guiado com o instrutor.",
+          "Projeto Restaurante: aplicação autônoma da Guilda com tarefas e evidências no Kanban."
+        ]
+      },
+      {
+        "title": "Resultado esperado",
+        "items": [
+          "index.html na raiz; sobre.html, cursos.html e contato.html dentro de pages/ (EduTech).",
+          "No Restaurante, trocar cursos.html por cardapio.html.",
+          "Hoje: estrutura HTML, cabeçalho, navegação, main, rodapé e testes. Conteúdo completo, CSS e JavaScript ficam para depois."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f2",
+    "type": "visual-summary",
+    "title": "Fundamentos 02 · HTML, tags e atributos",
+    "summary": "8h10–8h20 · Conceitos dos slides",
+    "idea": "HTML é a linguagem de marcação que organiza o conteúdo; CSS cuida da aparência; JavaScript acrescenta comportamento.",
+    "sections": [
+      {
+        "title": "Elementos HTML",
+        "items": [
+          "<p>Texto</p> possui abertura, conteúdo e fechamento; <img> e <br> são elementos vazios, sem tag de fechamento.",
+          "Tags estruturam conteúdo; atributos fornecem informações adicionais dentro da abertura."
+        ]
+      },
+      {
+        "title": "Atributos na prática",
+        "items": [
+          "<a href=\"pages/sobre.html\">Sobre</a> aponta para outra página.",
+          "<img src=\"imagens/curso.jpg\" alt=\"Estudante programando\" width=\"250\"> referencia imagem, descreve-a e informa largura.",
+          "class identifica elementos para futura estilização; o HTML funciona mesmo sem CSS."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f3",
+    "type": "visual-summary",
+    "title": "Fundamentos 03 · Esqueleto de um documento HTML5",
+    "summary": "8h20–8h30 · Entenda cada parte",
+    "idea": "O navegador precisa reconhecer o documento, seu idioma, metadados e o conteúdo visível.",
+    "sections": [
+      {
+        "title": "Estrutura",
+        "items": [
+          "<!DOCTYPE html> declara HTML5; <html lang=\"pt-BR\"> identifica o idioma.",
+          "<head> guarda metadados e título da aba; <body> contém a página visível."
+        ]
+      },
+      {
+        "title": "Metadados",
+        "items": [
+          "<meta charset=\"UTF-8\"> permite acentuação; viewport orienta a exibição em dispositivos móveis.",
+          "<meta name=\"description\"> descreve o conteúdo; <title> é diferente de <h1>.",
+          "<link rel=\"stylesheet\"> e <script src=\"...\"> conectam CSS e JS quando seus arquivos estiverem prontos."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f4",
+    "type": "visual-summary",
+    "title": "Fundamentos 04 · Cabeçalho, navegação e rodapé",
+    "summary": "8h30–8h40 · Estrutura reutilizável",
+    "idea": "O cabeçalho e o rodapé serão copiados entre páginas; cada página terá conteúdo próprio dentro de main.",
+    "sections": [
+      {
+        "title": "Cabeçalho",
+        "items": [
+          "<header> identifica o topo; <nav> agrupa links; <a href> permite navegação.",
+          "<div> agrupa elementos; <span> marca parte de um texto. class=\"ativo\" pode ajudar na futura estilização.",
+          "Atributo aria-current=\"page\" identifica a página atual."
+        ]
+      },
+      {
+        "title": "Conteúdo e rodapé",
+        "items": [
+          "<main> delimita o conteúdo principal; <section> organiza seções; <article> representa conteúdo independente.",
+          "<h1>, <h2>, <h3>, <p>, <ul>, <li> e <strong> organizam títulos, textos, listas e destaques.",
+          "<footer> contém informações fixas e links de contato."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f5",
+    "type": "visual-summary",
+    "title": "Fundamentos 05 · Pastas e caminhos relativos",
+    "summary": "8h40–8h50 · Navegação sem links quebrados",
+    "idea": "O endereço de um link depende da pasta onde está o arquivo HTML que o contém.",
+    "sections": [
+      {
+        "title": "EduTech/",
+        "items": [
+          "Raiz: index.html; pasta pages/: sobre.html, cursos.html, contato.html.",
+          "Pastas de apoio na raiz: css/, js/ e imagens/."
+        ]
+      },
+      {
+        "title": "No index.html",
+        "items": [
+          "Use pages/sobre.html, pages/cursos.html e pages/contato.html.",
+          "Para recursos na raiz: css/style.css, js/script.js e imagens/foto.jpg."
+        ]
+      },
+      {
+        "title": "Dentro de pages/",
+        "items": [
+          "Use ../index.html para voltar à página inicial; sobre.html, cursos.html e contato.html para navegar entre páginas irmãs.",
+          "Para recursos da raiz: ../css/style.css, ../js/script.js e ../imagens/foto.jpg.",
+          "O símbolo ../ significa subir um nível de pasta."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f6",
+    "type": "visual-summary",
+    "title": "Fundamentos 06 · Comentários e próximos conteúdos",
+    "summary": "8h50–9h00 · Organização profissional",
+    "idea": "Comentários ajudam a compreender e manter o HTML, mas não escondem informações sensíveis.",
+    "sections": [
+      {
+        "title": "Sintaxe",
+        "items": [
+          "<!-- INÍCIO DO CABEÇALHO --> e <!-- FIM DO CABEÇALHO --> delimitam blocos.",
+          "Comentários não aparecem na página, mas podem ser vistos no código-fonte."
+        ]
+      },
+      {
+        "title": "Conteúdos das próximas etapas",
+        "items": [
+          "index.html: hero e cards com destaques; sobre.html: história, missão e valores.",
+          "cursos.html/cardapio.html: artigos, descrições, imagens e preços/carga horária.",
+          "contato.html: form, label, input, textarea e button; type, required, placeholder, for e id.",
+          "Nesta aula apenas preparar as áreas e títulos: os exemplos completos dos slides serão aplicados ao preencher o conteúdo."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2b-f7",
+    "type": "flashcards",
+    "title": "Checkpoint · Revise os fundamentos",
+    "summary": "Revisão rápida antes da prática",
+    "pairs": [
+      [
+        "O que HTML, CSS e JavaScript fazem?",
+        "HTML estrutura; CSS estiliza; JavaScript acrescenta comportamentos."
+      ],
+      [
+        "Qual a diferença entre head e header?",
+        "head contém metadados; header é um cabeçalho visível dentro de body."
+      ],
+      [
+        "Para que serve nav?",
+        "Agrupar os links de navegação."
+      ],
+      [
+        "O que significa ../index.html?",
+        "Subir uma pasta e abrir index.html."
+      ],
+      [
+        "O que é compartilhado entre páginas?",
+        "A estrutura do cabeçalho e do rodapé, copiada e adaptada conforme os caminhos."
+      ],
+      [
+        "Onde entra o conteúdo exclusivo?",
+        "Dentro de main, com título e seções próprias de cada página."
+      ]
+    ]
+  },
+  {
+    "id": "2b-f8",
+    "type": "quiz",
+    "title": "Checkpoint · Caminhos",
+    "question": "Dentro de pages/sobre.html, qual link volta ao index.html da raiz?",
+    "options": [
+      "index.html",
+      "../index.html",
+      "pages/index.html"
+    ],
+    "answer": 1,
+    "feedback": "../ sobe de pages/ para a raiz do projeto."
+  }
+];
+export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:phase===2?1:1.5,steps:phase===2?PHASE_2_FOUNDATIONS:[]}));
 export const getFundamental=phase=>FUNDAMENTALS.find(f=>f.phase===Number(phase));
