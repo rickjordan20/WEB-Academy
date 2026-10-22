@@ -783,5 +783,5 @@ const PHASE_2_FOUNDATIONS=[
     "feedback": "../ sobe de pages/ para a raiz do projeto."
   }
 ];
-export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:phase===2?1:1.5,steps:phase===2?PHASE_2_FOUNDATIONS:[]}));
+export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:phase===2?1:1.5,steps:phase===2?[{id:"2b-f-infografico",type:"image-review",title:"Aula 4 · Infográfico completo dos Fundamentos HTML5",summary:"Leia o infográfico: estrutura, tags, atributos, caminhos e objetivos. Depois marque Concluir etapa para iniciar a prática.",imageUrl:"assets/infografico-aula4-html5.svg",imageCaption:"Fundamentos da Aula 4 · Todas as tags e seus conceitos · EduTech e Projeto Restaurante"}]:[]}));
 export const getFundamental=phase=>FUNDAMENTALS.find(f=>f.phase===Number(phase));
