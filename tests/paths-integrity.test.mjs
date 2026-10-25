@@ -26,7 +26,12 @@ test('todos os imports estáticos relativos resolvem arquivos existentes',async(
   const regex=/\b(?:import|export)\s+(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/g;
   for(const match of text.matchAll(regex)){
    if(!match[1].startsWith('.'))continue;
-   if(!await exists(resolve(dirname(file),match[1])))broken.push(relative(root,file)+' -> '+match[1]);
+   const source=relative(root,file);
+   // O editor gera um iframe srcdoc com <base href=location.href>.
+   // Nesse HTML embutido, ./js/... é relativo à página na raiz, não ao arquivo JS.
+   const embeddedPreview=source==='js/mission-builder-page.js'&&match[1]==='./js/step-renderer.js'&&text.includes('frame.srcdoc=');
+   const target=embeddedPreview?resolve(root,match[1]):resolve(dirname(file),match[1]);
+   if(!await exists(target))broken.push(source+' -> '+match[1]);
   }
  }
  assert.deepEqual(broken,[]);
