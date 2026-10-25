@@ -6,7 +6,7 @@
 
 | Área | Situação | Decisão |
 | --- | --- | --- |
-| Páginas HTML | 27 páginas na raiz (incluindo `index.html`, `mission.html`, `instructor.html`) | **Manter URLs públicas** para preservar links e GitHub Pages |
+| Páginas HTML | Páginas na raiz (incluindo `index.html`, `mission.html`, `instructor.html`) | **Manter URLs públicas** para preservar links e GitHub Pages |
 | `js/` | Módulos ES usados por páginas e por outros módulos | Mapear imports antes de qualquer movimentação |
 | `css/` | Estilos globais e por tela | Manter caminhos atuais nesta etapa |
 | `data/` | Definições pedagógicas e conteúdo | Preservar imports relativos |
