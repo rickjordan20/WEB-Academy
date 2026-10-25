@@ -1,120 +1,119 @@
-# UC7 Web Academy — Fase 3: Ambiente Interativo de Aprendizagem
+# WEB-Academy — UC7 | Desenvolvimento de Aplicações Web
 
-Plataforma web gamificada de apoio à UC7 — Desenvolver aplicações web.
+Plataforma de aprendizagem gamificada para a **UC7 — Desenvolver aplicações web**, do curso Técnico em Desenvolvimento de Sistemas. Reúne fundamentos, práticas guiadas, projetos, missões, evidências, acompanhamento pedagógico e entregas em um ambiente web.
 
-## Estado atual
+> **Estado do projeto:** aplicação em evolução contínua, com autenticação e persistência em nuvem integradas ao código, além de testes automatizados isolados. A aprovação desses testes **não equivale à homologação completa** dos fluxos reais no navegador e no Supabase.
 
-### Fase 1 — Fundação
-- identidade visual e dashboard
-- perfil local do estudante
-- localStorage e backup JSON
+## Visão geral
 
-### Fase 2 — Motor da Jornada
-- mapa das 14 Fases
-- desbloqueio sequencial
-- estados de missão
-- retomada do progresso
-- Mission Engine orientado a dados
+- **Fundamentos:** conteúdo introdutório, questões, checkpoints e atividades práticas.
+- **Prática guiada — EduTech:** aplicação individual dos conceitos em um projeto web.
+- **Prática autônoma — Projeto Restaurante:** trabalho em Guildas, Kanban e registros individuais de colaboração.
+- **Jornada:** missões organizadas por fases, desbloqueios, progresso e evidências.
+- **Gamificação:** XP, níveis e conquistas; recompensas motivacionais, sem substituição da avaliação docente.
+- **Acompanhamento:** indicadores, entregas, feedback e consulta ao histórico.
+- **Gestão pedagógica:** turmas, cronograma e liberação de atividades conforme publicação e janela de acesso.
 
-### Fase 3 — Ambiente Interativo de Aprendizagem
-- renderer reutilizável de etapas pedagógicas
-- Trilha de Conhecimento
-- checkpoints objetivos com nova tentativa
-- atividade de completar código
-- Laboratório HTML com editor e preview em iframe
-- Desafio Guiado
-- autoavaliação/reflexão
-- registro de evidência
-- persistência das respostas e código no navegador
-- Missão 1A transformada em experiência didática funcional
-- Missão 1B com fluxo de Guilda e evidência
+## Organização pedagógica
 
-## Tipos de etapa disponíveis
+O catálogo da jornada contempla **14 fases**, com missões **A (EduTech)** e **B (Projeto Restaurante)**, além de atividades extras e marcos avaliativos. O conteúdo das missões é orientado a dados em `data/missions.js`, com renderização reutilizável em `js/step-renderer.js`.
 
-`content`, `quiz`, `complete-code`, `editor`, `guided`, `reflection`, `checkpoint` e `evidence`.
+Tipos de etapa disponíveis: `content`, `quiz`, `complete-code`, `editor`, `guided`, `reflection`, `checkpoint` e `evidence`.
 
-O conteúdo das missões fica em `data/missions.js` e é renderizado pelo componente reutilizável `js/step-renderer.js`. Assim, novas missões podem ser cadastradas como dados sem criar uma página HTML para cada uma.
+O laboratório de HTML utiliza um `iframe` com `srcdoc` para pré-visualização. Respostas, tentativas e progresso podem ser preservados localmente.
 
-## Laboratório
+## Acesso, prazos e entregas
 
-O laboratório atual executa HTML client-side em um `iframe` usando `srcdoc`. O código é salvo no estado local durante a edição.
+O acesso às missões considera a turma ativa, o cronograma e o estado de publicação. As regras implementadas distinguem:
 
-## Persistência
+| Situação | Comportamento previsto |
+| --- | --- |
+| Não publicada ou ainda não aberta | Acesso à realização bloqueado |
+| Publicada e dentro do prazo | Realização de etapas e entrega permitidas |
+| Prazo encerrado | Consulta do conteúdo e progresso; novas etapas bloqueadas |
+| Entrega após o prazo | Permitida, com motivo e justificativa obrigatórios, marcada como **em atraso** |
+| Entrega já avaliada | Novo envio bloqueado pelo formulário |
 
-Ainda é um MVP local: dados, respostas, código e progresso ficam no `localStorage`. A persistência centralizada e a autenticação real serão integradas posteriormente.
+O envio apresenta uma revisão prévia do progresso e das pendências antes da confirmação. A entrega registra informações de prazo, respostas, evidências e uma fotografia do progresso para análise do instrutor.
 
-## Como executar
+**Atenção:** a consistência integral desse fluxo ainda depende de testes integrados com autenticação, banco de dados e interfaces reais.
 
-Use um servidor local, como Live Server no VS Code, e abra `index.html`.
+## Guildas e participação individual
 
-## Tecnologias
+O Projeto Restaurante utiliza tarefas em Kanban, atribuição de responsabilidades e registros de contribuições. A visualização individual filtra os registros pelo estudante selecionado, incluindo descrições e links de evidências quando disponíveis.
 
-HTML5, CSS3, JavaScript ES Modules e localStorage. Sem TypeScript e sem framework.
+**Tarefa atribuída ou concluída não é, por si só, comprovação automática de aprendizagem.** A avaliação depende das evidências e da análise do instrutor.
 
+## Indicadores e avaliação
 
-## Fase 4 — Gamificação
-- XP concedido uma única vez por missão concluída (anti-farming)
-- níveis progressivos da Jornada Web
-- atualização automática do nível conforme XP
-- conquistas iniciais: Primeira Missão, Primeiro Commit, Guilda em Ação e Fase Conquistada
-- galeria de Conquistas
-- dashboard conectado ao XP, nível e conquistas reais
-- XP é motivacional e não substitui menção, indicadores ou avaliação do instrutor
+A plataforma apoia o acompanhamento dos indicadores da UC e o registro de evidências. O **XP é motivacional** e não determina automaticamente menções ou o resultado final da unidade curricular. A homologação pedagógica continua sob responsabilidade do instrutor.
 
+## Arquitetura e persistência
 
-## Fase 5 — Projetos e Guildas
+- **Frontend:** HTML5, CSS3 e JavaScript com ES Modules, sem TypeScript e sem framework obrigatório.
+- **Dados locais:** `localStorage` como cache e contingência, com recursos de backup.
+- **Backend integrado:** Supabase/PostgreSQL, autenticação, turmas, membros, entregas e estado do estudante.
+- **Sincronização:** `js/cloud-sync.js` realiza mesclagem de estados e utiliza rotina de gravação com controle de concorrência; `js/mission-engine.js` controla o progresso.
+- **Segurança:** políticas de acesso e operações reais do Supabase exigem verificação integrada, incluindo RLS.
 
-- área dedicada ao Projeto Individual EduTech;
-- repositório e evidências do projeto individual;
-- área da Guilda para o Projeto Restaurante;
-- cadastro local de nome, integrantes e repositório da Guilda;
-- Quadro de Missões em Kanban (A Fazer, Em Missão, Em Revisão e Concluído);
-- responsável, competências, evidência e histórico por tarefa;
-- registro de contribuição individual da Guilda;
-- persistência local integrada ao backup existente.
+A sincronização procura preservar etapas concluídas, evidências e o maior XP registrado. **Conflitos simultâneos em respostas e cenários reais de múltiplos dispositivos ainda precisam de homologação adicional.**
 
+## Executar localmente
 
-## Fase 6 — Acompanhamento Pedagógico
+1. Clone o repositório.
+2. Abra a pasta no VS Code.
+3. Execute com um servidor HTTP local, por exemplo a extensão **Live Server**.
+4. Abra `index.html` no navegador.
 
-- área Competências da Jornada com os seis indicadores oficiais I1–I6;
-- registros reflexivos do estudante por competência;
-- contagem de evidências sem conversão automática em menção;
-- área Meu Progresso integrando Jornada, EduTech, Guilda e evidências;
-- próximas ações para continuidade do estudante;
-- estrutura preparada para futura visão centralizada do instrutor quando houver backend/autenticação.
+Recursos que dependem de autenticação, turmas e banco de dados requerem configuração válida do Supabase. Não publique credenciais privadas ou chaves de serviço no repositório.
 
+## Testes automatizados sem contas reais
 
-## Fase 7 — Conteúdo da UC7
+O projeto possui uma suíte isolada em `tests/`, executada pelo GitHub Actions em `.github/workflows/isolated-tests.yml`.
 
-- catálogo completo das 28 missões presenciais (14 fases × A/B);
-- Missões A conectadas ao Projeto Individual EduTech;
-- Missões B conectadas ao Projeto Restaurante da Guilda;
-- competências relacionadas registradas por missão;
-- sete Missões Extras correspondentes às 28h não presenciais;
-- quatro Marcos Avaliativos alinhados ao PTD;
-- conteúdo continua orientado a dados no Mission Engine, sem páginas HTML duplicadas por missão.
+| Arquivo | Cobertura |
+| --- | --- |
+| `tests/integrity.test.mjs` | Sequência de etapas, mesclagem de progresso e evidências, salvamentos redundantes e bloqueio por prazo |
+| `tests/participation.test.mjs` | Filtragem de contribuições individuais, isolamento entre colegas e estimativa de XP |
+| `tests/delivery-contract.test.mjs` | Verificações estáticas do contrato de entrega: revalidação do prazo, atraso, justificativa, confirmação e bloqueio após avaliação |
 
+Executar localmente com **Node.js 22**:
 
-## Fase 8 — Validação e Publicação
+```bash
+node --experimental-vm-modules --test tests/*.test.mjs
+```
 
-- diagnóstico local de integridade da aplicação e do estado;
-- relatório individual consolidado para impressão ou salvamento em PDF pelo navegador;
-- revisão do estado inicial e do anti-farming da gamificação;
-- identificação visual do MVP atualizada;
-- preparação para testes finais em navegadores/dispositivos e publicação estática;
-- backend, autenticação real e dados centralizados permanecem como evolução de produção.
+O fluxo automático é acionado por alterações relevantes no código, nos testes ou no workflow, por pull requests e manualmente no GitHub Actions.
 
+**Histórico de validação (25/10/2026):** as três primeiras execuções do workflow foram concluídas com status **Success** na branch `master`, conforme verificação do painel GitHub Actions. Isso comprova a aprovação da suíte executada nessas revisões, **não** a ausência de falhas em toda a plataforma.
 
-## Fase 9 — Backend, Banco de Dados e Autenticação
+[Consultar execuções no GitHub Actions](https://github.com/rickjordan20/WEB-Academy/actions/workflows/isolated-tests.yml)
 
-- integração preparada para Supabase/PostgreSQL;
-- autenticação real por e-mail e senha;
-- cadastro e recuperação de senha;
-- perfis aluno/instrutor;
-- modelo de turmas, estudantes, Guildas e integrantes;
-- Row Level Security no schema inicial;
-- sincronização do estado da Jornada com student_states;
-- localStorage preservado como cache/contingência;
-- fallback automático para o MVP local enquanto o projeto Supabase não estiver configurado.
+### Limites dos testes atuais
 
-A criação do projeto Supabase e a aplicação da migração exigem a escolha explícita da organização e confirmação de eventual custo antes da ativação.
+- Os testes de participação usam dados fictícios e respostas simuladas do banco.
+- Os testes de entrega verificam trechos do código, mas **não** executam um envio completo.
+- Ainda faltam testes integrados do envio e da avaliação pelo instrutor, permissões RLS, concorrência real no Supabase e navegação ponta a ponta no navegador.
+- Nenhum teste isolado precisa utilizar contas ou modificar dados reais de estudantes.
+
+## Estrutura principal
+
+```text
+data/                        Conteúdos, fundamentos e definições das missões
+js/                          Interface, progresso, entregas, sincronização e gamificação
+tests/                       Testes automatizados isolados
+.github/workflows/           Integração contínua no GitHub Actions
+index.html                   Entrada da aplicação
+README.md                    Documentação do projeto
+```
+
+## Próximas validações
+
+1. Simular o fluxo completo de entrega atrasada e exibição ao instrutor.
+2. Homologar permissões e isolamento de dados por turma/usuário em ambiente de testes.
+3. Validar sincronização simultânea, conflitos de respostas e recuperação após falhas de rede.
+4. Testar navegação, acessibilidade e responsividade com perfis fictícios.
+
+---
+
+**Projeto educacional em desenvolvimento contínuo.** As alterações devem preservar os registros existentes, manter a separação entre XP e avaliação docente e priorizar a rastreabilidade das evidências individuais.
