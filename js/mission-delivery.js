@@ -1,6 +1,7 @@
 import {normalizeMissionDefinition,revisionBlocks} from "./mission-builder-core.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {getState} from "./storage.js";
+import {missionWindow} from "./mission-window.js";
 import {mountMissionParticipation} from "./mission-participation.js";
 import {getMission,getFundamental,completeFundamentalStep} from "./mission-engine.js";
 import {estimateMissionXp} from "./mission-assessment-utils.js";
@@ -47,7 +48,11 @@ export async function mountMissionDelivery(missionId,access,root){
  if(late&&previous?.late_reason)reason.value=previous.late_reason;if(late&&previous?.late_explanation)explanation.value=previous.late_explanation;
  if(previous?.status==="evaluated"){button.disabled=true;feedback.textContent="Entrega já avaliada. Consulte o feedback do instrutor."}
  button.onclick=async()=>{
-  if(late&&(!reason?.value||explanation?.value.trim().length<10)){feedback.textContent="Selecione o motivo do atraso e escreva uma justificativa com pelo menos 10 caracteres.";return}
+  const latestAccess=await missionWindow(missionId);
+  if(latestAccess.state!=="open"&&latestAccess.state!=="closed"){feedback.textContent="Não foi possível confirmar a liberação da missão. Atualize a página.";return}
+  const isLate=latestAccess.state==="closed"||(latestAccess.closesAt&&Date.now()>new Date(latestAccess.closesAt).getTime());
+  if(isLate&&!late){feedback.textContent="O prazo terminou. Atualize a página para informar o motivo e a justificativa do atraso.";return}
+  if(isLate&&(!reason?.value||explanation?.value.trim().length<10)){feedback.textContent="Selecione o motivo do atraso e escreva uma justificativa com pelo menos 10 caracteres.";return}
   try{
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
    const phase=Number(String(missionId).match(/^\\d+/)?.[0]||0);
@@ -77,10 +82,10 @@ export async function mountMissionDelivery(missionId,access,root){
     return;
    }
    button.disabled=true;feedback.textContent="Enviando...";
-   const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!late,deadline_at:access?.closesAt||null,late_reason:late?reason.value:null,late_explanation:late?explanation.value.trim():"",submitted_at:new Date().toISOString()};
+   const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!isLate,deadline_at:latestAccess.closesAt||null,late_reason:isLate?reason.value:null,late_explanation:isLate?explanation.value.trim():"",submitted_at:new Date().toISOString()};
    const result=previous?.id?await sb.from("mission_submissions").update(payload).eq("id",previous.id):await sb.from("mission_submissions").insert(payload);
    if(result.error)throw result.error;
-   feedback.textContent=late?"Missão entregue em atraso e registrada para avaliação do instrutor.":"Entrega registrada para avaliação do instrutor.";button.textContent=late?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
+   feedback.textContent=isLate?"Missão entregue em atraso e registrada para avaliação do instrutor.":"Entrega registrada para avaliação do instrutor.";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  };
  root.append(section);
