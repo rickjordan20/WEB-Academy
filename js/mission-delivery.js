@@ -10,21 +10,23 @@ export function reapplyMissionRevision(root,mission){if(cachedRevision?.missionI
 const reasons=[["absence","Ausência ou falta à aula"],["organization","Falta de atenção ou organização"],["platform","Problema na plataforma"],["internet","Internet ou equipamento"],["personal","Motivo pessoal ou de saúde"],["other","Outro motivo"]];
 export async function mountMissionDelivery(missionId,access,root){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return;
- const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1);
- const classId=members?.[0]?.class_id;if(!classId)return;
+ const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active");
+ const preferred=localStorage.getItem("webacademy.student.activeClass");
+ const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;
  const {data:previous}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades,progress_snapshot").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  if(isRevision){cachedRevision={missionId,previous};applyMissionRevision(root,mission,previous)}
  const late=access?.state==="closed"||(access?.closesAt&&new Date(access.closesAt).getTime()<Date.now());
+ const previousLate=previous?.is_late===true;
  const section=document.createElement("section");section.className="card current-mission mission-delivery"+(late?" is-overdue":"");
  const options=reasons.map(([value,label])=>'<option value="'+value+'">'+label+'</option>').join("");
  const safe=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const statuses={submitted:"Enviada para avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
  section.innerHTML=`
  <div class="delivery-heading"><div class="delivery-icon" aria-hidden="true">${late?"!":"✓"}</div><div class="delivery-heading-copy"><span class="delivery-eyebrow">${late?"ENTREGA FORA DO PRAZO":"REGISTRO DE ENTREGA"}</span><h2>${late?"Prazo encerrado":"Entregar missão"}</h2><p>${late?"Você ainda pode entregar esta missão. Informe o motivo do atraso para que o instrutor possa analisar sua justificativa.":"Envie sua atividade para avaliação do instrutor."}</p></div><span class="delivery-status">${late?"Prazo vencido":"No prazo"}</span></div>
- ${previous?`<div class="delivery-history"><strong>Última entrega:</strong> ${new Date(previous.submitted_at).toLocaleString("pt-BR")} <span>· ${statuses[previous.status]||safe(previous.status)}</span></div>`:""}
+ ${previous?`<div class="delivery-history"><strong>Última entrega:</strong> ${new Date(previous.submitted_at).toLocaleString("pt-BR")} <span>· ${statuses[previous.status]||safe(previous.status)}${previousLate?" · Entregue em atraso":""}</span></div>`:""}
  ${previous?.grades?.indicators&&Object.keys(previous.grades.indicators).length?`<div class="delivery-history"><strong>Indicadores avaliados:</strong> ${Object.entries(previous.grades.indicators).map(([k,v])=>safe(k)+" — "+safe(v)).join(" · ")}</div>`:""}
  
  ${previous?.feedback&&!isRevision?`<div class="delivery-history"><strong>Recado do instrutor:</strong> ${safe(previous.feedback)}</div>`:""}
@@ -78,7 +80,7 @@ export async function mountMissionDelivery(missionId,access,root){
    const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!late,deadline_at:access?.closesAt||null,late_reason:late?reason.value:null,late_explanation:late?explanation.value.trim():"",submitted_at:new Date().toISOString()};
    const result=previous?.id?await sb.from("mission_submissions").update(payload).eq("id",previous.id):await sb.from("mission_submissions").insert(payload);
    if(result.error)throw result.error;
-   feedback.textContent="Entrega registrada para avaliação do instrutor.";button.textContent="Entrega enviada";preflight.hidden=true;
+   feedback.textContent=late?"Missão entregue em atraso e registrada para avaliação do instrutor.":"Entrega registrada para avaliação do instrutor.";button.textContent=late?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  };
  root.append(section);
