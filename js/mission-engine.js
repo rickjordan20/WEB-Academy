@@ -9,12 +9,12 @@ const fId=phase=>`F${phase}`;
 const verifiedWindows=new Map();
 export function setVerifiedMissionWindow(id,access){
  if(!getMission(id)&&!EXTRA_MISSIONS.some(m=>m.id===id))return;
- if(access?.state==="open")verifiedWindows.set(id,{checkedAt:Date.now(),opensAt:access.opensAt});
+ if(access?.state==="open")verifiedWindows.set(id,{checkedAt:Date.now(),opensAt:access.opensAt,closesAt:access.closesAt});
  else verifiedWindows.delete(id);
 }
 export function canRecordMissionProgress(id){
  const entry=verifiedWindows.get(id);
- return Boolean(entry&&Date.now()-entry.checkedAt<120000&&(!entry.opensAt||Date.now()>=new Date(entry.opensAt).getTime()));
+ return Boolean(entry&&Date.now()-entry.checkedAt<120000&&(!entry.opensAt||Date.now()>=new Date(entry.opensAt).getTime())&&(!entry.closesAt||Date.now()<new Date(entry.closesAt).getTime()));
 }
 const canRecordUnit=id=>canRecordMissionProgress(/^F[0-9]+$/.test(id)?`${Number(id.slice(1))}A`:id);
 
