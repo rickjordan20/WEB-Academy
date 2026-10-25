@@ -12,7 +12,7 @@ export function mergeStudentStates(remote,local){
  for(const field of ["completedMissions","unlockedMissions","completedFundamentals","unlockedFundamentals"])journey[field]=unique(remote.journey?.[field],local.journey?.[field]);
  for(const field of ["missionProgress","fundamentalProgress"]){
   journey[field]={...remote.journey?.[field],...local.journey?.[field]};
-  for(const key of Object.keys(journey[field])){const a=remote.journey?.[field]?.[key]||{},b=local.journey?.[field]?.[key]||{};journey[field][key]={...a,...b,completedSteps:unique(a.completedSteps,b.completedSteps)}}
+  for(const key of Object.keys(journey[field])){const a=remote.journey?.[field]?.[key]||{},b=local.journey?.[field]?.[key]||{};journey[field][key]={...(newer?a:b),...(newer?b:a),completedSteps:unique(a.completedSteps,b.completedSteps),startedAt:[a.startedAt,b.startedAt].filter(Boolean).sort()[0]||null,currentStep:Math.max(a.currentStep||0,b.currentStep||0)}}
  }
  journey.currentPhase=Math.max(remote.journey?.currentPhase||1,local.journey?.currentPhase||1);
  journey.progress=Math.max(remote.journey?.progress||0,local.journey?.progress||0);
@@ -20,6 +20,7 @@ export function mergeStudentStates(remote,local){
  gamification.rewarded=unique(remote.gamification?.rewarded,local.gamification?.rewarded);
  gamification.achievements=records(remote.gamification?.achievements,local.gamification?.achievements);
  gamification.xpHistory=records(remote.gamification?.xpHistory,local.gamification?.xpHistory);
+ // XP acumulado não pode diminuir ao reconciliar dispositivos; eventos continuam deduplicados.
  gamification.xp=Math.max(remote.gamification?.xp||0,local.gamification?.xp||0);
  const competencies={...remote.competencies,...local.competencies};
  for(const key of unique(Object.keys(remote.competencies||{}),Object.keys(local.competencies||{})))competencies[key]=records(remote.competencies?.[key],local.competencies?.[key]);
@@ -27,7 +28,7 @@ export function mergeStudentStates(remote,local){
   answers:{...secondary.answers,...primary.answers},
   evidence:records(remote.evidence,local.evidence),
   extraMissions:{...secondary.extraMissions,...primary.extraMissions,completed:unique(remote.extraMissions?.completed,local.extraMissions?.completed)},
-  meta:{...secondary.meta,...primary.meta,updatedAt:new Date().toISOString()}};
+  meta:{...secondary.meta,...primary.meta,updatedAt:primary.meta?.updatedAt||secondary.meta?.updatedAt||new Date().toISOString()}};
 }
 export async function pullCloudState(){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return null;setActiveUser(session.user.id);
