@@ -18,7 +18,7 @@ if(!mission){root.innerHTML='<section class="card current-mission"><h1>Missão n
 else if(initialAccess.state==="unpublished"||initialAccess.state==="upcoming"||initialAccess.state==="unconfigured"||initialAccess.state==="error"){root.replaceChildren(windowNotice(initialAccess));startWindowWatch(id);}
 else{try{applyEditedMissionContent(id,await loadEditedMissionContent(id))}catch(error){root.textContent="Não foi possível carregar o conteúdo da missão. Atualize a página.";throw error}root.innerHTML='<section class="card current-mission"><h1>Carregando missão...</h1></section>';missionAccess=initialAccess;missionReadOnly=initialAccess.state==="closed";if(!missionReadOnly)startMission(id);projectContext=await getMissionProjectContext(mission);render(missionReadOnly,initialAccess);refreshMissionSchedule();startWindowWatch(id);watchMissionContent(id,async content=>{applyEditedMissionContent(id,content);const access=await missionWindow(id);missionAccess=access;if(access.state==="open"||access.state==="closed"){missionReadOnly=access.state==="closed";render(missionReadOnly,access)}else{root.replaceChildren(windowNotice(access))}}).catch(error=>console.warn("Escuta de missão:",error));}
 
-const escapeMissionText=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function escapeMissionText(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderGuildMissionBrief(m,context){
  const e=escapeMissionText;
  const req=context?.requirements||[];
