@@ -182,3 +182,17 @@ body:has(#activeClassSelect) .app-shell>.sidebar .sidebar-footer{flex:0 0 auto;m
 #studentsSection .admin-table th:nth-child(8),#studentsSection .admin-table td:nth-child(8){min-width:155px;white-space:normal;overflow-wrap:anywhere}
 #studentsSection .admin-table th:nth-child(9),#studentsSection .admin-table td:nth-child(9){min-width:145px;white-space:normal}
 @media print{ @page{size:A4 landscape;margin:10mm} #studentsSection .table-wrap{overflow:visible} #studentsSection .admin-table{min-width:0;width:100%;table-layout:fixed;font-size:8px} #studentsSection .admin-table th,#studentsSection .admin-table td{padding:5px 3px;white-space:normal;min-width:0!important;max-width:none!important;overflow-wrap:anywhere} #studentsSection .admin-table th:first-child{width:22%} #studentsSection .admin-table th:nth-child(8){width:15%} #studentsSection .admin-table th:nth-child(9){width:16%} #studentsSection .admin-table thead{display:table-header-group} #studentsSection .admin-table tr{break-inside:avoid} }
+
+/* Ficha de avaliação: apresentação legível de respostas e evidências estruturadas */
+.eval-answer-text{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;line-height:1.65;color:var(--text)}
+.eval-answer-fields{display:grid;gap:.65rem;margin:.65rem 0 0;min-width:0}
+.eval-answer-field{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:.75rem;padding:.7rem .8rem;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.025);min-width:0}
+.eval-answer-field dt{font-size:.78rem;font-weight:700;color:var(--muted);overflow-wrap:anywhere}
+.eval-answer-field dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.eval-answer-list{margin:.6rem 0;padding-left:1.5rem;display:grid;gap:.6rem}
+.eval-answer-list li{padding-left:.25rem;overflow-wrap:anywhere}
+.eval-answer-link{display:inline-block;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.eval-empty{color:var(--muted);font-size:.86rem;margin:.45rem 0}
+.eval-submitted{min-width:0;max-width:100%;overflow:hidden}
+.eval-submitted .eval-answer-fields .eval-answer-fields{margin-top:.4rem}
+@media(max-width:640px){.eval-answer-field{grid-template-columns:minmax(0,1fr);gap:.35rem}.eval-block{padding:.85rem}}
