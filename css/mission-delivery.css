@@ -53,3 +53,14 @@
 .mission-delivery .guild-delivery-exception textarea{width:100%;min-width:0;box-sizing:border-box;min-height:90px;padding:12px;border:1px solid #506987;border-radius:10px;background:#091625;color:#eef6ff;font:inherit;resize:vertical}
 .mission-delivery .guild-delivery-exception textarea:focus-visible{outline:2px solid #79b8ff;outline-offset:2px}
 .mission-delivery .guild-delivery-exception p{margin:0;line-height:1.5}
+
+/* Destaque dos requisitos específicos já configurados para cada missão B. */
+.guild-mission-brief{display:grid;gap:12px;border:1px solid rgba(96,165,250,.4);background:linear-gradient(155deg,#11263e,#0d1b2e);color:#eaf2ff}
+.guild-mission-brief h2,.guild-mission-brief h3{margin:0;color:#f1f7ff}
+.guild-mission-brief .guild-mission-challenge{font-size:1.05rem;line-height:1.6;margin:0}
+.guild-mission-brief .guild-mission-note,.guild-mission-brief .guild-mission-brief-tip{margin:0;line-height:1.55}
+.guild-mission-brief .guild-mission-criterion{padding:14px 16px;border:1px solid rgba(148,163,184,.28);background:#0b1b2e;border-radius:12px;overflow-wrap:anywhere}
+.guild-mission-brief .guild-mission-criterion p{margin:8px 0;line-height:1.55}
+.guild-mission-brief .guild-mission-criterion ul{padding-left:22px;margin:8px 0}
+.guild-mission-brief .guild-mission-criterion li{margin:5px 0;line-height:1.5}
+.guild-mission-brief details{border-top:1px solid rgba(148,163,184,.22);padding-top:12px}
