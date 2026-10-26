@@ -112,13 +112,13 @@ function organizeEduTechPanels(){
  });
  open(keys.includes(activeEduTechPanel)?activeEduTechPanel:"fundamentals");
 }
-const EDUTECH_REVIEW_FIELDS=[
+function getEduTechReviewFields(){return [
  {type:"select",label:"Como você avalia sua participação nesta prática?",options:["Participei ativamente e realizei as atividades","Participei e precisei de algumas orientações","Participei parcialmente e preciso retomar algumas etapas"]},
  {type:"select",label:"Quanto você conseguiu compreender e aplicar?",options:["Compreendi e consegui aplicar com autonomia","Compreendi a maior parte, mas precisei de ajuda","Ainda tenho dúvidas e preciso praticar mais"]},
  {type:"select",label:"Como você avalia o resultado do seu trabalho?",options:["Concluí e conferi o resultado","Concluí parcialmente e identifiquei melhorias","Ainda não consegui concluir"]},
  {type:"short",label:"Qual foi seu principal aprendizado ou desafio? (uma ou duas frases)"},
  {type:"short",label:"Informe o link ou referência de uma evidência do que realizou"}
-];
+].map(field=>({...field,options:field.options?[...field.options]:undefined}));}
 function applyEduTechReviewTemplate(){
  if(mission.type!=="training")return;
  mission.steps.forEach(step=>{
@@ -126,7 +126,7 @@ function applyEduTechReviewTemplate(){
   // Mantém o ID da atividade e o vínculo com os registros existentes.
   step.title="Autoavaliação Individual — EduTech";
   step.summary="Avalie sua participação, aprendizagem e resultados. Responda com sinceridade e apresente uma evidência.";
-  step.fields=EDUTECH_REVIEW_FIELDS;
+  step.fields=getEduTechReviewFields();
  });
 }
 function render(readOnly=false,access=null){
