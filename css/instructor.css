@@ -209,3 +209,12 @@ details.eval-review-step:not([open])>summary:after{content:"▸"}
 details.eval-review-step>summary:focus-visible{outline:2px solid #60a5fa;outline-offset:4px;border-radius:6px}
 details.eval-review-step>summary strong{flex:1;min-width:0;overflow-wrap:anywhere}
 details.eval-review-step>summary span{font-size:.78rem;color:var(--muted)}
+
+.eval-auto-panel{margin:1rem 0 1.5rem}
+.eval-auto-panel h4{margin:1rem 0 .6rem}
+.eval-auto-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.35rem 1rem;padding:.65rem .25rem;border-bottom:1px solid rgba(148,163,184,.2)}
+.eval-auto-line strong{min-width:0;overflow-wrap:anywhere;font-size:.9rem}
+.eval-auto-line span{font-weight:600;font-size:.85rem}
+.eval-auto-line small{grid-column:1/-1;opacity:.8;overflow-wrap:anywhere}
+.eval-auto-panel .eval-comment-label{display:block;margin-top:1.2rem}
+@media(max-width:640px){.eval-auto-line{grid-template-columns:1fr}.eval-auto-line small{grid-column:1}}
