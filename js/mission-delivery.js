@@ -42,6 +42,11 @@ export async function mountMissionDelivery(missionId,access,root){
 
  if(!late){section.querySelector(".delivery-fields").remove();}
  if(mission?.type==="guild")mountMissionParticipation(section.querySelector("[data-mission-participation]"),{missionId,classId}).catch(console.warn);
+ if(mission?.type==="guild"&&/^(?:[2-9]|1[0-4])B$/.test(mission.displayId||"")){
+  const participation=section.querySelector("[data-mission-participation]");
+  const justification=document.createElement("div");justification.className="guild-delivery-exception";justification.innerHTML='<label for="guildDeliveryJustification">Justificativa excepcional (somente se não houver tarefa atribuída ou existirem pendências)</label><textarea id="guildDeliveryJustification" name="guildDeliveryJustification" rows="3" maxlength="1500" placeholder="Explique sua participação e por que o Kanban ainda não registra a conclusão. O instrutor analisará as evidências."></textarea><p class="muted">A justificativa não comprova a execução nem garante menção A. O instrutor avaliará individualmente as evidências.</p>';
+  (participation||section).insertAdjacentElement("afterend",justification);
+ }
  const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
  if(late){reason.closest("label").hidden=false;explanation.closest("label").hidden=false;}
@@ -63,8 +68,9 @@ export async function mountMissionDelivery(missionId,access,root){
     const {data:taskRows,error:taskError}=await sb.from("guild_tasks").select("id,title,status,responsible_user_id,source").eq("guild_id",membership.data.guild_id).eq("mission_id",missionId);
     if(taskError)throw taskError;
     const myTasks=(taskRows||[]).filter(t=>t.source!=="mission"&&t.responsible_user_id===session.user.id);
-    if(!myTasks.length){feedback.textContent="Associe pelo menos uma tarefa à missão e atribua-a a você antes de entregar.";return}
-    if(myTasks.some(t=>t.status!=="done")){feedback.textContent="Conclua todas as suas tarefas atribuídas no Kanban antes de entregar.";return}
+    const pendingTasks=myTasks.filter(t=>t.status!=="done");
+    const exceptionReason=section.querySelector('[name="guildDeliveryJustification"]')?.value?.trim()||"";
+    if((!myTasks.length||pendingTasks.length)&&exceptionReason.length<30){feedback.textContent="Existem tarefas sem conclusão registrada ou nenhuma tarefa atribuída. Informe uma justificativa de pelo menos 30 caracteres para encaminhar a situação à análise do instrutor.";section.querySelector('[name="guildDeliveryJustification"]')?.focus();return}
     const reviewForm=section.querySelector(".mp-self-form");
     if(!reviewForm){feedback.textContent="A ficha de autoavaliação ainda não carregou. Aguarde ou atualize a página.";return}
     const reviewData=Object.fromEntries(new FormData(reviewForm));
@@ -73,7 +79,7 @@ export async function mountMissionDelivery(missionId,access,root){
      feedback.textContent="Preencha todas as seções obrigatórias da ficha individual antes de entregar.";reviewForm.scrollIntoView({behavior:"smooth",block:"nearest"});return
     }
     if(reviewData.evidence&&!/^https:\/\//i.test(reviewData.evidence)){feedback.textContent="Informe um link HTTPS válido na ficha.";return}
-    guildReview={version:1,missionId,submittedAt:new Date().toISOString(),form:reviewData,tasks:myTasks.map(t=>({id:t.id,title:t.title,status:t.status}))};
+    guildReview={version:1,missionId,submittedAt:new Date().toISOString(),form:reviewData,exceptional:!myTasks.length||pendingTasks.length>0,justification:exceptionReason,tasks:myTasks.map(t=>({id:t.id,title:t.title,status:t.status}))};
    }
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
    if(guildReview)answers[missionId+":guild_self_review"]=guildReview;
