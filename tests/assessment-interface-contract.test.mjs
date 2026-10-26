@@ -14,7 +14,7 @@ test('ficha separa checks da missão e fundamentos e sinaliza histórico',()=>{
 test('etapas são expansíveis e os comentários não são preenchidos automaticamente',()=>{
  assert.match(source,/return '<details class="eval-block eval-review-step"/);
  assert.match(source,/<\/textarea><\/label><\/div><\/details>/);
- assert.match(source,/el\.value=saved!==undefined\?saved:"";/);
+ assert.match(source,/el\.value=saved!==undefined\?saved:el\.value\|\|"";/);
 });
 test('salvamento usa os blocos efetivamente exibidos',()=>{
  assert.match(source,/for\(const step of \[\.\.\.\(reviewMission\?\.steps/);
