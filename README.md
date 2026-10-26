@@ -30,13 +30,46 @@ O acesso às missões considera a turma ativa, o cronograma e o estado de public
 | --- | --- |
 | Não publicada ou ainda não aberta | Acesso à realização bloqueado |
 | Publicada e dentro do prazo | Realização de etapas e entrega permitidas |
-| Prazo encerrado | Consulta do conteúdo e progresso; novas etapas bloqueadas |
+| Prazo encerrado | A missão continua disponível para realização e envio; a entrega exige justificativa e ciência de atraso |
 | Entrega após o prazo | Permitida, com motivo e justificativa obrigatórios, marcada como **em atraso** |
 | Entrega já avaliada | Novo envio bloqueado pelo formulário |
 
 O envio apresenta uma revisão prévia do progresso e das pendências antes da confirmação. A entrega registra informações de prazo, respostas, evidências e uma fotografia do progresso para análise do instrutor.
 
 **Atenção:** a consistência integral desse fluxo ainda depende de testes integrados com autenticação, banco de dados e interfaces reais.
+
+## Construtor, calendário e disponibilidade (26/10/2026)
+
+O construtor de missões (`mission-builder.html`, `js/mission-builder-page.js`) trabalha com os dois tipos de missão: **EduTech (A)** e **Projeto Restaurante/Guilda (B)**. O modelo EduTech separa fundamentos, prática guiada e relatório individual; o conteúdo técnico de cada etapa é editável. A Guilda utiliza prática autônoma, Kanban e evidências próprias. A autoavaliação EduTech é um formulário genérico compartilhado, com cartões, escala, checklist, escolha única, resposta curta e link de evidência.
+
+### Regras do cronograma
+
+- A **abertura** da missão é a data e hora de início da aula vinculada.
+- O **prazo final** é um minuto antes da abertura da **próxima missão cadastrada** no cronograma, incluindo missões remotas. Não significa bloqueio de entrega.
+- A **última missão**, sem sucessora, recebe provisoriamente o fim do próprio dia (23h59).
+- Os campos são mostrados em dois blocos: **Dados da aula** e **Disponibilidade da missão**. A abertura e o prazo são derivados do cronograma, não editados isoladamente.
+- Os valores persistem em `class_schedule.mission_open_at` e `class_schedule.mission_close_at` (fuso `America/Sao_Paulo`); a alteração da data/hora inicial no cronograma aciona a sincronização automática das janelas da UC7.
+- A publicação é independente do calendário: uma missão não publicada permanece indisponível, ainda que sua data de abertura tenha chegado.
+- A missão vencida **não pode ser encerrada automaticamente pelo prazo**. O estudante pode continuar e enviar com justificativa e confirmação de ciência; o instrutor analisa o atraso.
+- A data de término da **aula** não é o prazo de entrega. O término da aula continua sendo um campo independente.
+
+### Identificadores: atenção obrigatória
+
+A jornada apresenta `1A, 1B, 1C, 2A, 2B...`, mas `data/missions.js` conserva identificadores **internos históricos** para progresso, entregas e avaliações. O cronograma usa o **identificador exibido** (por exemplo, `3B`). Ao buscar a aula no construtor, utilizar `mission.displayId`, não `mission.id` nem `mission.lesson`; ao salvar, usar o `id` da linha encontrada. Nunca migrar IDs de entregas existentes sem um plano específico.
+
+**Ponto pendente:** a sequência inicial da jornada inclui `1C`, mas o cronograma consultado não contém uma linha `1C`. Verificar a vinculação dessa missão antes de afirmar que todas as missões têm janela de acesso. As missões remotas `R1...` têm seu próprio identificador.
+
+### Testes e critérios de homologação
+
+1. Abrir uma missão A e uma B no construtor e confirmar que ambas exibem os dois blocos do cronograma.
+2. Conferir o mapeamento entre `displayId` e `class_schedule.mission_id`, especialmente `1C`, `2B`, `3B` e missões remotas.
+3. Alterar a data/hora inicial de uma aula de teste e confirmar que a abertura e o prazo da missão anterior são recalculados sem alterar o conteúdo publicado ou as entregas.
+4. Verificar a fronteira temporal (um minuto antes, no horário e após a abertura da próxima missão).
+5. Entregar uma missão atrasada, conferir justificativa, ciência, marcação de atraso e visualização pelo instrutor.
+6. Confirmar que missão não publicada continua bloqueada e que conta de instrutor não é tratada como estudante sem matrícula.
+7. Testar responsividade, publicação, carregamento do relatório EduTech, respostas no Supabase e apresentação ao instrutor.
+
+**Validação já realizada:** consultas SQL confirmaram a atualização das janelas da UC7; a sintaxe do construtor foi verificada e a implantação do frontend foi confirmada na Vercel. **Não foi concluído um teste autenticado ponta a ponta** de todas essas condições. O calendário foi sincronizado com os dados existentes, inclusive horários atípicos: revisar no cronograma aulas com início diferente do esperado.
 
 ## Guildas e participação individual
 
