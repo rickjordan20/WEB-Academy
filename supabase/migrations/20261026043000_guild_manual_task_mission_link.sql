@@ -20,9 +20,7 @@ begin
   then raise exception 'Responsável não pertence à Guilda.';end if;
   select coalesce(full_name,'') into v_name from public.profiles where id=p_responsible_user_id;
  end if;
- if v_mission is not null and not exists(
-  select 1 from public.guild_tasks t where t.guild_id=p_guild_id and t.mission_id=v_mission and t.source='mission'
- ) then raise exception 'A missão precisa estar liberada e sincronizada no Kanban antes da associação.';end if;
+ if v_mission is not null and not (v_mission ~ '^(?:[4-9]|1[0-4])A$' or v_mission ~ '^(?:[3-9]|1[0-4])B$') then raise exception 'Identificador de missão inválido.';end if;
  insert into public.guild_tasks(guild_id,mission_id,source,title,description,phase,status,responsible,responsible_user_id,competencies,evidence,history,created_by)
  values(p_guild_id,v_mission,'manual',btrim(p_title),btrim(p_description),p_phase,'todo',v_name,p_responsible_user_id,'{}'::text[],'',jsonb_build_array(jsonb_build_object('from',null,'to','todo','at',now())),auth.uid())
  returning * into v_task;
