@@ -26,7 +26,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const safe=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  const statuses={submitted:"Enviada para avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
  section.innerHTML=`
- <div class="delivery-heading"><div class="delivery-icon" aria-hidden="true">${late?"!":"✓"}</div><div class="delivery-heading-copy"><span class="delivery-eyebrow">${late?"ENTREGA FORA DO PRAZO":"REGISTRO DE ENTREGA"}</span><h2>${late?"Prazo encerrado":"Entregar missão"}</h2><p>${late?"Você ainda pode entregar esta missão. Informe o motivo do atraso para que o instrutor possa analisar sua justificativa.":"Envie sua atividade para avaliação do instrutor."}</p></div><span class="delivery-status">${late?"Prazo vencido":"No prazo"}</span></div>
+ <div class="delivery-heading"><div class="delivery-icon" aria-hidden="true">${late?"!":"✓"}</div><div class="delivery-heading-copy"><span class="delivery-eyebrow">${late?"ENTREGA FORA DO PRAZO":"REGISTRO DE ENTREGA"}</span><h2>${late?"Entregar missão em atraso":"Entregar missão"}</h2><p>${late?"Você ainda pode entregar esta missão. Informe o motivo do atraso para que o instrutor possa analisar sua justificativa.":"Envie sua atividade para avaliação do instrutor."}</p></div><span class="delivery-status">${late?"Prazo vencido":"No prazo"}</span></div>
  ${previous?`<div class="delivery-history"><strong>Última entrega:</strong> ${new Date(previous.submitted_at).toLocaleString("pt-BR")} <span>· ${statuses[previous.status]||safe(previous.status)}${previousLate?" · Entregue em atraso":""}</span></div>`:""}
  ${previous?.grades?.indicators&&Object.keys(previous.grades.indicators).length?`<div class="delivery-history"><strong>Indicadores avaliados:</strong> ${Object.entries(previous.grades.indicators).map(([k,v])=>safe(k)+" — "+safe(v)).join(" · ")}</div>`:""}
  
@@ -35,6 +35,7 @@ export async function mountMissionDelivery(missionId,access,root){
  <label class="delivery-field"><span>Motivo do atraso <em>Obrigatório</em></span><select data-late-reason><option value="">Selecione o motivo</option>${options}</select></label>
  <label class="delivery-field"><span>Justificativa <em>Obrigatória</em></span><textarea data-late-explanation rows="4" placeholder="Conte brevemente o que aconteceu e por que não conseguiu entregar no prazo."></textarea><small>Escreva pelo menos 10 caracteres.</small></label>
  </div>
+ <label class="delivery-acknowledgement" data-late-acknowledgement ${late?"":"hidden"}><input type="checkbox" data-late-consent><span>Estou ciente de que esta entrega será registrada como <strong>atrasada</strong>, com data e horário, e que minha justificativa e as evidências serão analisadas pelo instrutor. O envio não garante aprovação.</span></label>
  ${mission?.type==="guild"?'<section class="mp-summary" data-mission-participation></section>':""}
  <div class="delivery-preflight" data-delivery-preflight hidden></div>
  <div class="delivery-footer"><p class="delivery-help">A entrega ficará registrada com a data e o horário do envio para análise do instrutor.</p><button class="btn btn-primary delivery-submit" type="button" data-submit-mission>${late?"Enviar entrega atrasada":"Enviar para avaliação"} →</button></div>
@@ -48,6 +49,7 @@ export async function mountMissionDelivery(missionId,access,root){
   if(participation)participation.insertAdjacentElement("afterend",justification);else section.append(justification);
  }
  const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
+ const consent=section.querySelector("[data-late-consent]"),acknowledgement=section.querySelector("[data-late-acknowledgement]");
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
  if(late){reason.closest("label").hidden=false;explanation.closest("label").hidden=false;}
  if(late&&previous?.late_reason)reason.value=previous.late_reason;if(late&&previous?.late_explanation)explanation.value=previous.late_explanation;
@@ -56,8 +58,13 @@ export async function mountMissionDelivery(missionId,access,root){
   const latestAccess=await missionWindow(missionId);
   if(latestAccess.state!=="open"&&latestAccess.state!=="closed"){feedback.textContent="Não foi possível confirmar a liberação da missão. Atualize a página.";return}
   const isLate=latestAccess.state==="closed"||(latestAccess.closesAt&&Date.now()>new Date(latestAccess.closesAt).getTime());
-  if(isLate&&!late){feedback.textContent="O prazo terminou. Atualize a página para informar o motivo e a justificativa do atraso.";return}
+  if(isLate&&!late){
+   const fields=section.querySelector(".delivery-fields");
+   if(!fields){feedback.textContent="O prazo terminou durante o preenchimento. Atualize a página para informar a justificativa e a ciência do atraso.";return}
+   fields.hidden=false;acknowledgement.hidden=false;
+  }
   if(isLate&&(!reason?.value||explanation?.value.trim().length<10)){feedback.textContent="Selecione o motivo do atraso e escreva uma justificativa com pelo menos 10 caracteres.";return}
+  if(isLate&&!consent?.checked){feedback.textContent="Marque a ciência sobre o registro da entrega em atraso e sua avaliação pelo instrutor.";consent?.focus();return}
   try{
    // Para missões da Guilda a partir da 2B, a ficha individual integra a entrega oficial.
    let guildReview=null;
@@ -98,7 +105,7 @@ export async function mountMissionDelivery(missionId,access,root){
    const pending=steps.filter(step=>!completed.has(step.id));
    const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
    const estimate=estimateMissionXp(mission,progressSnapshot);
-   const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value});
+   const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value,lateConsent:consent?.checked});
    if(confirmedFingerprint!==fingerprint){
     confirmedFingerprint=fingerprint;
     const missing=[...pending.map(s=>"Missão: "+s.title),...fundamentalPending.map(s=>"Fundamentos: "+s.title)];
