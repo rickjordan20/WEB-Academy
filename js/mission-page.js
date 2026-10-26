@@ -55,8 +55,9 @@ function organizeEduTechPanels(){
   host.append(panel);return panel;
  });
  panels[0].append(fundamentals);
- const project=root.querySelector(".project-context, .project-context-card, .mission-project-context, .project-brief");
- if(project)panels[1].append(project);
+ const project=root.querySelector(".mission-project-brief");
+ // O documento do projeto é referência permanente: fica antes da estrutura da aula.
+ if(project)flow.insertAdjacentElement("beforebegin",project);
  const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
  if(guided){
   const reportIds=new Set(mission.steps.filter(step=>step.type==="evidence").map(step=>step.id));
