@@ -207,7 +207,7 @@ function suggestedXpPlan(mission,foundation,maxXp,submission){
   const response=responseForStep(submission.answers,unit,step);
   const objective=objectiveResult(step,response.value);
   const hasValue=value=>typeof value==="string"?value.trim().length>0:Array.isArray(value)?value.some(hasValue):value!==null&&value!==undefined&&typeof value==="object"?Object.values(value).some(hasValue):typeof value==="number"||typeof value==="boolean";
-  const answered=objective?objective.answered===true:hasValue(response.value)||response.extras.some(x=>hasValue(x));
+  const answered=objective?objective.answered===true:hasValue(response.value)||response.extras.some(([,value])=>hasValue(value));
   const cap=allocated.get(key)||0;
   // Checks e visualizações não contam como resposta: somente produção enviada.
   return {key,step,cap,suggested:answered?cap:0,answered,objective};
