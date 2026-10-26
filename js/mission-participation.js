@@ -40,6 +40,27 @@ export async function mountMissionParticipation(target,{missionId,classId=null,s
   if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId,[]);return}
   const taskQuery=sb.from("guild_tasks").select("id,title,status,responsible_user_id,mission_id,source").eq("guild_id",guildId).eq("mission_id",missionId);
   const {data:tasks,error:te}=await taskQuery;if(te)throw te;
+  if(teacher){
+   const {data:allTasks,error:allError}=await sb.from("guild_tasks").select("id,title,status,mission_id,source,responsible_user_id,created_by,evidence,history,created_at,updated_at").eq("guild_id",guildId);
+   if(allError)throw allError;
+   const related=(allTasks||[]).filter(t=>t.mission_id===missionId&&(t.responsible_user_id===uid||t.created_by===uid));
+   const assigned=related.filter(t=>t.responsible_user_id===uid);
+   const created=related.filter(t=>t.created_by===uid);
+   const previous=(allTasks||[]).filter(t=>t.mission_id!==missionId&&(t.responsible_user_id===uid||t.created_by===uid));
+   const taskIds=(allTasks||[]).map(t=>t.id);
+   const {data:contributions,error:logError}=taskIds.length?await sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",taskIds).eq("author_id",uid).order("created_at",{ascending:false}):{data:[],error:null};
+   if(logError)throw logError;
+   const relevantLogs=(contributions||[]).filter(c=>(allTasks||[]).some(t=>t.id===c.task_id&&t.mission_id===missionId));
+   const taskLine=t=>'<article class="mp-entry"><strong>'+esc(t.title||"Tarefa sem título")+'</strong><p class="muted">Missão '+esc(t.mission_id||"não definida")+' · '+esc(t.status||"sem status")+' · '+(t.responsible_user_id===uid?"Atribuída ao estudante":"Sem atribuição individual ao estudante")+'</p>'+(typeof t.evidence==="string"&&/^https:\/\//i.test(t.evidence)?'<a href="'+esc(t.evidence)+'" target="_blank" rel="noopener noreferrer">Evidência cadastrada ↗</a>':"")+'</article>';
+   target.innerHTML='<div class="mp-head"><div><p class="eyebrow">Banco de dados · situação atual</p><h3>Contribuições e tarefas da Guilda</h3></div><span class="mp-counter">'+relevantLogs.length+' registro(s) de contribuição</span></div>'+
+    '<div class="mp-stats"><span><b>'+assigned.length+'</b> atribuídas nesta missão</span><span><b>'+created.length+'</b> criadas nesta missão</span><span><b>'+relevantLogs.length+'</b> contribuições registradas</span></div>'+
+    '<p class="muted">Consulta atual ao Kanban. Não representa necessariamente a situação na data da entrega. Criar uma tarefa, ser responsável e comprovar execução são fatos diferentes.</p>'+
+    '<details open><summary><strong>Tarefas atribuídas ('+assigned.length+')</strong></summary>'+(assigned.map(taskLine).join("")||'<p class="muted">Nenhuma tarefa atribuída nesta missão.</p>')+'</details>'+
+    '<details><summary><strong>Tarefas criadas ('+created.length+')</strong></summary>'+(created.map(taskLine).join("")||'<p class="muted">Nenhuma tarefa criada nesta missão.</p>')+'</details>'+
+    '<details open><summary><strong>Histórico de contribuições ('+relevantLogs.length+')</strong></summary>'+(relevantLogs.map(c=>'<article class="mp-entry"><strong>'+esc((allTasks||[]).find(t=>t.id===c.task_id)?.title||"Tarefa")+'</strong><p>'+esc(c.summary||"Sem descrição")+'</p><small>'+esc(new Date(c.created_at).toLocaleString("pt-BR"))+'</small>'+(typeof c.evidence_url==="string"&&/^https:\/\//i.test(c.evidence_url)?'<p><a href="'+esc(c.evidence_url)+'" target="_blank" rel="noopener noreferrer">Abrir evidência ↗</a></p>':"")+'</article>').join("")||'<p class="muted">Nenhuma contribuição individual registrada nesta missão.</p>')+'</details>'+
+    (previous.length?'<details><summary><strong>Registros de outras missões ('+previous.length+')</strong></summary><p class="muted">Contexto histórico, não pontuação automática desta missão.</p>'+previous.map(taskLine).join("")+'</details>':"");
+   return;
+  }
   if(!tasks?.length){target.innerHTML='<p class="muted">Ainda não há tarefas vinculadas a esta missão. O líder poderá organizá-las no Kanban.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId,tasks||[]);return}
   const ids=tasks.map(t=>t.id);
   const [logs,team]=await Promise.all([sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",ids).order("created_at",{ascending:false}),sb.from("guild_members").select("user_id").eq("guild_id",guildId)]);
