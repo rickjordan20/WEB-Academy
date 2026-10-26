@@ -113,20 +113,24 @@ function organizeEduTechPanels(){
  open(keys.includes(activeEduTechPanel)?activeEduTechPanel:"fundamentals");
 }
 function getEduTechReviewFields(){return [
- {type:"select",label:"Como você avalia sua participação nesta prática?",options:["Participei ativamente e realizei as atividades","Participei e precisei de algumas orientações","Participei parcialmente e preciso retomar algumas etapas"]},
- {type:"select",label:"Quanto você conseguiu compreender e aplicar?",options:["Compreendi e consegui aplicar com autonomia","Compreendi a maior parte, mas precisei de ajuda","Ainda tenho dúvidas e preciso praticar mais"]},
- {type:"select",label:"Como você avalia o resultado do seu trabalho?",options:["Concluí e conferi o resultado","Concluí parcialmente e identifiquei melhorias","Ainda não consegui concluir"]},
- {type:"short",label:"Qual foi seu principal aprendizado ou desafio? (uma ou duas frases)"},
- {type:"short",label:"Informe o link ou referência de uma evidência do que realizou"}
-].map(field=>({...field,options:field.options?[...field.options]:undefined}));}
+ {type:"cards",label:"Como foi sua participação nesta prática?",options:[{emoji:"🚀",label:"Participei ativamente"},{emoji:"🤝",label:"Participei com orientação"},{emoji:"🌱",label:"Participei parcialmente"}]},
+ {type:"scale",label:"Quanto você confia na sua capacidade de aplicar o que aprendeu?",minLabel:"Ainda preciso praticar",maxLabel:"Consigo fazer sozinho"},
+ {type:"checklist",label:"O que você conseguiu desenvolver?",options:["Compreendi os conceitos apresentados","Acompanhei e realizei a prática guiada","Consegui aplicar o que aprendi","Testei e conferi meu resultado","Identifiquei algo que preciso melhorar"]},
+ {type:"radio",label:"Como você lidou com as dificuldades?",options:["Resolvi pesquisando ou tentando novamente","Precisei de orientação para avançar","Ainda tenho dúvidas que preciso esclarecer","Não encontrei dificuldades significativas"]},
+ {type:"short",label:"Qual foi sua principal conquista ou aprendizado? (uma ou duas frases)"},
+ {type:"url",label:"Link de uma evidência do que você realizou"}
+];}
 function applyEduTechReviewTemplate(){
  if(mission.type!=="training")return;
- mission.steps.forEach(step=>{
-  if(step.type!=="evidence")return;
-  // Mantém o ID da atividade e o vínculo com os registros existentes.
-  step.title="Autoavaliação Individual — EduTech";
-  step.summary="Avalie sua participação, aprendizagem e resultados. Responda com sinceridade e apresente uma evidência.";
+ const reviews=mission.steps.filter(step=>step.type==="evidence");
+ // Se o conteúdo publicado não trouxer relatório, acrescenta o modelo sem alterar os blocos existentes.
+ if(!reviews.length){mission.steps.push({id:"edutech-self-review",type:"evidence"});reviews.push(mission.steps[mission.steps.length-1]);}
+ reviews.forEach(step=>{
+  step.title="Minha evolução na EduTech — Autoavaliação Individual";
+  step.summary="Avalie sua participação, confiança e aprendizagem. Registre uma reflexão curta e uma evidência real.";
   step.fields=getEduTechReviewFields();
+  // Preserva respostas dos formulários antigos em suas chaves originais.
+  step.answerKey=step.id+"::edutech-self-review-v2";
  });
 }
 function render(readOnly=false,access=null){
