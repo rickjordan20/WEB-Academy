@@ -116,3 +116,31 @@
 .edutech-review-fields input[data-evidence][type="url"],.edutech-review-fields input[data-evidence][type="text"]{width:100%;box-sizing:border-box;min-height:46px;border:1px solid #455c78;border-radius:10px;padding:11px 12px;background:#091625;color:#f0f5ff;font:inherit}
 .edutech-review-fields input[data-evidence]:focus-visible{outline:2px solid #a99cff;outline-offset:2px}
 @media(max-width:600px){.edutech-review-fields .review-card-grid{grid-template-columns:1fr}.edutech-review-fields .review-card-content{min-height:75px;flex-direction:row;justify-content:flex-start;text-align:left;padding:10px 15px}}
+
+/* Correção isolada: rótulos de checklist e rádio não podem herdar o grid dos campos discursivos. */
+.learning-step .reflection-fields.edutech-review-fields fieldset.review-checklist,
+.learning-step .reflection-fields.edutech-review-fields fieldset.review-radio{display:block;width:100%;min-width:0;box-sizing:border-box}
+.learning-step .reflection-fields.edutech-review-fields .review-checklist>label,
+.learning-step .reflection-fields.edutech-review-fields .review-radio>label{
+ display:grid!important;grid-template-columns:20px minmax(0,1fr)!important;
+ align-items:start;justify-content:stretch;column-gap:12px;
+ width:100%;max-width:100%;min-width:0;box-sizing:border-box;
+ margin:9px 0;padding:12px 14px;
+ text-align:left;white-space:normal;word-break:normal;overflow-wrap:break-word;
+}
+.learning-step .reflection-fields.edutech-review-fields .review-checklist>label>input,
+.learning-step .reflection-fields.edutech-review-fields .review-radio>label>input{
+ grid-column:1;width:18px!important;height:18px!important;min-height:18px!important;
+ max-width:18px!important;margin:3px 0 0!important;padding:0!important;
+ display:block;flex:none;
+}
+.learning-step .reflection-fields.edutech-review-fields .review-checklist>label>span,
+.learning-step .reflection-fields.edutech-review-fields .review-radio>label>span{
+ grid-column:2;display:block!important;min-width:0;width:auto!important;
+ white-space:normal;word-break:normal;overflow-wrap:break-word;
+ line-height:1.5;font-size:.93rem;font-weight:550;
+}
+@media print{
+ .learning-step .reflection-fields.edutech-review-fields .review-checklist>label,
+ .learning-step .reflection-fields.edutech-review-fields .review-radio>label{break-inside:avoid;page-break-inside:avoid}
+}
