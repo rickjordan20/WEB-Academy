@@ -427,7 +427,7 @@ export const MISSIONS=originalMissions.map((original,index)=>{
  index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:{};
  return {...original,...source,id:original.id,number:index+1,lesson:index+1,phase,displayId,...special,
   // Os blocos personalizados continuam vinculados ao identificador interno original.
-  steps:displayId==="3B"?structuredClone(MISSION_3B_STEPS):index<3?retrospectiveSteps[index]:original.id==="2A"?MISSION_2B_STEPS.filter(step=>step.id.startsWith("2b-p1")||step.id.startsWith("2b-p2")||step.id.startsWith("2b-p3")||step.id==="2b-p7"):original.id==="2B"?[...MISSION_2B_STEPS,guidedSteps(2,"HTML","Estrutura Inicial do EduTech")[1]]:original.steps};
+  steps:displayId==="3B"?structuredClone(MISSION_3B_STEPS):index<3?retrospectiveSteps[index]:original.id==="2A"||original.id==="2B"?MISSION_2B_STEPS.filter(step=>["2b-p1","2b-p2","2b-p3","2b-p5","2b-p7"].includes(step.id)):displayId==="2B"?MISSION_2B_STEPS.filter(step=>["2b-p4","2b-p6"].includes(step.id)):original.steps};
 });
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
