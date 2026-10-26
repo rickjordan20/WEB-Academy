@@ -111,13 +111,13 @@ export async function mountMissionDelivery(missionId,access,root){
    const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
    const estimate=estimateMissionXp(currentMission,progressSnapshot);
    const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value,lateConsent:consent?.checked});
-   if(confirmedFingerprint!==fingerprint){
+   if(confirmedFingerprint!==fingerprint && !preflight.querySelector("[data-confirm-delivery]")?.checked){
     confirmedFingerprint=fingerprint;
     const missing=[...pending.map(s=>"Missão: "+s.title),...fundamentalPending.map(s=>"Fundamentos: "+s.title)];
     preflight.hidden=false;
-    preflight.innerHTML='<strong>Revisão antes do envio</strong><p>Progresso registrado: '+estimate.completed+' de '+estimate.total+' etapas ('+estimate.percent+'%). XP sugerido: '+estimate.xp+' de '+estimate.max+'.</p>'+(missing.length?'<p><strong>'+missing.length+' item(ns) ainda sem check:</strong></p><ul>'+missing.map(t=>'<li>'+safe(t)+'</li>').join("")+'</ul><p>Você pode enviar assim mesmo. Os itens não concluídos serão apresentados ao instrutor.</p>':'<p>Todos os checks previstos estão registrados. Confirme para enviar.</p>')+'<p><strong>Confirme o envio clicando novamente no botão abaixo.</strong></p>';
-    button.textContent="Confirmar envio →";
-    feedback.textContent="Confira o resumo antes de confirmar.";
+    preflight.innerHTML='<strong>Revisão antes do envio</strong><p>Progresso registrado: '+estimate.completed+' de '+estimate.total+' etapas ('+estimate.percent+'%). XP sugerido: '+estimate.xp+' de '+estimate.max+'.</p>'+(missing.length?'<p><strong>'+missing.length+' item(ns) ainda sem check:</strong></p><ul>'+missing.map(t=>'<li>'+safe(t)+'</li>').join("")+'</ul><p>Você pode enviar assim mesmo. Os itens não concluídos serão apresentados ao instrutor.</p>':'<p>Todos os checks previstos estão registrados. Confirme para enviar.</p>')+'<label style="display:flex;gap:.6rem;align-items:flex-start;margin-top:1rem"><input type="checkbox" data-confirm-delivery> <span>Revisei o resumo e autorizo o envio desta entrega para avaliação.</span></label><p><strong>Marque a confirmação acima e clique em Enviar para avaliação.</strong></p>';
+    button.textContent="Enviar para avaliação →";
+    feedback.textContent="Revise o resumo, marque a caixa de confirmação e clique novamente para enviar.";
     preflight.scrollIntoView({behavior:"smooth",block:"nearest"});
     return;
    }
