@@ -47,11 +47,11 @@ function organizeEduTechPanels(){
  const host=document.createElement("div");host.className="edutech-stage-content";host.id="edutechStageContent";flow.insertAdjacentElement("afterend",host);
  const panels=["fundamentals","practice","report"].map((key,i)=>{const panel=document.createElement("section");panel.className="edutech-stage-panel";panel.dataset.eduPanel=key;panel.setAttribute("aria-label",stageLinks[i]?.querySelector("strong")?.textContent||key);panel.hidden=true;host.append(panel);return panel});
  panels[0].append(fundamentals);
- const project=root.querySelector(".project-context");
+ const project=root.querySelector(".project-context, .project-context-card, .mission-project-context");
  const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
  if(project)panels[1].append(project);
- if(guided){const children=[...guided.children];const reportItems=children.filter(el=>el.id==="individualReport"||el.querySelector('[data-mission-step]')?.dataset.missionStep==="individualReport");panels[1].append(guided);for(const el of reportItems)panels[2].append(el)}
- const open=key=>{activeEduTechPanel=key;panels.forEach(p=>p.hidden=p.dataset.eduPanel!==key);stageLinks.forEach((link,i)=>{const selected=panels[i].dataset.eduPanel===key;link.classList.toggle("active",selected);link.setAttribute("aria-expanded",String(selected));link.setAttribute("aria-controls","edutechStageContent")});host.scrollIntoView({behavior:"smooth",block:"start"})};
+ if(guided){const children=[...guided.children];const reportIds=new Set(mission.steps.filter(step=>step.type==="evidence").map(step=>step.id));const reportItems=children.filter(el=>el.id==="individualReport"||reportIds.has(el.dataset.missionStep));panels[1].append(guided);for(const el of reportItems)panels[2].append(el)}
+ const open=key=>{const previous=activeEduTechPanel;activeEduTechPanel=key;panels.forEach(p=>p.hidden=p.dataset.eduPanel!==key);stageLinks.forEach((link,i)=>{const selected=panels[i].dataset.eduPanel===key;link.classList.toggle("active",selected);link.setAttribute("aria-expanded",String(selected));link.setAttribute("aria-controls","edutechStageContent")});if(previous!==key&&document.activeElement?.closest(".lesson-stage"))host.scrollIntoView({behavior:"smooth",block:"start"})};
  stageLinks.forEach((link,i)=>{link.setAttribute("role","button");link.addEventListener("click",event=>{event.preventDefault();open(panels[i].dataset.eduPanel)})});
  open(activeEduTechPanel||"fundamentals");
 }
