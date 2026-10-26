@@ -88,7 +88,7 @@ function displayExtraAnswer(key,value){
  return '<div class="eval-submitted"><small>'+esc(/^q[0-9]+$/i.test(label)?"Questão "+label.slice(1):"Registro complementar")+'</small>'+answerHTML(value)+'</div>';
 }
 function objectiveResult(step,answer){
- if(!["quiz","checkpoint"].includes(step.type)||!Array.isArray(step.options)||!Number.isInteger(Number(step.answer)))return null;
+ if(!["quiz","checkpoint"].includes(step.type)||!Array.isArray(step.options)||step.answer===null||step.answer===undefined||!Number.isInteger(Number(step.answer)))return null;
  const selected=(typeof answer==="number"||typeof answer==="string"&&/^[0-9]+$/.test(answer.trim()))?Number(answer):null;
  if(selected===null||!Number.isInteger(selected)||selected<0||selected>=step.options.length)return {answered:false};
  const correct=Number(step.answer);
