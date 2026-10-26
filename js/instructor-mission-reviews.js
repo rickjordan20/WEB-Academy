@@ -51,7 +51,7 @@ function renderList(box){
 const stepTypeLabels={content:"Conteúdo de estudo","visual-summary":"Resumo visual","image-review":"Revisão visual",flashcards:"Cartões de revisão",quiz:"Questão",checkpoint:"Questão objetiva",evidence:"Registro de evidência",practice:"Atividade prática"};
 function responseForStep(answers,unitId,step){
  const prefix=unitId+":"+step.id;
- const entries=Object.entries(answers||{}).filter(([key])=>key===prefix||key.startsWith(prefix+":"));
+ const entries=Object.entries(answers||{}).filter(([key])=>key===prefix||key.startsWith(prefix+":")||(step.type==="quiz"&&/^\\d+$/.test(key.slice(prefix.length))&&key.startsWith(prefix)));
  return {value:entries.find(([key])=>key===prefix)?.[1],extras:entries.filter(([key])=>key!==prefix&&!key.endsWith(":revealed")),keys:entries.map(([key])=>key)};
 }
 function displayExtraAnswer(key,value){
