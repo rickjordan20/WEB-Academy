@@ -155,7 +155,7 @@ function autoPanel(r,mission,fundamental){
  const responded=objectives.filter(x=>x.result.answered).length;
  const completed=checks.filter(x=>x.checked).length;
  const saved=r.grades?.blocks||{};
- const checkFeedback=r.grades?.checksFeedback||"";
+ const checkFeedback=safeAiFeedback(r.grades?.checksFeedback);
  return '<section class="eval-block eval-auto-panel"><div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-generate-feedback>Gerar sugestões de feedback</button><button type="button" class="btn btn-secondary btn-small" data-ai-review>Analisar entrega com IA</button><small class="muted" data-suggestion-status>Sem IA · Apenas campos vazios · Revisão do instrutor</small><small class="muted" data-ai-review-status role="status"></small></div><div class="eval-ai-review-result" data-ai-review-result hidden></div><h3>1. Checks de toda a missão</h3><p class="muted">Resumo único de todos os checks, incluindo Fundamentos, questões e etapas práticas. O check indica conclusão registrada; a avaliação das competências considera também as respostas e evidências.</p>'+
  '<div class="eval-progress-summary"><div><small>Checks registrados</small><strong>'+completed+'/'+checks.length+'</strong></div><div><small>Questões com gabarito</small><strong>'+correct+'/'+objectives.length+' corretas</strong><p class="muted">'+responded+' respondidas</p></div></div>'+
  (checks.length?'<div class="eval-checks-grid">'+checks.map(({unit,step,checked})=>'<div class="eval-auto-line"><strong>'+esc(step.title||step.id)+'</strong><span>'+(checked?'✓ Marcado':'Não marcado')+'</span><small>'+esc(unit)+'</small></div>').join("")+'</div>':'<p class="muted">Nenhum check configurado.</p>')+
@@ -334,7 +334,7 @@ function openReview(box,id){
      if(field&&!field.value.trim()&&value){field.value=value;applied++}
     }
     const checks=box.querySelector("[data-checks-feedback]");
-    if(checks&&!checks.value.trim()){const suggested=safeAiFeedback(data.checks_feedback)||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
+    if(checks&&!checks.value.trim()){const suggested=safeAiFeedback(data.checks_feedback)||safeAiFeedback(autoSuggestions.checks);if(suggested){checks.value=suggested;applied++}}
     const summary=inds.map(code=>{
      const relevant=blocks.filter(b=>(b.indicators||[]).some(i=>i.code===code));
      const evidence=relevant.filter(b=>b.evidence_used?.length||b.question_analysis?.some(q=>q.status==="atendida"||q.status==="parcial"));
