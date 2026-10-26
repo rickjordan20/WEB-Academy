@@ -214,6 +214,12 @@ function suggestedXpPlan(mission,foundation,maxXp,submission){
  });
  return {items,total:items.reduce((sum,x)=>sum+x.suggested,0),max:maxXp};
 }
+function safeAiFeedback(value){
+ if(typeof value==="string")return value.trim();
+ if(Array.isArray(value))return value.map(safeAiFeedback).filter(Boolean).join(" ");
+ if(value&&typeof value==="object")return ["feedback","summary","text","comment","message","notes"].map(k=>safeAiFeedback(value[k])).find(Boolean)||"";
+ return "";
+}
 function indicatorEvidenceSuggestions(box,codes,aiEntries=[]){
  return codes.map(code=>{
   const radios=[...box.querySelectorAll('input[name^="block-ind-"]')].filter(el=>el.name.endsWith(":"+code));
@@ -302,7 +308,7 @@ function openReview(box,id){
      const matching=blockFields.filter(el=>key?el.dataset.blockComment===key:el.dataset.blockComment?.endsWith(":"+block.step_id));
      if(matching.length!==1)continue;
      const field=matching[0];
-     if(!field.value.trim()&&block.feedback?.trim()){field.value=block.feedback.trim();applied++}
+     if(!field.value.trim()&&safeAiFeedback(block.feedback)){field.value=safeAiFeedback(block.feedback);applied++}
      const codeList=Array.isArray(block.indicators)?block.indicators:[];
      for(const suggestion of codeList){
       if(!["A","PA","NA"].includes(suggestion.mention))continue;
@@ -328,7 +334,7 @@ function openReview(box,id){
      if(field&&!field.value.trim()&&value){field.value=value;applied++}
     }
     const checks=box.querySelector("[data-checks-feedback]");
-    if(checks&&!checks.value.trim()){const suggested=data.checks_feedback?.trim()||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
+    if(checks&&!checks.value.trim()){const suggested=safeAiFeedback(data.checks_feedback)||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
     const summary=inds.map(code=>{
      const relevant=blocks.filter(b=>(b.indicators||[]).some(i=>i.code===code));
      const evidence=relevant.filter(b=>b.evidence_used?.length||b.question_analysis?.some(q=>q.status==="atendida"||q.status==="parcial"));
@@ -364,16 +370,18 @@ function openReview(box,id){
       return fraction===null?item.suggested:Math.min(item.suggested,Math.round(item.cap*fraction));
      });
      const aiXp=Math.min(xpPlan.total,maxXp,scores.reduce((a,b)=>a+b,0));
+     const xpBreakdown=xpPlan.items.filter(item=>item.cap>0).map((item,i)=>({title:item.step.title||item.step.id,eligible:item.suggested,suggested:scores[i],discount:item.suggested-scores[i]}));
      const reviewedBlocks=aiBlocks.filter(b=>xpPlan.items.some(item=>item.answered&&(b.review_key===item.key||(!b.review_key&&String(b.step_id)===String(item.step.id)))));
      const qualityMeasured=reviewedBlocks.some(b=>typeof b.quality_score==="number"||Array.isArray(b.question_analysis)&&b.question_analysis.length);
 
      if(g.xp==null&&qualityMeasured){xpInput.value=String(aiXp);applied++}
      const xpNote=box.querySelector("[data-xp-plan]");
-     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA sugere "+aiXp+" XP com base em "+reviewedBlocks.length+" bloco(s) analisado(s); revise os demais antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
+     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA sugere "+aiXp+" XP com base em "+reviewedBlocks.length+" bloco(s) analisado(s). Distribuição: "+xpBreakdown.map(x=>x.title+": "+x.suggested+"/"+x.eligible+" XP"+(x.discount?" (redução de "+x.discount+" XP; conferir qualidade e evidência)":"")).join(" · ")+". Revise antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
     }
     // Não aplicar menções gerais da IA sem correspondência com evidências da missão.
     for(const i of entries){
      if(!["A","PA"].includes(i.mention))continue;
+     if(!blocks.some(b=>(b.indicators||[]).some(v=>v.code===i.code&&(v.mention==="A"||v.mention==="PA")&&(b.evidence_used?.length||b.question_analysis?.some(q=>q.status==="atendida"||q.status==="parcial")))))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
      if(radios.some(x=>x.checked))continue;
      const target=radios.find(x=>x.value===i.mention);
