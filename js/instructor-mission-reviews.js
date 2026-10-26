@@ -235,7 +235,7 @@ function openReview(box,id){
   try{
    const sb=window.__evalSupabase;
    const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:reviewMission.steps,competencies:inds}}});
-   if(error)throw new Error(data?.error||error.message||"Falha de conexão");
+   if(error){let detail=data?.error;try{if(!detail&&error.context?.json){const body=await error.context.json();detail=body?.error||body?.message}}catch{}throw new Error(detail||error.message||"Falha de conexão")}
    if(data?.error)throw new Error(data.error);
    const result=box.querySelector("[data-ai-review-result]");
    const entries=Array.isArray(data.indicators)?data.indicators:[];
