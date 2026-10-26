@@ -156,7 +156,7 @@ function autoPanel(r,mission,fundamental){
  const completed=checks.filter(x=>x.checked).length;
  const saved=r.grades?.blocks||{};
  const checkFeedback=r.grades?.checksFeedback||"";
- return '<section class="eval-block eval-auto-panel"><div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-generate-feedback>Gerar sugestões de feedback</button><small class="muted" data-suggestion-status>Sem IA · Apenas campos vazios · Revisão do instrutor</small></div><h3>1. Checks de toda a missão</h3><p class="muted">Resumo único de todos os checks, incluindo Fundamentos, questões e etapas práticas. O check indica conclusão registrada; a avaliação das competências considera também as respostas e evidências.</p>'+
+ return '<section class="eval-block eval-auto-panel"><div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-generate-feedback>Gerar sugestões de feedback</button><button type="button" class="btn btn-secondary btn-small" data-ai-review>Analisar entrega com IA</button><small class="muted" data-suggestion-status>Sem IA · Apenas campos vazios · Revisão do instrutor</small><small class="muted" data-ai-review-status role="status"></small></div><div class="eval-ai-review-result" data-ai-review-result hidden></div><h3>1. Checks de toda a missão</h3><p class="muted">Resumo único de todos os checks, incluindo Fundamentos, questões e etapas práticas. O check indica conclusão registrada; a avaliação das competências considera também as respostas e evidências.</p>'+
  '<div class="eval-progress-summary"><div><small>Checks registrados</small><strong>'+completed+'/'+checks.length+'</strong></div><div><small>Questões com gabarito</small><strong>'+correct+'/'+objectives.length+' corretas</strong><p class="muted">'+responded+' respondidas</p></div></div>'+
  (checks.length?'<div class="eval-checks-grid">'+checks.map(({unit,step,checked})=>'<div class="eval-auto-line"><strong>'+esc(step.title||step.id)+'</strong><span>'+(checked?'✓ Marcado':'Não marcado')+'</span><small>'+esc(unit)+'</small></div>').join("")+'</div>':'<p class="muted">Nenhum check configurado.</p>')+
  '<label class="eval-comment-label"><strong>Feedback único dos checks</strong><textarea class="admin-input" rows="3" data-checks-feedback placeholder="Avalie em conjunto todos os checks e as evidências de conclusão.">'+esc(checkFeedback)+'</textarea></label>'+
@@ -227,6 +227,41 @@ function openReview(box,id){
   const textarea=[...box.querySelectorAll("[data-block-comment]")].find(el=>el.dataset.blockComment===select.dataset.feedbackTemplate);
   if(textarea){textarea.value=select.options[select.selectedIndex].textContent;textarea.focus()}
  }));
+ box.querySelector("[data-ai-review]")?.addEventListener("click",async()=>{
+  const button=box.querySelector("[data-ai-review]");
+  const status=box.querySelector("[data-ai-review-status]");
+  button.disabled=true;button.textContent="Analisando...";
+  if(status)status.textContent="Analisando as evidências por indicador. Nenhuma menção será aplicada automaticamente.";
+  try{
+   const sb=window.__evalSupabase;
+   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id}});
+   if(error)throw new Error(data?.error||error.message||"Falha de conexão");
+   if(data?.error)throw new Error(data.error);
+   const result=box.querySelector("[data-ai-review-result]");
+   const entries=Array.isArray(data.indicators)?data.indicators:[];
+   result.innerHTML='<h4>Parecer sugerido pela IA — revisão obrigatória</h4>'+
+    '<p>'+esc(data.summary||"")+'</p>'+
+    entries.map(i=>'<article class="eval-ai-indicator"><strong>'+esc(i.code)+' · '+esc(i.mention==="SEM_EVIDENCIA"?"Sem evidência suficiente":i.mention)+'</strong><p>'+esc(i.justification||"")+'</p>'+(i.evidence?.length?'<small>Evidências: '+esc(i.evidence.join("; "))+'</small>':"")+(i.gaps?.length?'<small>Lacunas: '+esc(i.gaps.join("; "))+'</small>':"")+'</article>').join("")+
+    '<label class="eval-comment-label">Feedback geral sugerido<textarea class="admin-input" rows="5" data-ai-feedback-draft>'+esc(data.feedback||"")+'</textarea></label>'+
+    '<div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-ai-apply>Aplicar sugestões aos campos vazios</button></div>';
+   result.hidden=false;
+   result.querySelector("[data-ai-apply]").onclick=()=>{
+    let applied=0;
+    const general=box.querySelector("[data-eval-feedback]");
+    if(general&&!general.value.trim()){general.value=result.querySelector("[data-ai-feedback-draft]").value;applied++}
+    for(const i of entries){
+     if(!["A","PA","NA"].includes(i.mention))continue;
+     const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
+     if(radios.some(x=>x.checked))continue;
+     const target=radios.find(x=>x.value===i.mention);
+     if(target){target.checked=true;applied++}
+    }
+    if(status)status.textContent=applied+" sugestão(ões) aplicada(s) em campos vazios. Revise as menções e o feedback antes de salvar.";
+   };
+   if(status)status.textContent="Parecer disponível para conferência. Nenhuma avaliação foi salva.";
+  }catch(error){if(status)status.textContent="Análise indisponível: "+error.message}
+  finally{button.disabled=false;button.textContent="Analisar entrega com IA"}
+ });
  box.querySelector("[data-generate-feedback]")?.addEventListener("click",()=>{
   const suggestions=feedbackSuggestions(r,reviewMission,reviewFundamental);
   let applied=0,skipped=0;
