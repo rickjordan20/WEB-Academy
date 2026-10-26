@@ -37,7 +37,7 @@ test('outro estudante não herda contribuições do colega',async()=>{
  assert.match(target.innerHTML,/não comprovação automática de aprendizagem/);
 });
 test('XP proporcional considera apenas etapas existentes',async()=>{
- const {estimateMissionXp}=await load('../js/mission-assessment-utils.js');
+ const {estimateMissionXp}=await load('../js/missions/mission-assessment-utils.js');
  const result=estimateMissionXp({maxXp:120,steps:[{id:'a'},{id:'b'},{id:'c'}]},{version:1,mission:{completedSteps:['a','invalid']}});
  assert.equal(result.completed,1);
  assert.equal(result.xp,40);
