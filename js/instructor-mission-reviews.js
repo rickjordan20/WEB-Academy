@@ -193,6 +193,46 @@ function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  return '<details class="eval-block eval-review-step" '+((hasAnswer||response.extras.length||blockCodes.length)?'open':'')+'><summary class="eval-block-head"><strong>'+(idx+1)+'. '+esc(step.title||step.id)+'</strong><span>'+esc(stepTypeLabels[step.type]||step.type||"Etapa")+'</span></summary>' +promptHtml+(step.goal?'<p class="muted">'+esc(step.goal)+'</p>':"")+'<p class="eval-check-status">'+esc(label)+'</p>' +autoSummary+(hasAnswer?'<div class="eval-submitted"><small>Resposta enviada</small>'+displayAnswer+'</div>':informational?'<p class="muted">Bloco informativo, sem resposta textual obrigatória.</p>':checked?'<p class="muted">Conclusão registrada por check. Esta etapa não contém resposta textual salva.</p>':'<p class="muted">Não há resposta textual nesta entrega.</p>')+response.extras.map(([key,value])=>displayExtraAnswer(key,value)).join("")+(attempts?'<p class="muted">Verificações de código: '+esc(attempts.count||0)+' · Aprovadas: '+esc(attempts.passed||0)+'</p>':"")+progress.map(x=>'<div class="eval-submitted">'+answerHTML(x)+'</div>').join("")+blockAssessment+'<div class="eval-feedback-tools"><label>Modelo de feedback<select class="admin-input" data-feedback-template="'+esc(unitId+":"+step.id)+'"><option value="">Escolher sugestão (opcional)</option>'+suggestions.map((s,i)=>'<option value="'+i+'">'+esc(s)+'</option>').join("")+'</select></label><label class="eval-comment-label">Feedback deste bloco<textarea class="admin-input" rows="2" data-block-comment="'+esc(unitId+":"+step.id)+'" placeholder="Edite ou escreva uma orientação personalizada"></textarea></label></div></details>'
 }
 
+function suggestedXpPlan(mission,foundation,maxXp,submission){
+ const units=[...(foundation?.steps||[]).map(step=>({step,unit:foundation.id})),...(mission?.steps||[]).map(step=>({step,unit:mission.id}))];
+ const eligible=units.filter(({step})=>step.visible!==false&&step.required!==false);
+ const weight=step=>["practice","code","evidence","upload","form"].includes(step.type)?3:["reflection","text","textarea","quiz","checkpoint"].includes(step.type)?2:1;
+ const total=eligible.reduce((sum,{step})=>sum+weight(step),0);
+ const raw=eligible.map(({step,unit})=>({key:unit+":"+step.id,raw:maxXp*weight(step)/Math.max(1,total)}));
+ const allocated=new Map(raw.map(x=>[x.key,Math.floor(x.raw)]));
+ let remainder=maxXp-[...allocated.values()].reduce((a,b)=>a+b,0);
+ for(const item of [...raw].sort((a,b)=>(b.raw-Math.floor(b.raw))-(a.raw-Math.floor(a.raw)))){if(remainder--<=0)break;allocated.set(item.key,allocated.get(item.key)+1)}
+ const items=units.map(({step,unit})=>{
+  const key=unit+":"+step.id;
+  const response=responseForStep(submission.answers,unit,step);
+  const checkList=unit===mission.id?submission.progress_snapshot?.mission?.completedSteps:submission.progress_snapshot?.fundamentals?.completedSteps;
+  const checked=Array.isArray(checkList)&&checkList.includes(step.id);
+  const objective=objectiveResult(step,response.value);
+  const evidence=Boolean(response.value!==undefined&&response.value!==null&&response.value!=="")||response.extras.length>0;
+  const cap=allocated.get(key)||0;
+  const factor=objective?(objective.passed?1:objective.answered?0.25:0):checked?(evidence||["content","visual-summary","flashcards"].includes(step.type)?1:0.65):evidence?0.5:0;
+  return {key,step,cap,suggested:Math.round(cap*factor),checked,evidence};
+ });
+ return {items,total:items.reduce((sum,x)=>sum+x.suggested,0),max:maxXp};
+}
+function indicatorEvidenceSuggestions(box,codes,aiEntries=[]){
+ return codes.map(code=>{
+  const radios=[...box.querySelectorAll('input[name^="block-ind-"]')].filter(el=>el.name.endsWith(":"+code));
+  const groups=[...new Set(radios.map(el=>el.name))];
+  const mentions=groups.map(name=>box.querySelectorAll('input[name="'+name+'"]:checked')[0]?.value).filter(Boolean);
+  const ai=aiEntries.find(item=>item.code===code);
+  const evidenceCount=mentions.filter(x=>x==="A"||x==="PA").length;
+  let suggestion=null;
+  if(mentions.length&&mentions.length===groups.length)suggestion=mentions.every(x=>x==="A")?"A":mentions.includes("NA")?"NA":"PA";
+  else if(mentions.length)suggestion=mentions.every(x=>x==="A")?"A":"PA";
+  if(ai&&["A","PA","NA"].includes(ai.mention)){
+   if(suggestion==="A"&&ai.mention!=="A")suggestion="PA";
+   else if(!suggestion)suggestion=ai.mention;
+  }
+  if(!evidenceCount&&suggestion==="A")suggestion=null;
+  return {code,suggestion,evidenceCount,assessed:mentions.length,total:groups.length,ai:ai?.mention||null};
+ });
+}
 function openReview(box,id){
  const r=rows.find(x=>x.id===id);if(!r)return;current=id;const m=missionOf(r.mission_id,r.class_id);const inds=indicators(m);const g=r.grades||{},blockComments=g.blocks||{},concepts=g.indicators||{};
  const answers=keysFor(m,r.answers);const snapshot=r.progress_snapshot||{};const estimate=estimateMissionXp(m,snapshot);const maxXp=missionMaxXp(m);
@@ -203,6 +243,7 @@ function openReview(box,id){
  const configured=effectiveDefinition(r,m,fundamental);
  const reviewMission={...m,steps:configured.steps};
  const reviewFundamental=fundamental?{...fundamental,steps:configured.fundamental.steps}:null;
+ const xpPlan=suggestedXpPlan(reviewMission,reviewFundamental,maxXp,r);
  const audit=checkSummary(r,m,reviewMission.steps,fundamental,reviewFundamental?.steps||[]);
  const unmatchedHistorical=Object.keys(r.answers||{}).filter(k=>k.startsWith(m.id+":")&&!reviewMission.steps.some(step=>k===m.id+":"+step.id||k.startsWith(m.id+":"+step.id+":")));
  const historicalWarning=(audit.obsolete.length||unmatchedHistorical.length||audit.historical.length)?'<div class="eval-history-warning" role="note"><strong>Conferência de versão necessária</strong><p>A entrega possui '+audit.obsolete.length+' check(s) de etapas ausentes na configuração atual e '+unmatchedHistorical.length+' registro(s) de resposta sem etapa correspondente. Esses dados históricos permanecem preservados e não devem ser interpretados como falha do estudante.</p><p class="muted">Etapas históricas: '+esc(audit.historical.join(" · ")||audit.obsolete.join(" · ")||"não identificadas")+'</p></div>':"";
@@ -212,7 +253,7 @@ function openReview(box,id){
  const manualFundamental=(reviewFundamental?.steps||[]).filter(step=>isManualStep(step,responseForStep(r.answers,reviewFundamental.id,step)));
  const assigned=new Set([...(reviewMission?.steps||[]).flatMap(step=>responseForStep(r.answers,m.id,step).keys),...(reviewFundamental?.steps||[]).flatMap(step=>responseForStep(r.answers,reviewFundamental.id,step).keys)]);
  const extra=answers.filter(([k])=>!assigned.has(k)&&!k.endsWith(":revealed"));
- box.innerHTML='<button class="btn btn-secondary btn-small" data-eval-back>← Voltar à Central</button><header class="eval-detail-header"><p class="eyebrow">Ficha individual de avaliação</p><h2>'+esc(m?.title||r.mission_id)+'</h2><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span></header>'+(r.is_late?'<div class="eval-late-box"><strong>Entrega fora do prazo</strong><p>Motivo: '+esc(r.late_reason||"Não informado")+'</p><p>Justificativa: '+esc(r.late_explanation||"Não informada")+'</p></div>':"")+missionProgress+historicalWarning+'<div class="eval-progress-summary"><div><small>XP estimado (não é menção)</small><strong>'+estimate.xp+' / '+maxXp+' XP</strong><p class="muted">Estimativa técnica. Revisar evidências antes de aprovar.</p></div></div><h3>Produção enviada pelo estudante</h3><p class="muted">Respostas preservadas no momento da entrega. O conteúdo original da missão serve como referência; não é uma área de edição.</p>'+autoPanel(r,reviewMission,reviewFundamental)+'<h3>3. Respostas discursivas e evidências práticas</h3><p class="muted">Somente estas atividades precisam de avaliação manual individual.</p>'+(manualMission.length?manualMission.map((step,i)=>reviewBlock(r,reviewMission,step,i,m.id,snapshot.mission?.completedSteps||[])).join(""):"")+(manualFundamental.length?'<h4>Fundamentos — atividades discursivas</h4>'+manualFundamental.map((step,i)=>reviewBlock(r,reviewMission,step,i,reviewFundamental.id,snapshot.fundamentals?.completedSteps||[])).join(""):"")+(extra.length?'<section class="eval-block"><h3>Outros registros da missão</h3>'+extra.map(([k,v])=>displayExtraAnswer(k,v)).join("")+'</section>':"")+(Array.isArray(r.evidence)&&r.evidence.length?'<section class="eval-block"><h3>Evidências adicionais</h3>'+r.evidence.filter(e=>!((reviewMission?.steps||[]).concat(reviewFundamental?.steps||[]).some(step=>step.id===(e?.stepId||e?.step_id)))).map(e=>'<div class="eval-submitted">'+answerHTML(e)+'</div>').join("")+'</section>':"")+'<section class="eval-block"><h3>Consolidação dos indicadores</h3><p class="muted">Registre a menção com base nas evidências da missão. A menção final da UC continua sob responsabilidade do instrutor.</p>'+(inds.length?inds.map(code=>'<div class="eval-indicator"><strong>'+esc(code)+'</strong><div class="eval-concepts">'+["A","PA","NA"].map(v=>'<label><input type="radio" name="eval-ind-'+esc(code)+'" value="'+v+'" '+(concepts[code]===v?"checked":"")+'> '+v+'</label>').join("")+'</div></div>').join(""):'<p class="muted">Esta missão não possui indicadores configurados.</p>')+'</section><section class="eval-block"><h3>Resultado e devolutiva</h3><label class="eval-comment-label">Feedback geral<textarea class="admin-input" rows="4" data-eval-feedback placeholder="Destaque avanços, dificuldades e próximos passos">'+esc(r.feedback||"")+'</textarea></label><label class="eval-comment-label">XP sugerido (editável; máximo da missão: '+maxXp+' XP)<input class="admin-input" type="number" min="0" max="'+maxXp+'" step="1" data-eval-xp value="'+esc(g.xp??(hasSnapshot?estimate.xp:0))+'"></label><p class="muted">O XP por bloco exige check registrado e confirmação do instrutor. Ao concluir a avaliação, o valor aprovado será registrado na ficha; a atualização do saldo do estudante ainda depende da integração segura com o sistema de pontuação.</p><div class="eval-actions"><button class="btn btn-secondary" data-eval-save="draft">Salvar rascunho</button><button class="btn btn-secondary" data-eval-save="changes_requested">Solicitar ajustes</button><button class="btn btn-primary" data-eval-save="evaluated">Concluir avaliação</button></div><p data-eval-message role="status"></p></section>';
+ box.innerHTML='<button class="btn btn-secondary btn-small" data-eval-back>← Voltar à Central</button><header class="eval-detail-header"><p class="eyebrow">Ficha individual de avaliação</p><h2>'+esc(m?.title||r.mission_id)+'</h2><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span></header>'+(r.is_late?'<div class="eval-late-box"><strong>Entrega fora do prazo</strong><p>Motivo: '+esc(r.late_reason||"Não informado")+'</p><p>Justificativa: '+esc(r.late_explanation||"Não informada")+'</p></div>':"")+missionProgress+historicalWarning+'<div class="eval-progress-summary"><div><small>XP estimado (não é menção)</small><strong>'+estimate.xp+' / '+maxXp+' XP</strong><p class="muted">Estimativa técnica. Revisar evidências antes de aprovar.</p></div></div><h3>Produção enviada pelo estudante</h3><p class="muted">Respostas preservadas no momento da entrega. O conteúdo original da missão serve como referência; não é uma área de edição.</p>'+autoPanel(r,reviewMission,reviewFundamental)+'<h3>3. Respostas discursivas e evidências práticas</h3><p class="muted">Somente estas atividades precisam de avaliação manual individual.</p>'+(manualMission.length?manualMission.map((step,i)=>reviewBlock(r,reviewMission,step,i,m.id,snapshot.mission?.completedSteps||[])).join(""):"")+(manualFundamental.length?'<h4>Fundamentos — atividades discursivas</h4>'+manualFundamental.map((step,i)=>reviewBlock(r,reviewMission,step,i,reviewFundamental.id,snapshot.fundamentals?.completedSteps||[])).join(""):"")+(extra.length?'<section class="eval-block"><h3>Outros registros da missão</h3>'+extra.map(([k,v])=>displayExtraAnswer(k,v)).join("")+'</section>':"")+(Array.isArray(r.evidence)&&r.evidence.length?'<section class="eval-block"><h3>Evidências adicionais</h3>'+r.evidence.filter(e=>!((reviewMission?.steps||[]).concat(reviewFundamental?.steps||[]).some(step=>step.id===(e?.stepId||e?.step_id)))).map(e=>'<div class="eval-submitted">'+answerHTML(e)+'</div>').join("")+'</section>':"")+'<section class="eval-block"><h3>Consolidação dos indicadores</h3><p class="muted">Registre a menção com base nas evidências da missão. A menção final da UC continua sob responsabilidade do instrutor.</p>'+(inds.length?inds.map(code=>'<div class="eval-indicator"><strong>'+esc(code)+'</strong><div class="eval-concepts">'+["A","PA","NA"].map(v=>'<label><input type="radio" name="eval-ind-'+esc(code)+'" value="'+v+'" '+(concepts[code]===v?"checked":"")+'> '+v+'</label>').join("")+'</div></div>').join(""):'<p class="muted">Esta missão não possui indicadores configurados.</p>')+'</section><section class="eval-block"><h3>Resultado e devolutiva</h3><label class="eval-comment-label">Feedback geral<textarea class="admin-input" rows="4" data-eval-feedback placeholder="Destaque avanços, dificuldades e próximos passos">'+esc(r.feedback||"")+'</textarea></label><label class="eval-comment-label">XP sugerido (editável; máximo da missão: '+maxXp+' XP)<input class="admin-input" type="number" min="0" max="'+maxXp+'" step="1" data-eval-xp value="'+esc(g.xp??xpPlan.total)+'"></label><p class="muted">O XP é sugerido automaticamente por complexidade, respostas e progresso. A distribuição é apenas uma proposta; a publicação depende da revisão e confirmação do instrutor. Ao concluir a avaliação, o valor aprovado será registrado na ficha; a atualização do saldo do estudante ainda depende da integração segura com o sistema de pontuação.</p><div class="eval-actions"><button class="btn btn-secondary" data-eval-save="draft">Salvar rascunho</button><button class="btn btn-secondary" data-eval-save="changes_requested">Solicitar ajustes</button><button class="btn btn-primary" data-eval-save="evaluated">Concluir avaliação</button></div><p data-eval-message role="status"></p></section>';
  if(m?.type==="guild")mountMissionParticipation(box.querySelector("[data-review-participation]"),{missionId:r.mission_id,classId:r.class_id,studentId:r.student_id,teacher:true}).catch(console.warn);
  box.querySelector("[data-eval-back]").onclick=()=>{current=null;renderList(box)};
  box.querySelectorAll("[data-block-comment]").forEach(el=>{
@@ -227,6 +268,10 @@ function openReview(box,id){
   const textarea=[...box.querySelectorAll("[data-block-comment]")].find(el=>el.dataset.blockComment===select.dataset.feedbackTemplate);
   if(textarea){textarea.value=select.options[select.selectedIndex].textContent;textarea.focus()}
  }));
+ const xpField=box.querySelector("[data-eval-xp]");
+ const xpInfo=document.createElement("p");
+ xpInfo.className="muted";xpInfo.dataset.xpPlan="";xpInfo.textContent="Distribuição sugerida: "+xpPlan.items.filter(x=>x.cap>0).map(x=>x.step.title+": "+x.suggested+"/"+x.cap+" XP").join(" · ")+". Total: "+xpPlan.total+"/"+maxXp+" XP. Editável e sujeito à revisão.";
+ xpField?.closest("label")?.after(xpInfo);
  box.querySelector("[data-ai-review]")?.addEventListener("click",async()=>{
   const button=box.querySelector("[data-ai-review]");
   const status=box.querySelector("[data-ai-review-status]");
@@ -276,6 +321,16 @@ function openReview(box,id){
     }
     const checks=box.querySelector("[data-checks-feedback]");
     if(checks&&!checks.value.trim()){const suggested=data.checks_feedback?.trim()||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
+    const consolidation=indicatorEvidenceSuggestions(box,inds,entries);
+    for(const item of consolidation){
+     if(!item.suggestion)continue;
+     const radios=[...box.querySelectorAll('input[name="eval-ind-'+item.code+'"]')];
+     if(radios.some(x=>x.checked))continue;
+     const radio=radios.find(x=>x.value===item.suggestion);
+     if(radio){radio.checked=true;applied++}
+    }
+    const xpInput=box.querySelector("[data-eval-xp]");
+    if(xpInput&&g.xp==null){xpInput.value=String(xpPlan.total);applied++}
     for(const i of entries){
      if(!["A","PA","NA"].includes(i.mention))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
