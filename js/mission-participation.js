@@ -1,5 +1,5 @@
 import {getSupabase,getSession} from "./supabase-client.js";
-const isFutureGuildMission=id=>/^(?:[3-9]|1[0-4])B$/.test(String(id||""))||/^(?:[4-9]|1[0-4])A$/.test(String(id||""));
+const isFutureGuildMission=id=>/^(?:[2-9]|1[0-4])B$/.test(String(id||""))||/^(?:[3-9]|1[0-4])A$/.test(String(id||""));
 const draftKey=(uid,id)=>"webacademy:guild-self-review:"+uid+":"+id;
 function mountGuildSelfReview(target,uid,missionId,tasks=[],contributions=[]){
  if(!isFutureGuildMission(missionId))return;
