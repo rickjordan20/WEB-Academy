@@ -56,7 +56,7 @@ function checkedInSubmission(r,unit,step,m,fundamental){
  const completed=unit===m?.id?snapshot.mission?.completedSteps:unit===fundamental?.id?snapshot.fundamentals?.completedSteps:[];
  return Number(snapshot.version)>0&&Array.isArray(completed)&&completed.includes(step.id);
 }
-function indicators(m){return [...new Set(m?.competencies||[])]}
+function indicators(m){return [...new Set([...(m?.competencies||[]),...(m?.steps||[]).flatMap(step=>step.indicators||step.competencies||[])].filter(code=>/^I[1-6]$/.test(code)))]}
 function keysFor(m,answers){return Object.entries(answers||{}).filter(([key])=>key.startsWith(m.id+":")||(m.type==="training"&&key.startsWith("F"+m.phase+":")))}
 function answerText(v){return typeof v==="string"?v:JSON.stringify(v,null,2)}
 const answerLabels={answer:"Resposta",response:"Resposta",value:"Valor",text:"Texto",content:"Conteúdo",description:"Descrição",summary:"Resumo",url:"Link",link:"Link",file_url:"Arquivo",filename:"Arquivo",file_name:"Arquivo",name:"Nome",type:"Tipo",language:"Linguagem",code:"Código",notes:"Observações",comment:"Comentário",result:"Resultado",output:"Saída",status:"Situação",created_at:"Registrado em",stepId:"Etapa"};
