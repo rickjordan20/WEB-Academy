@@ -96,20 +96,22 @@ const lessonStart=row=>row?.lesson_date+"T"+(hhmm(row?.start_time_override)||hhm
 function nextMissionStart(currentStart){
  return scheduleTimeline.filter(row=>row.id!==schedule?.id&&row.mission_id&&lessonStart(row)>currentStart).sort((a,b)=>lessonStart(a).localeCompare(lessonStart(b)))[0]||null;
 }
-function updateMissionDates(){
+function updateMissionDates(force=false){
  if(!schedule)return;
  const date=$("#scheduleLessonDate").value,start=hhmm($("#scheduleStartTime").value);
- const open=date&&start?date+"T"+start:"";$("#scheduleMissionOpen").value=open;
+ const open=date&&start?date+"T"+start:"";
+ const openInput=$("#scheduleMissionOpen"),closeInput=$("#scheduleMissionClose");
+ if(force||!openInput.value)openInput.value=localMissionTime(schedule.mission_open_at)||open;
  const next=open?nextMissionStart(open):null;
  const info=$("#scheduleNextMissionInfo");
  if(next){
   const nextOpen=lessonStart(next);
   const close=new Date(new Date(missionIso(nextOpen)).getTime()-60000);
-  $("#scheduleMissionClose").value=localMissionTime(close.toISOString());
-  info.textContent="Próxima aula/missão: "+next.mission_id+" · "+formatDate(next.lesson_date)+" às "+nextOpen.slice(11)+". O prazo termina um minuto antes.";
+  if(force||!closeInput.value)closeInput.value=localMissionTime(schedule.mission_close_at)||localMissionTime(close.toISOString());
+  info.textContent="Próxima missão prevista: "+next.mission_id+" · "+formatDate(next.lesson_date)+" às "+nextOpen.slice(11)+". Você pode ajustar os prazos sem alterar a aula.";
  }else{
-  $("#scheduleMissionClose").value=localMissionTime(schedule.mission_close_at)||"";
-  info.textContent="Não existe uma próxima missão posterior no cronograma. Cadastre-a para definir automaticamente o prazo final.";
+  if(force||!closeInput.value)closeInput.value=localMissionTime(schedule.mission_close_at)||"";
+  info.textContent="Sem próxima missão cadastrada. Defina o prazo final manualmente.";
  }
 }
 function renderSchedule(){
@@ -121,7 +123,7 @@ function renderSchedule(){
  $("#scheduleExecutionMode").value=schedule.execution_mode;
  $("#scheduleStartTime").value=hhmm(schedule.start_time_override)||hhmm(classHours?.lesson_start_time);
  $("#scheduleEndTime").value=hhmm(schedule.end_time_override)||hhmm(classHours?.lesson_end_time);
- updateMissionDates();
+ updateMissionDates(true);
  const mode=$("#scheduleExecutionMode");mode.disabled=true;
  mode.title="Para trocar a modalidade, utilize o Cronograma de Aulas, que valida a associação entre missão e modalidade.";
 }
@@ -130,7 +132,6 @@ async function saveSchedule(event){
  const date=$("#scheduleLessonDate").value,start=hhmm($("#scheduleStartTime").value),end=hhmm($("#scheduleEndTime").value);
  const feedback=$("#scheduleSaveFeedback"),button=$("#saveSchedule");
  if(!date||!start||!end||start>=end){feedback.textContent="Confira a data e os horários. O término precisa ser posterior ao início.";return}
- updateMissionDates();
  const openValue=$("#scheduleMissionOpen").value,closeValue=$("#scheduleMissionClose").value;
  if(!openValue||!closeValue||new Date(missionIso(closeValue))<=new Date(missionIso(openValue))){feedback.textContent="O prazo final da missão deve ser posterior à abertura.";return}
  if(!confirm("Salvar nova data e horários da aula "+schedule.lesson_number+" no cronograma? Isso pode alterar a janela de acesso dos estudantes."))return;
@@ -226,7 +227,7 @@ if(id==="1A"&&fundamental){
  };
 }
 if(id==="1B"&&!stored.draft&&(!Array.isArray(stored.steps)||stored.steps.length===0)){mainEditor.setSteps(structuredClone(mission.steps));renderOverview();message("Missão 1B: roteiro do Restaurante carregado para edição. O estudante já utiliza o planejamento padrão; para persistir esta versão no Supabase, revise e publique pelo editor.");}
-$("#builderScheduleForm").addEventListener("submit",saveSchedule);for(const key of ["scheduleLessonDate","scheduleStartTime"])$("#"+key).addEventListener("change",updateMissionDates);$("#distributeMissionXp").onclick=()=>{
+$("#builderScheduleForm").addEventListener("submit",saveSchedule);for(const key of ["scheduleLessonDate","scheduleStartTime"])$("#"+key).addEventListener("change",()=>{ /* Datas da missão independentes da data da aula. */ });$("#distributeMissionXp").onclick=()=>{
  try{
   const total=Number($("#missionXpBudget").value);
   const {mission:allocated,eligibleCount}=distributeMissionXp(working(),total);
