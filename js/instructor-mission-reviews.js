@@ -123,6 +123,32 @@ function isManualStep(step,response){
  if(["content","visual-summary","image-review","flashcards"].includes(step.type))return false;
  return ["evidence","practice","text","textarea","reflection","upload","form","code"].includes(step.type)||response.value!==undefined&&response.value!==null&&response.value!==""||response.extras.some(([key])=>!key.endsWith(":revealed"));
 }
+function feedbackSuggestions(r,mission,fundamental){
+ const {objectives,checks}=automaticSummary(r,mission,fundamental);
+ const snapshotKnown=Number(r.progress_snapshot?.version)>0;
+ const completed=checks.filter(item=>item.checked);
+ const missing=checks.filter(item=>!item.checked);
+ const correct=objectives.filter(item=>item.result.passed);
+ const incorrect=objectives.filter(item=>item.result.answered&&!item.result.passed);
+ const unanswered=objectives.filter(item=>!item.result.answered);
+ const titles=items=>items.map(item=>item.step.title||item.step.id).join("; ");
+ let checksText="";
+ if(!snapshotKnown)checksText="O histórico de checks desta entrega não está disponível. Não é possível confirmar quais etapas foram marcadas apenas pelos dados preservados.";
+ else if(!checks.length)checksText="Esta missão não possui etapas com checks configurados para conferência.";
+ else checksText="Foram registrados "+completed.length+" de "+checks.length+" checks previstos na configuração atual."+
+  (completed.length?" Etapas com conclusão registrada: "+titles(completed)+".":" Não há checks de conclusão registrados nas etapas atuais.")+
+  (missing.length?" Etapas sem registro de check: "+titles(missing)+".":" Todas as etapas atuais apresentam check registrado.")+
+  " Os checks indicam conclusão registrada, não comprovam isoladamente o domínio das competências.";
+ const objectiveTexts={};
+ for(const {unit,step,result} of objectives){
+  const key=unit+":"+step.id,topic=step.title||step.question||step.id;
+  objectiveTexts[key]=!result.answered?"Não há resposta registrada para a questão sobre "+topic+". Recomendo retomar o enunciado e responder à atividade.":
+   result.passed?"Sua resposta à questão sobre "+topic+" está correta conforme o gabarito. Continue aplicando esse conhecimento nas atividades práticas.":
+   "Na questão sobre "+topic+", a alternativa selecionada não corresponde ao gabarito. Revise o conteúdo e considere a resposta correta: "+String(step.options[result.correct])+".";
+ }
+ const objectiveSummary=objectives.length?" Nas questões objetivas com gabarito, houve "+correct.length+" acerto(s) em "+objectives.length+" questão(ões), "+incorrect.length+" erro(s) e "+unanswered.length+" sem resposta.":" Não há questões objetivas com gabarito válido para correção automática.";
+ return {checks:checksText,objectives:objectiveTexts,general:checksText+objectiveSummary+" As atividades discursivas e práticas dependem de análise do instrutor."};
+}
 function autoPanel(r,mission,fundamental){
  const {objectives,checks}=automaticSummary(r,mission,fundamental);
  const correct=objectives.filter(x=>x.result.passed).length;
@@ -130,7 +156,7 @@ function autoPanel(r,mission,fundamental){
  const completed=checks.filter(x=>x.checked).length;
  const saved=r.grades?.blocks||{};
  const checkFeedback=r.grades?.checksFeedback||"";
- return '<section class="eval-block eval-auto-panel"><h3>1. Checks de toda a missão</h3><p class="muted">Resumo único de todos os checks, incluindo Fundamentos, questões e etapas práticas. O check indica conclusão registrada; a avaliação das competências considera também as respostas e evidências.</p>'+
+ return '<section class="eval-block eval-auto-panel"><div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-generate-feedback>Gerar sugestões de feedback</button><small class="muted" data-suggestion-status>Sem IA · Apenas campos vazios · Revisão do instrutor</small></div><h3>1. Checks de toda a missão</h3><p class="muted">Resumo único de todos os checks, incluindo Fundamentos, questões e etapas práticas. O check indica conclusão registrada; a avaliação das competências considera também as respostas e evidências.</p>'+
  '<div class="eval-progress-summary"><div><small>Checks registrados</small><strong>'+completed+'/'+checks.length+'</strong></div><div><small>Questões com gabarito</small><strong>'+correct+'/'+objectives.length+' corretas</strong><p class="muted">'+responded+' respondidas</p></div></div>'+
  (checks.length?'<div class="eval-checks-grid">'+checks.map(({unit,step,checked})=>'<div class="eval-auto-line"><strong>'+esc(step.title||step.id)+'</strong><span>'+(checked?'✓ Marcado':'Não marcado')+'</span><small>'+esc(unit)+'</small></div>').join("")+'</div>':'<p class="muted">Nenhum check configurado.</p>')+
  '<label class="eval-comment-label"><strong>Feedback único dos checks</strong><textarea class="admin-input" rows="3" data-checks-feedback placeholder="Avalie em conjunto todos os checks e as evidências de conclusão.">'+esc(checkFeedback)+'</textarea></label>'+
@@ -201,6 +227,18 @@ function openReview(box,id){
   const textarea=[...box.querySelectorAll("[data-block-comment]")].find(el=>el.dataset.blockComment===select.dataset.feedbackTemplate);
   if(textarea){textarea.value=select.options[select.selectedIndex].textContent;textarea.focus()}
  }));
+ box.querySelector("[data-generate-feedback]")?.addEventListener("click",()=>{
+  const suggestions=feedbackSuggestions(r,reviewMission,reviewFundamental);
+  let applied=0,skipped=0;
+  const fill=(el,value)=>{if(!el)return;if(el.value.trim()){skipped++;return}if(!value)return;el.value=value;el.dispatchEvent(new Event("input",{bubbles:true}));applied++};
+  fill(box.querySelector("[data-checks-feedback]"),suggestions.checks);
+  for(const [key,value] of Object.entries(suggestions.objectives)){
+   const el=[...box.querySelectorAll("[data-block-comment]")].find(item=>item.dataset.blockComment===key);
+   fill(el,value);
+  }
+  const status=box.querySelector("[data-suggestion-status]");
+  if(status)status.textContent=applied+" sugestão(ões) inserida(s). "+skipped+" campo(s) já preenchido(s) preservado(s). Revise antes de salvar.";
+ });
  box.querySelectorAll("[data-eval-save]").forEach(b=>b.onclick=async()=>{
   const action=b.dataset.evalSave,feedback=box.querySelector("[data-eval-feedback]").value.trim(),xp=Number(box.querySelector("[data-eval-xp]").value);
   if(!Number.isFinite(xp)||xp<0||xp>maxXp){box.querySelector("[data-eval-message]").textContent="Informe XP entre 0 e "+maxXp+".";return}
