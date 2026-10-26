@@ -383,7 +383,7 @@ function openReview(box,id){
    if(codes.length)blockIndicators[unit+":"+s.id]=entry;
   }
   const blockChecks={...(g.blockChecks||{}),...Object.fromEntries([...box.querySelectorAll("[data-eval-block-check]")].map(el=>[el.dataset.evalBlockCheck,el.checked&&!el.disabled]))};
-  const awardDefinition={steps:reviewMission.steps.map(s=>({...s,id:blockKey(m.id,s)})),fundamental:reviewFundamental?{steps:reviewFundamental.steps.map(s=>({...s,id:blockKey(fundamental.id,s)}))}:null};
+  const awardDefinition={steps:reviewMission.steps.map(s=>({...s,id:blockKey(m.id,s),xp:xpPlan.items.find(item=>item.key===blockKey(m.id,s))?.suggested||0})),fundamental:reviewFundamental?{steps:reviewFundamental.steps.map(s=>({...s,id:blockKey(fundamental.id,s),xp:xpPlan.items.find(item=>item.key===blockKey(fundamental.id,s))?.suggested||0}))}:null};
   const awarded=calculatePublishedXp(awardDefinition,{status:action==="evaluated"?"evaluated":action,published:action==="evaluated",blockChecks});
   const xpAward=action==="draft"?g.xpAward||null:{amount:awarded.xp,published:action==="evaluated",blocks:awarded.blocks,calculated_at:new Date().toISOString()};
   const grades={...g,checksFeedback:box.querySelector("[data-checks-feedback]")?.value.trim()||"",blockChecks,xpAward,version:4,blocks,blockIndicators,indicators:indicatorGrades,progress:{completed:estimate.completed,total:estimate.total,percent:estimate.percent,hasSnapshot},xp:Number.isFinite(xp)?Math.max(0,Math.min(maxXp,Math.round(xp))):0,draft:action==="draft"};
