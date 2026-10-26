@@ -1,5 +1,6 @@
 import {getSupabase,getSession} from "./supabase-client.js";
-const isFutureGuildMission=id=>/^(?:[3-9]|1[0-4])B$/.test(String(id||""));
+import {MISSIONS} from "../data/missions.js";
+const isFutureGuildMission=id=>{const m=MISSIONS.find(m=>m.id===id||m.displayId===id);return !!m&&m.type==="guild"&&Number(m.phase)>=3};
 const draftKey=(uid,id)=>"webacademy:guild-self-review:"+uid+":"+id;
 function mountGuildSelfReview(target,uid,missionId){
  if(!isFutureGuildMission(missionId))return;
@@ -20,10 +21,10 @@ export async function mountMissionParticipation(target,{missionId,classId=null,s
   let guildId=null;
   const membership=await sb.from("guild_members").select("guild_id").eq("user_id",uid).maybeSingle();
   if(membership.error)throw membership.error;guildId=membership.data?.guild_id;
-  if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';return}
+  if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId);return}
   const taskQuery=sb.from("guild_tasks").select("id,title,status,responsible_user_id,mission_id").eq("guild_id",guildId).eq("mission_id",missionId);
   const {data:tasks,error:te}=await taskQuery;if(te)throw te;
-  if(!tasks?.length){target.innerHTML='<p class="muted">Ainda não há tarefas vinculadas a esta missão. O líder poderá organizá-las no Kanban.</p>';return}
+  if(!tasks?.length){target.innerHTML='<p class="muted">Ainda não há tarefas vinculadas a esta missão. O líder poderá organizá-las no Kanban.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId);return}
   const ids=tasks.map(t=>t.id);
   const [logs,team]=await Promise.all([sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",ids).order("created_at",{ascending:false}),sb.from("guild_members").select("user_id").eq("guild_id",guildId)]);
   if(logs.error)throw logs.error;if(team.error)throw team.error;
