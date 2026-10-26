@@ -370,7 +370,7 @@ function openReview(box,id){
       return fraction===null?item.suggested:Math.min(item.suggested,Math.round(item.cap*fraction));
      });
      const aiXp=Math.min(xpPlan.total,maxXp,scores.reduce((a,b)=>a+b,0));
-     const xpBreakdown=xpPlan.items.filter(item=>item.cap>0).map((item,i)=>({title:item.step.title||item.step.id,eligible:item.suggested,suggested:scores[i],discount:item.suggested-scores[i]}));
+     const xpBreakdown=xpPlan.items.map((item,i)=>({title:item.step.title||item.step.id,eligible:item.suggested,suggested:scores[i],discount:item.suggested-scores[i]})).filter(item=>item.eligible>0);
      const reviewedBlocks=aiBlocks.filter(b=>xpPlan.items.some(item=>item.answered&&(b.review_key===item.key||(!b.review_key&&String(b.step_id)===String(item.step.id)))));
      const qualityMeasured=reviewedBlocks.some(b=>typeof b.quality_score==="number"||Array.isArray(b.question_analysis)&&b.question_analysis.length);
 
