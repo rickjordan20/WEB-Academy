@@ -8,9 +8,18 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const fmt=d=>d?new Date(d).toLocaleString("pt-BR"):"—";
 const statuses={submitted:"Aguardando avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
 let rows=[],names=new Map(),classes=[],overrides=new Map(),current=null,filter="submitted",search="",missionFilter="";
-function missionOf(id){return getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id)}
+function missionOf(id,classId){
+ const builtin=getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id);
+ if(builtin)return builtin;
+ const stored=overrides.get(classId+":"+id)||{};
+ const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;
+ const steps=Array.isArray(configured.steps)?configured.steps:[];
+ const title=configured.title||stored.title||configured.name||stored.name||("Missão "+id);
+ const competencies=Array.isArray(configured.competencies)?configured.competencies:Array.isArray(stored.competencies)?stored.competencies:[...new Set(steps.flatMap(step=>step.indicators||step.competencies||[]))];
+ return {id,title,subtitle:configured.subtitle||stored.subtitle||"",steps,competencies,type:configured.type||stored.type||"custom",maxXp:Number(configured.maxXp??stored.maxXp??0)||0};
+}
 function effectiveDefinition(r,m,fundamental){
- const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=stored.steps?stored:stored.draft?.steps?stored.draft:{};
+ const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=stored.steps?stored:stored.draft?.steps?stored.draft:stored;
  return {steps:content.steps||m?.steps||[],fundamental:fundamental?{steps:content.fundamental?.steps||fundamental.steps||[]}:null};
 }
 function completedIds(snapshot,kind){const ids=snapshot?.[kind]?.completedSteps;return Array.isArray(ids)?ids:[]}
@@ -65,9 +74,9 @@ function answerHTML(v,depth=0){
  if(!entries.length)return '<p class="eval-empty">Nenhum dado registrado.</p>';
  return '<dl class="eval-answer-fields">'+entries.map(([key,value])=>'<div class="eval-answer-field"><dt>'+esc(answerLabels[key]||key.replace(/[_-]/g," "))+'</dt><dd>'+answerHTML(value,depth+1)+'</dd></div>').join("")+'</dl>';
 }
-function card(r){const m=missionOf(r.mission_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
+function card(r){const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
 function renderList(box){
- const missions=[...new Map(rows.map(r=>[r.mission_id,missionOf(r.mission_id)?.title||r.mission_id])).entries()];
+ const missions=[...new Map(rows.map(r=>[r.mission_id,missionOf(r.mission_id,r.class_id)?.title||r.mission_id])).entries()];
  const counts={all:rows.length,submitted:0,changes_requested:0,evaluated:0};rows.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1});
  const list=rows.filter(r=>(filter==="all"||r.status===filter)&&(!missionFilter||r.mission_id===missionFilter)&&(!search||[names.get(r.student_id),missionOf(r.mission_id)?.title,r.mission_id].some(v=>String(v||"").toLowerCase().includes(search))));
  box.innerHTML='<div class="eval-heading"><div><p class="eyebrow">UC7 · Acompanhamento formativo</p><h2>Central de Avaliação</h2><p class="muted">Abra cada entrega para analisar respostas, evidências, indicadores e feedback.</p></div></div><div class="eval-filters">'+["submitted","changes_requested","evaluated","all"].map(s=>'<button type="button" data-eval-filter="'+s+'" class="eval-filter '+(filter===s?"active":"")+'">'+({submitted:"Pendentes",changes_requested:"Ajustes solicitados",evaluated:"Avaliadas",all:"Todas"}[s])+' ('+(counts[s]||0)+')</button>').join("")+'</div><div class="eval-search"><input class="admin-input" data-eval-search placeholder="Buscar estudante ou missão" value="'+esc(search)+'"><select class="admin-input" data-eval-mission><option value="">Todas as missões</option>'+missions.map(([id,title])=>'<option value="'+esc(id)+'" '+(missionFilter===id?"selected":"")+'>'+esc(title)+'</option>').join("")+'</select></div><div class="eval-list">'+(list.length?list.map(card).join(""):'<p class="muted">Nenhuma entrega corresponde aos filtros.</p>')+'</div>';
