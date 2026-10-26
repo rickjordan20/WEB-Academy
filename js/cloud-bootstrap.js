@@ -16,7 +16,13 @@ if(sb){
     const result=await pushCloudState();
     if(result?.synced){pending=saveVersion!==startedAtVersion;if(pending)scheduleRetry();}
     else scheduleRetry();
-   }catch(error){\n    if(error?.code==="P0001"&&/active enrollment required/i.test(error?.message||"")){\n     enrollmentBlocked=true;clearTimeout(retryTimer);\n     console.warn("Sincronização pausada: esta sessão não tem matrícula ativa reconhecida. Progresso local preservado. Verifique a conta autenticada e a turma selecionada.");\n     window.dispatchEvent(new CustomEvent("uc7:enrollment-required"));\n    }else{console.warn("Sincronização pendente; progresso local preservado:",error);scheduleRetry()}\n   }
+   }catch(error){
+    if(error?.code==="P0001"&&/active enrollment required/i.test(error?.message||"")){
+     enrollmentBlocked=true;clearTimeout(retryTimer);
+     console.warn("Sincronização pausada: esta sessão não tem matrícula ativa reconhecida. Progresso local preservado. Verifique a conta autenticada e a turma selecionada.");
+     window.dispatchEvent(new CustomEvent("uc7:enrollment-required"));
+    }else{console.warn("Sincronização pendente; progresso local preservado:",error);scheduleRetry()}
+   }
    finally{syncing=false}
   }
   window.addEventListener("uc7:state-saved",()=>{
