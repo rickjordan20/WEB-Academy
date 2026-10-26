@@ -306,6 +306,19 @@ function openReview(box,id){
  const xpInfo=document.createElement("p");
  xpInfo.className="muted";xpInfo.dataset.xpPlan="";xpInfo.textContent="XP elegível por bloco (sem pontuar checks ou autodeclarações): "+xpPlan.items.filter(x=>x.cap>0).map(x=>x.step.title+": "+x.suggested+"/"+x.cap+" XP").join(" · ")+". Total: "+xpPlan.total+"/"+maxXp+" XP. Editável e sujeito à revisão.";
  xpField?.closest("label")?.after(xpInfo);
+ if(m?.type==="guild"){
+  const review=document.createElement("section");
+  review.className="eval-block eval-guild-panel";
+  review.innerHTML='<h3>Conferência do XP por evidência</h3><p class="muted">Marque apenas os blocos para os quais você conferiu uma produção individual pertinente (repositório, Kanban ou registro de contribuição). O check da etapa e a autoavaliação, isoladamente, não são comprovação.</p>'+
+   xpPlan.items.filter(x=>x.cap>0).map(x=>'<label class="eval-guild-xp-row"><input type="checkbox" data-xp-evidence="'+esc(x.key)+'" '+(x.answered?'checked disabled':'')+'><span><strong>'+esc(x.step.title||x.step.id)+'</strong><small>'+(x.answered?'Resposta vinculada à etapa':'Conferência manual necessária')+'</small></span><strong>'+x.cap+' XP máx.</strong></label>').join("")+
+   '<button type="button" class="btn btn-secondary btn-small" data-xp-recalculate>Aplicar teto dos blocos conferidos</button><p class="muted">A aplicação atualiza somente o campo de proposta. Revise a qualidade e ajuste o XP antes de concluir. Nenhuma avaliação é salva automaticamente.</p>';
+  xpInfo.after(review);
+  review.querySelector("[data-xp-recalculate]")?.addEventListener("click",()=>{
+   const total=xpPlan.items.reduce((sum,item)=>sum+(item.answered||review.querySelectorAll("[data-xp-evidence]").length&&[...review.querySelectorAll("[data-xp-evidence]:checked")].some(el=>el.dataset.xpEvidence===item.key)?item.cap:0),0);
+   if(xpField)xpField.value=String(Math.min(maxXp,total));
+   xpInfo.textContent="Teto recalculado após conferência docente: "+Math.min(maxXp,total)+"/"+maxXp+" XP. Ajuste conforme a qualidade efetiva da produção.";
+  });
+ }
  box.querySelector("[data-ai-review]")?.addEventListener("click",async()=>{
   const button=box.querySelector("[data-ai-review]");
   const status=box.querySelector("[data-ai-review-status]");
