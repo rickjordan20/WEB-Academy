@@ -64,3 +64,9 @@
 .guild-mission-brief .guild-mission-criterion ul{padding-left:22px;margin:8px 0}
 .guild-mission-brief .guild-mission-criterion li{margin:5px 0;line-height:1.5}
 .guild-mission-brief details{border-top:1px solid rgba(148,163,184,.22);padding-top:12px}
+
+/* Ciência obrigatória do estudante em entregas após o prazo */
+.mission-delivery .delivery-acknowledgement{display:flex;align-items:flex-start;gap:12px;margin:14px 0;padding:14px;border:1px solid rgba(251,191,36,.38);border-radius:12px;background:#152334;color:#f2f5fc;line-height:1.55}
+.mission-delivery .delivery-acknowledgement[hidden]{display:none}
+.mission-delivery .delivery-acknowledgement input{flex:0 0 auto;width:19px;height:19px;margin-top:3px;accent-color:#8574ff}
+.mission-delivery .delivery-acknowledgement input:focus-visible{outline:2px solid #a7baff;outline-offset:3px}
