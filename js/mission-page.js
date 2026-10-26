@@ -43,17 +43,63 @@ function organizeEduTechPanels(){
  const flow=root.querySelector(".lesson-flow");
  const fundamentals=root.querySelector("#missionFundamentals");
  if(!flow||!fundamentals)return;
- const stageLinks=[...flow.querySelectorAll(".lesson-stage")];
- const host=document.createElement("div");host.className="edutech-stage-content";host.id="edutechStageContent";flow.insertAdjacentElement("afterend",host);
- const panels=["fundamentals","practice","report"].map((key,i)=>{const panel=document.createElement("section");panel.className="edutech-stage-panel";panel.dataset.eduPanel=key;panel.setAttribute("aria-label",stageLinks[i]?.querySelector("strong")?.textContent||key);panel.hidden=true;host.append(panel);return panel});
+ const links=[...flow.querySelectorAll(".lesson-stage")];
+ if(links.length!==3)return;
+ const keys=["fundamentals","practice","report"];
+ const titles=["Fundamentos","Prática Guiada EduTech","Relatório Individual"];
+ const host=document.createElement("section");host.className="edutech-stage-content";host.id="edutechStageContent";host.setAttribute("aria-label","Conteúdo da etapa selecionada");
+ flow.insertAdjacentElement("afterend",host);
+ const panels=keys.map((key,i)=>{
+  const panel=document.createElement("div");panel.className="edutech-stage-panel";panel.id="edutech-panel-"+key;panel.dataset.eduPanel=key;panel.hidden=true;
+  panel.innerHTML='<div class="edutech-stage-heading"><p class="eyebrow">Etapa '+(i+1)+' de 3</p><h2>'+titles[i]+'</h2></div>';
+  host.append(panel);return panel;
+ });
  panels[0].append(fundamentals);
- const project=root.querySelector(".project-context, .project-context-card, .mission-project-context");
- const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
+ const project=root.querySelector(".project-context, .project-context-card, .mission-project-context, .project-brief");
  if(project)panels[1].append(project);
- if(guided){const children=[...guided.children];const reportIds=new Set(mission.steps.filter(step=>step.type==="evidence").map(step=>step.id));const reportItems=children.filter(el=>el.id==="individualReport"||reportIds.has(el.dataset.missionStep));panels[1].append(guided);for(const el of reportItems)panels[2].append(el)}
- const open=key=>{const previous=activeEduTechPanel;activeEduTechPanel=key;panels.forEach(p=>p.hidden=p.dataset.eduPanel!==key);stageLinks.forEach((link,i)=>{const selected=panels[i].dataset.eduPanel===key;link.classList.toggle("active",selected);link.setAttribute("aria-expanded",String(selected));link.setAttribute("aria-controls","edutechStageContent")});if(previous!==key&&document.activeElement?.closest(".lesson-stage"))host.scrollIntoView({behavior:"smooth",block:"start"})};
- stageLinks.forEach((link,i)=>{link.setAttribute("role","button");link.addEventListener("click",event=>{event.preventDefault();open(panels[i].dataset.eduPanel)})});
- open(activeEduTechPanel||"fundamentals");
+ const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
+ if(guided){
+  const reportIds=new Set(mission.steps.filter(step=>step.type==="evidence").map(step=>step.id));
+  const guidedList=document.createElement("div");guidedList.className="learning-list";
+  const reportList=document.createElement("div");reportList.className="learning-list";
+  [...guided.children].forEach(el=>{
+   const isReport=reportIds.has(el.dataset.missionStep)||el.id==="individualReport";
+   (isReport?reportList:guidedList).append(el);
+  });
+  guided.remove();
+  if(guidedList.children.length)panels[1].append(guidedList);
+  if(reportList.children.length)panels[2].append(reportList);
+ }
+ if(!panels[2].querySelector(".learning-list"))panels[2].insertAdjacentHTML("beforeend",'<p>Revise a prática e registre suas evidências na entrega da missão.</p>');
+ const controls=document.createElement("nav");controls.className="edutech-stage-navigation";controls.setAttribute("aria-label","Navegação entre etapas");
+ controls.innerHTML='<button type="button" class="btn btn-secondary" data-edu-prev>← Etapa anterior</button><span class="edutech-stage-counter" aria-live="polite"></span><button type="button" class="btn btn-primary" data-edu-next>Próxima etapa →</button>';
+ host.append(controls);
+ const prev=controls.querySelector("[data-edu-prev]"),next=controls.querySelector("[data-edu-next]"),counter=controls.querySelector(".edutech-stage-counter");
+ const open=(key,scroll=false)=>{
+  const index=Math.max(0,keys.indexOf(key));activeEduTechPanel=keys[index];
+  panels.forEach((p,i)=>p.hidden=i!==index);
+  links.forEach((link,i)=>{
+   const selected=i===index;
+   link.classList.toggle("active",selected);
+   link.setAttribute("aria-current",selected?"step":"false");
+   link.setAttribute("aria-controls",panels[i].id);
+   link.setAttribute("aria-expanded",String(selected));
+  });
+  prev.hidden=index===0;next.hidden=index===2;
+  next.textContent=index===1?"Ir para o relatório →":"Avançar para a prática →";
+  counter.textContent="Etapa "+(index+1)+" de 3 · "+titles[index];
+  if(scroll)host.scrollIntoView({behavior:"smooth",block:"start"});
+ };
+ links.forEach((link,i)=>{
+  link.addEventListener("click",event=>{event.preventDefault();open(keys[i],true)});
+ });
+ prev.addEventListener("click",()=>open(keys[keys.indexOf(activeEduTechPanel)-1],true));
+ next.addEventListener("click",()=>open(keys[keys.indexOf(activeEduTechPanel)+1],true));
+ root.querySelectorAll('a[href="#guidedPractice"],a[href="#individualReport"],a[href="#missionFundamentals"]').forEach(link=>{
+  if(link.closest(".lesson-stage"))return;
+  link.addEventListener("click",event=>{event.preventDefault();open(link.getAttribute("href")==="#guidedPractice"?"practice":link.getAttribute("href")==="#individualReport"?"report":"fundamentals",true)});
+ });
+ open(keys.includes(activeEduTechPanel)?activeEduTechPanel:"fundamentals");
 }
 function render(readOnly=false,access=null){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
