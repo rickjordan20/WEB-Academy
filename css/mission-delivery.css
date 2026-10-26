@@ -94,3 +94,25 @@
 .learning-step .reflection-fields select,.learning-step .reflection-fields input[data-evidence]{display:block;width:100%;max-width:100%;min-height:44px;box-sizing:border-box;margin-top:8px;padding:10px 12px;border:1px solid rgba(148,163,184,.35);border-radius:10px;background:#091725;color:#edf3ff;font:inherit;color-scheme:dark}
 .learning-step .reflection-fields select option{background:#101e30;color:#edf3ff}
 .learning-step .reflection-fields select:focus-visible,.learning-step .reflection-fields input[data-evidence]:focus-visible{outline:2px solid #8e7bff;outline-offset:2px}
+
+/* Autoavaliação EduTech — formatos interativos e acessíveis */
+.edutech-review-fields{display:grid;gap:22px}
+.edutech-review-fields fieldset{min-width:0;margin:0;padding:15px;border:1px solid rgba(143,164,198,.3);border-radius:13px;background:#0c1b2e}
+.edutech-review-fields legend{padding:0 6px;font-weight:750;color:#f1f6ff;line-height:1.5}
+.edutech-review-fields .review-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.edutech-review-fields .review-card-option{position:relative;display:block;cursor:pointer;margin:0}
+.edutech-review-fields .review-card-option input{position:absolute;opacity:0;width:1px;height:1px}
+.edutech-review-fields .review-card-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:118px;padding:12px 8px;text-align:center;border:1px solid #405371;border-radius:12px;background:#0b1728;color:#edf4ff;transition:background .15s,border-color .15s}
+.edutech-review-fields .review-card-emoji{font-size:27px;line-height:1.2}
+.edutech-review-fields .review-card-content strong{font-size:.85rem;line-height:1.4}
+.edutech-review-fields .review-card-option input:checked+.review-card-content{border:2px solid #8f7bff;background:#24244e}
+.edutech-review-fields .review-card-option input:focus-visible+.review-card-content{outline:3px solid #b7aaff;outline-offset:3px}
+.edutech-review-fields .review-scale-labels{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-size:.78rem;color:#bdcce4}
+.edutech-review-fields .review-scale input{display:block;width:100%;margin:14px 0;accent-color:#8975ff}
+.edutech-review-fields .review-scale output{display:block;text-align:center;font-weight:750;color:#e2d9ff}
+.edutech-review-fields .review-checklist label,.edutech-review-fields .review-radio label{display:flex;align-items:flex-start;gap:11px;margin:9px 0;padding:10px;border-radius:9px;background:#10243b;line-height:1.5;cursor:pointer}
+.edutech-review-fields .review-checklist input,.edutech-review-fields .review-radio input{flex:none;margin-top:4px;width:17px;height:17px;accent-color:#8874ff}
+.edutech-review-fields .review-hint{font-size:.8rem;color:#b4c6df;margin:8px 0}
+.edutech-review-fields input[data-evidence][type="url"],.edutech-review-fields input[data-evidence][type="text"]{width:100%;box-sizing:border-box;min-height:46px;border:1px solid #455c78;border-radius:10px;padding:11px 12px;background:#091625;color:#f0f5ff;font:inherit}
+.edutech-review-fields input[data-evidence]:focus-visible{outline:2px solid #a99cff;outline-offset:2px}
+@media(max-width:600px){.edutech-review-fields .review-card-grid{grid-template-columns:1fr}.edutech-review-fields .review-card-content{min-height:75px;flex-direction:row;justify-content:flex-start;text-align:left;padding:10px 15px}}
