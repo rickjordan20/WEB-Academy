@@ -134,7 +134,9 @@ async function saveSchedule(event){
  if(!date||!start||!end||start>=end){feedback.textContent="Confira a data e os horários. O término precisa ser posterior ao início.";return}
  const openValue=$("#scheduleMissionOpen").value,closeValue=$("#scheduleMissionClose").value;
  if(!openValue||!closeValue||new Date(missionIso(closeValue))<=new Date(missionIso(openValue))){feedback.textContent="O prazo final da missão deve ser posterior à abertura.";return}
- if(!confirm("Salvar nova data e horários da aula "+schedule.lesson_number+" no cronograma? Isso pode alterar a janela de acesso dos estudantes."))return;
+ const dateConflict=scheduleTimeline.find(row=>row.id!==schedule.id&&row.lesson_date===date);
+  if(dateConflict){feedback.textContent="Já existe outra aula da UC7 em "+formatDate(date)+". Para prorrogar apenas a missão, mantenha a data original da aula e altere somente a abertura e o prazo final da entrega.";return}
+  if(!confirm("Salvar alterações da aula e dos prazos da missão? O progresso e as entregas existentes serão preservados."))return;
  button.disabled=true;feedback.textContent="Salvando no cronograma...";
  try{
   const defaultStart=hhmm(classHours?.lesson_start_time),defaultEnd=hhmm(classHours?.lesson_end_time);
@@ -143,7 +145,7 @@ async function saveSchedule(event){
   const {data,error}=await sb.from("class_schedule").update(payload).eq("id",schedule.id).eq("class_id",classId).eq("uc","UC7").select("id,lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,mission_open_at,mission_close_at").single();
   if(error)throw error;
   schedule=data;const currentRow=scheduleTimeline.find(row=>row.id===data.id);if(currentRow)Object.assign(currentRow,data);renderSchedule();renderOverview();feedback.textContent="Cronograma sincronizado: abertura e prazo final salvos. Após o fechamento, a entrega permanece disponível com registro de atraso.";message("Disponibilidade sincronizada com o cronograma.");
- }catch(error){feedback.textContent="Não foi possível atualizar o cronograma: "+error.message}
+ }catch(error){feedback.textContent=error.code==="23505"?"Esta turma já possui uma aula da UC7 nessa data. Mantenha a data original e altere apenas os prazos da missão.":"Não foi possível atualizar o cronograma: "+error.message}
  finally{button.disabled=false}
 }
 
