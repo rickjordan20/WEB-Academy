@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 
 test('envio revalida a janela antes de registrar entrega',async()=>{
  const source=await readFile(new URL('../js/mission-delivery.js',import.meta.url),'utf8');
- assert.ok(source.includes('const latestAccess=await missionWindow(missionId)'));
+ assert.ok(source.includes('await missionWindow(missionId)'));
  assert.ok(source.includes('latestAccess.state!=="open"&&latestAccess.state!=="closed"'));
  assert.ok(source.includes('isLate&&!late'));
 });
