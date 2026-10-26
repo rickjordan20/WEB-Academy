@@ -230,3 +230,31 @@ details.eval-review-step>summary span{font-size:.78rem;color:var(--muted)}
 @media print{.eval-review-step{break-inside:avoid}.eval-auto-panel{break-inside:auto}.eval-objective-item{break-inside:avoid}}
 
 .eval-suggestion-toolbar{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:1.25rem}.eval-suggestion-toolbar small{line-height:1.4}
+
+/* Projeto Restaurante: ficha de evidências de todas as missões de Guilda */
+.eval-guild-panel{border:1px solid rgba(96,165,250,.32);background:linear-gradient(145deg,rgba(30,58,100,.26),rgba(15,23,42,.18));border-radius:16px;padding:clamp(1rem,2vw,1.5rem);overflow-wrap:anywhere}
+.eval-guild-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.eval-guild-heading h3{margin:.3rem 0 .5rem}
+.eval-guild-pill{font-size:.78rem;font-weight:700;border:1px solid rgba(96,165,250,.4);border-radius:99px;padding:.35rem .7rem;color:#93c5fd}
+.eval-guild-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin:1.15rem 0}
+.eval-guild-metrics>div{padding:.85rem;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(148,163,184,.18)}
+.eval-guild-metrics small{display:block;color:var(--muted);font-size:.76rem}
+.eval-guild-metrics strong{display:block;font-size:1.4rem;margin-top:.25rem}
+.eval-guild-alert{padding:.9rem 1rem;border-left:3px solid #fbbf24;border-radius:9px;background:rgba(245,158,11,.09);margin:1rem 0}
+.eval-guild-alert p{margin:.4rem 0;line-height:1.5}
+.eval-guild-section{margin:.85rem 0;border:1px solid rgba(148,163,184,.23);border-radius:12px;padding:.85rem 1rem}
+.eval-guild-section>summary{cursor:pointer;font-weight:700;line-height:1.5}
+.eval-guild-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin:1rem 0}
+.eval-guild-tags span{border-radius:99px;background:rgba(59,130,246,.15);border:1px solid rgba(96,165,250,.25);padding:.35rem .65rem;font-size:.8rem}
+.eval-guild-answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}
+.eval-guild-answer{background:rgba(15,23,42,.35);padding:.85rem;border-radius:10px;min-width:0}
+.eval-guild-answer>span{display:block;font-size:.77rem;color:#93c5fd;font-weight:700}
+.eval-guild-answer p{white-space:pre-wrap;line-height:1.55;margin:.4rem 0 0}
+.eval-guild-tasks{margin-top:.8rem}
+.eval-guild-tasks>div{display:flex;align-items:center;gap:.65rem;padding:.6rem 0;border-bottom:1px solid rgba(148,163,184,.15)}
+.eval-guild-tasks>div>span:nth-child(2){flex:1;min-width:0}
+.eval-guild-tasks small{color:var(--muted)}
+.eval-guild-task-state{font-weight:800;color:#93c5fd}
+.eval-guild-link a{display:inline-block;padding:.65rem .9rem;border:1px solid rgba(96,165,250,.4);border-radius:9px;font-weight:700}
+.eval-guild-footnote{font-size:.85rem;color:var(--muted);line-height:1.55;margin-top:1rem}
+@media(max-width:720px){.eval-guild-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.eval-guild-answers{grid-template-columns:1fr}}
