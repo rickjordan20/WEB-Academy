@@ -1,14 +1,30 @@
 import {getSupabase,getSession} from "./supabase-client.js";
 const isFutureGuildMission=id=>/^(?:[3-9]|1[0-4])B$/.test(String(id||""))||/^(?:[4-9]|1[0-4])A$/.test(String(id||""));
 const draftKey=(uid,id)=>"webacademy:guild-self-review:"+uid+":"+id;
-function mountGuildSelfReview(target,uid,missionId){
+function mountGuildSelfReview(target,uid,missionId,tasks=[]){
  if(!isFutureGuildMission(missionId))return;
- const key=draftKey(uid,missionId);
- let saved={};try{saved=JSON.parse(localStorage.getItem(key)||"{}")}catch{}
+ const key=draftKey(uid,missionId);let saved={};try{saved=JSON.parse(localStorage.getItem(key)||"{}")}catch{}
+ const assigned=tasks.filter(t=>t.responsible_user_id===uid);
+ const completed=assigned.filter(t=>t.status==="done").length;
  const section=document.createElement("section");section.className="card mp-self-review";
- section.innerHTML='<p class="eyebrow">Projeto Restaurante · Prática da Guilda</p><h3>Minha contribuição e autoavaliação</h3><p class="muted">Preencha individualmente. Este é um rascunho salvo neste navegador; não substitui o envio oficial da missão.</p><form class="mp-self-form"><label>Como participei desta missão?<select name="participation"><option value="">Selecione</option><option value="ativa">Participei ativamente</option><option value="parcial">Participei parcialmente</option><option value="apoio">Precisei de apoio</option><option value="nao">Ainda não participei</option></select></label><label>Como avalio minha contribuição?<select name="assessment"><option value="">Selecione</option><option value="autonomia">Realizei com autonomia</option><option value="ajuda">Realizei com ajuda</option><option value="revisar">Preciso revisar</option></select></label><label>O que eu fiz nesta missão?<textarea name="contribution" rows="3" maxlength="2000" placeholder="Descreva suas ações e tarefas"></textarea></label><label>O que aprendi ou preciso melhorar?<textarea name="learning" rows="3" maxlength="2000"></textarea></label><label>Link de evidência (GitHub, commit ou registro)<input name="evidence" type="url" placeholder="https://"></label><button class="btn btn-primary" type="submit">Salvar rascunho</button><p class="mp-save-status" role="status"></p></form>';
- target.append(section);const form=section.querySelector("form");for(const [k,v] of Object.entries(saved)){const field=form.elements.namedItem(k);if(field&&typeof v==="string")field.value=v}
- form.addEventListener("submit",event=>{event.preventDefault();const data=Object.fromEntries(new FormData(form));if(data.evidence&& !data.evidence.startsWith("https://")){form.querySelector(".mp-save-status").textContent="Informe um link HTTPS válido.";return}try{localStorage.setItem(key,JSON.stringify({...data,savedAt:new Date().toISOString()}));form.querySelector(".mp-save-status").textContent="Rascunho salvo neste navegador. Envie a missão normalmente para avaliação."}catch{form.querySelector(".mp-save-status").textContent="Não foi possível salvar neste navegador."}});
+ const activities=["Desenvolvi artefatos (documentos, diagramas, protótipos)","Organizei e atualizei tarefas no Kanban","Contribuí com ideias e soluções","Realizei pesquisas e levantamento de informações","Ajudei colegas com dúvidas","Participei das reuniões do grupo","Fiz testes e validações","Outra contribuição"];
+ section.innerHTML='<p class="eyebrow">Projeto Restaurante · Ficha individual</p><h3>Minha contribuição e autoavaliação</h3><p class="muted">Informações do Kanban carregadas automaticamente. As respostas são um rascunho local e não substituem a entrega oficial.</p>'+
+ '<div class="mp-head"><strong>1 · Minhas tarefas no Kanban</strong><span class="mp-counter">'+completed+'/'+assigned.length+' concluídas</span></div>'+
+ (assigned.length?'<div class="mp-entries">'+assigned.map(t=>'<article class="mp-entry"><strong>'+esc(t.title)+'</strong> · '+(t.status==="done"?"Concluída":esc(t.status))+'</article>').join("")+'</div>':'<p class="muted">Nenhuma tarefa atribuída a você nesta missão.</p>')+
+ '<form class="mp-self-form"><h4>2 · Minha participação no projeto</h4><p>Marque as atividades que realizou.</p><div class="mp-activities">'+activities.map((v,i)=>'<label style="display:inline-flex;align-items:center;gap:8px;margin:8px 14px 8px 0"><input type="checkbox" name="activity_'+i+'" value="yes">'+esc(v)+'</label>').join("")+'</div>'+
+ '<h4>3 · Sobre minhas tarefas atribuídas</h4><p>'+completed+' de '+assigned.length+' tarefa(s) concluída(s), conforme o Kanban.</p><label>Como foi sua participação nas tarefas?<select name="taskReflection"><option value="">Selecione</option><option value="todas">Concluí todas</option><option value="maioria">Concluí a maioria</option><option value="algumas">Concluí algumas</option><option value="nenhuma">Não concluí</option></select></label>'+
+ '<h4>4 · Autoavaliação da minha aprendizagem</h4><label>Meu nível de participação<select name="participation"><option value="">Selecione</option><option>Alta</option><option>Média</option><option>Baixa</option></select></label><label>Meu aprendizado<select name="learningLevel"><option value="">Selecione</option><option>Muito</option><option>Razoável</option><option>Pouco</option></select></label><label>Minha colaboração<select name="collaboration"><option value="">Selecione</option><option>Alta</option><option>Média</option><option>Baixa</option></select></label>'+
+ '<h4>5 · Registre sua contribuição</h4><label>O que você fez?<textarea name="contribution" rows="4" maxlength="500" placeholder="Descreva suas principais contribuições"></textarea></label>'+
+ '<h4>6 · Desafios e próximos passos</h4><label>Dificuldades e melhorias<textarea name="challenges" rows="4" maxlength="500"></textarea></label>'+
+ '<h4>7 · Evidências complementares (opcional)</h4><label>Link de evidência<input name="evidence" type="url" placeholder="https://"></label>'+
+ '<p class="muted">'+(assigned.length&&completed===assigned.length?"Todas as tarefas atribuídas estão concluídas.":"A entrega oficial exige a conclusão de todas as tarefas atribuídas.")+'</p>'+
+ '<button class="btn btn-primary" type="submit">Salvar rascunho</button><p class="mp-save-status" role="status"></p></form>';
+ target.append(section);const form=section.querySelector("form");
+ for(const [k,v] of Object.entries(saved)){const field=form.elements.namedItem(k);if(field&&typeof v==="string"&&field.type!=="checkbox")field.value=v;else if(field&&field.type==="checkbox")field.checked=v==="yes"}
+ form.addEventListener("submit",event=>{event.preventDefault();const data=Object.fromEntries(new FormData(form));for(let i=0;i<activities.length;i++)data["activity_"+i]=form.elements.namedItem("activity_"+i).checked?"yes":"no";
+ if(data.evidence&&!/^https:\/\//i.test(data.evidence)){form.querySelector(".mp-save-status").textContent="Informe um link HTTPS válido.";return}
+ try{localStorage.setItem(key,JSON.stringify({...data,savedAt:new Date().toISOString()}));form.querySelector(".mp-save-status").textContent="Rascunho salvo neste navegador. A entrega oficial continua sendo feita na missão."}catch{form.querySelector(".mp-save-status").textContent="Não foi possível salvar neste navegador."}
+ });
 }
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 export async function mountMissionParticipation(target,{missionId,classId=null,studentId=null,teacher=false}={}){
@@ -20,10 +36,10 @@ export async function mountMissionParticipation(target,{missionId,classId=null,s
   let guildId=null;
   const membership=await sb.from("guild_members").select("guild_id").eq("user_id",uid).maybeSingle();
   if(membership.error)throw membership.error;guildId=membership.data?.guild_id;
-  if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId);return}
+  if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId,[]);return}
   const taskQuery=sb.from("guild_tasks").select("id,title,status,responsible_user_id,mission_id").eq("guild_id",guildId).eq("mission_id",missionId);
   const {data:tasks,error:te}=await taskQuery;if(te)throw te;
-  if(!tasks?.length){target.innerHTML='<p class="muted">Ainda não há tarefas vinculadas a esta missão. O líder poderá organizá-las no Kanban.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId);return}
+  if(!tasks?.length){target.innerHTML='<p class="muted">Ainda não há tarefas vinculadas a esta missão. O líder poderá organizá-las no Kanban.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId,tasks);return}
   const ids=tasks.map(t=>t.id);
   const [logs,team]=await Promise.all([sb.from("guild_task_contributions").select("id,task_id,author_id,summary,evidence_url,created_at").eq("guild_id",guildId).in("task_id",ids).order("created_at",{ascending:false}),sb.from("guild_members").select("user_id").eq("guild_id",guildId)]);
   if(logs.error)throw logs.error;if(team.error)throw team.error;
