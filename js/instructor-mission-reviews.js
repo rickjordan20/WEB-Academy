@@ -234,7 +234,7 @@ function openReview(box,id){
   if(status)status.textContent="Analisando as evidências por indicador. Nenhuma menção será aplicada automaticamente.";
   try{
    const sb=window.__evalSupabase;
-   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id}});
+   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:reviewMission.steps,competencies:inds}}});
    if(error)throw new Error(data?.error||error.message||"Falha de conexão");
    if(data?.error)throw new Error(data.error);
    const result=box.querySelector("[data-ai-review-result]");
