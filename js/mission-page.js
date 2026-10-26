@@ -8,7 +8,7 @@ import {getMission,getFundamental,startMission,startFundamental,missionStatus,fu
 import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
-let projectContext=null,scheduledLesson=null,missionReadOnly=false,missionAccess=null;
+let projectContext=null,scheduledLesson=null,missionReadOnly=false,missionAccess=null,activeEduTechPanel=null;
 async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active");const preferred=localStorage.getItem("webacademy.student.activeClass");const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,class_id").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data;if(scheduledLesson){const {data:classData}=await sb.from("classes").select("lesson_start_time,lesson_end_time").eq("id",classId).maybeSingle();scheduledLesson.start=String(scheduledLesson.start_time_override||classData?.lesson_start_time||"").slice(0,5);scheduledLesson.end=String(scheduledLesson.end_time_override||classData?.lesson_end_time||"").slice(0,5)} if(mission&&missionAccess&&((missionAccess.state==="open"||missionAccess.state==="closed")))render(missionReadOnly,missionAccess)}catch(error){console.warn("Cronograma da missão:",error)}}
 const params=new URLSearchParams(location.search),id=params.get("id"),root=document.querySelector("#missionRoot");
 const state=getState();if(!state?.student?.name)location.replace("index.html");
@@ -39,6 +39,22 @@ function renderInlineFundamentals(unit,done){
  const percent=unit.steps.length?Math.round(completed/unit.steps.length*100):0;
  return `<section class="card current-mission" id="missionFundamentals" aria-label="Fundamentos da aula"><p class="eyebrow">Etapa 1 · Fundamentos</p><h2>📘 ${escapeMissionText(unit.title)}</h2><p>${escapeMissionText(unit.objective)}</p><p><strong>${completed} de ${unit.steps.length} atividades concluídas (${percent}%)</strong></p><div class="progress"><i style="width:${percent}%"></i></div><div class="learning-list">${unit.steps.map(step=>`<div data-fundamental-step="${escapeMissionText(step.id)}">${renderStep(step,`F${mission.phase}`,done.includes(step.id),{editableCompleted:true})}</div>`).join("")}</div><p class="mission-notice">Após revisar os conceitos, avance para a Prática Guiada EduTech. Você também pode voltar aos fundamentos para revisar.</p><a class="btn btn-secondary" href="#guidedPractice">Continuar para a prática guiada ↓</a></section>`;
 }
+function organizeEduTechPanels(){
+ const flow=root.querySelector(".lesson-flow");
+ const fundamentals=root.querySelector("#missionFundamentals");
+ if(!flow||!fundamentals)return;
+ const stageLinks=[...flow.querySelectorAll(".lesson-stage")];
+ const host=document.createElement("div");host.className="edutech-stage-content";host.id="edutechStageContent";flow.insertAdjacentElement("afterend",host);
+ const panels=["fundamentals","practice","report"].map((key,i)=>{const panel=document.createElement("section");panel.className="edutech-stage-panel";panel.dataset.eduPanel=key;panel.setAttribute("aria-label",stageLinks[i]?.querySelector("strong")?.textContent||key);panel.hidden=true;host.append(panel);return panel});
+ panels[0].append(fundamentals);
+ const project=root.querySelector(".project-context");
+ const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
+ if(project)panels[1].append(project);
+ if(guided){const children=[...guided.children];const reportItems=children.filter(el=>el.id==="individualReport"||el.querySelector('[data-mission-step]')?.dataset.missionStep==="individualReport");panels[1].append(guided);for(const el of reportItems)panels[2].append(el)}
+ const open=key=>{activeEduTechPanel=key;panels.forEach(p=>p.hidden=p.dataset.eduPanel!==key);stageLinks.forEach((link,i)=>{const selected=panels[i].dataset.eduPanel===key;link.classList.toggle("active",selected);link.setAttribute("aria-expanded",String(selected));link.setAttribute("aria-controls","edutechStageContent")});host.scrollIntoView({behavior:"smooth",block:"start"})};
+ stageLinks.forEach((link,i)=>{link.setAttribute("role","button");link.addEventListener("click",event=>{event.preventDefault();open(panels[i].dataset.eduPanel)})});
+ open(activeEduTechPanel||"fundamentals");
+}
 function render(readOnly=false,access=null){
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
  const retrospective=id==="1A"||id==="1B"||id==="2A";
@@ -52,6 +68,7 @@ function render(readOnly=false,access=null){
   startFundamental(mission.phase);
   fund.steps.forEach(step=>bindStep(step,`F${mission.phase}`,()=>render(false,missionAccess),(_,stepId)=>completeFundamentalStep(mission.phase,stepId),{completed:fundamentalProgress.includes(step.id)}));
  }
+ if(mission.type==="training"&&!retrospective)organizeEduTechPanels();
  reapplyMissionRevision(root,mission);
  if(mission.type==="guild")mountGuildMissionBoard(root,mission,{readOnly}).catch(error=>console.warn("Kanban:",error));
  if(!readOnly||access?.state==="closed")mountMissionDelivery(id,access,root).catch(error=>console.warn("Entrega indisponível:",error));
