@@ -2,7 +2,6 @@ import {getSupabase} from "./supabase-client.js";
 import {setVerifiedMissionWindow} from "./mission-engine.js";
 const fmt=iso=>iso?new Intl.DateTimeFormat("pt-BR",{timeZone:"America/Sao_Paulo",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(iso)):"a definir";
 export async function missionWindow(missionId){
- setVerifiedMissionWindow(missionId,null);
  try{
  const sb=await getSupabase();if(!sb)return {state:"error",message:"Conexão com o servidor indisponível."};
  const {data:auth,error:authError}=await sb.auth.getUser();if(authError||!auth?.user)return {state:"error",message:"Entre na sua conta para consultar a missão."};
