@@ -224,10 +224,10 @@ function indicatorEvidenceSuggestions(box,codes,aiEntries=[]){
   const evidenceCount=mentions.filter(x=>x==="A"||x==="PA").length;
   let suggestion=null;
   if(mentions.length&&mentions.length===groups.length)suggestion=mentions.every(x=>x==="A")?"A":mentions.includes("NA")?"NA":"PA";
-  else if(mentions.length)suggestion=mentions.every(x=>x==="A")?"A":"PA";
+  else if(mentions.length)suggestion="PA";
   if(ai&&["A","PA","NA"].includes(ai.mention)){
    if(suggestion==="A"&&ai.mention!=="A")suggestion="PA";
-   else if(!suggestion)suggestion=ai.mention;
+   else if(!suggestion&&evidenceCount>0)suggestion=ai.mention==="A"&&mentions.length<groups.length?"PA":ai.mention;
   }
   if(!evidenceCount&&suggestion==="A")suggestion=null;
   return {code,suggestion,evidenceCount,assessed:mentions.length,total:groups.length,ai:ai?.mention||null};
@@ -330,7 +330,18 @@ function openReview(box,id){
      if(radio){radio.checked=true;applied++}
     }
     const xpInput=box.querySelector("[data-eval-xp]");
-    if(xpInput&&g.xp==null){xpInput.value=String(xpPlan.total);applied++}
+    if(xpInput&&g.xp==null){
+     const aiBlocks=Array.isArray(data.blocks)?data.blocks:[];
+     const scores=xpPlan.items.map(item=>{
+      const ai=aiBlocks.find(b=>b.review_key===item.key||(!b.review_key&&b.step_id===item.step.id));
+      if(!ai)return item.suggested;
+      const statuses=(ai.question_analysis||[]).map(q=>q.status);
+      const fraction=statuses.length?statuses.reduce((sum,v)=>sum+(v==="atendida"?1:v==="parcial"?0.5:0),0)/statuses.length:null;
+      if(ai.needs_review)return Math.min(item.suggested,Math.round(item.cap*0.5));
+      return fraction===null?item.suggested:Math.min(item.cap,Math.round(item.cap*fraction));
+     });
+     xpInput.value=String(Math.min(maxXp,scores.reduce((a,b)=>a+b,0)));applied++;
+    }
     for(const i of entries){
      if(!["A","PA","NA"].includes(i.mention))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
