@@ -195,13 +195,14 @@ const phase1GuidedSteps=[
 ];
 
 const EDUTECH_SELF_REVIEW_FIELDS=[
- {type:"select",label:"Como você avalia sua participação nesta prática?",options:["Participei ativamente e realizei as atividades","Participei e precisei de algumas orientações","Participei parcialmente e preciso retomar algumas etapas"]},
- {type:"select",label:"Quanto você conseguiu compreender e aplicar?",options:["Compreendi e consegui aplicar com autonomia","Compreendi a maior parte, mas precisei de ajuda","Ainda tenho dúvidas e preciso praticar mais"]},
- {type:"select",label:"Como você avalia o resultado do seu trabalho?",options:["Concluí e conferi o resultado","Concluí parcialmente e identifiquei melhorias","Ainda não consegui concluir"]},
- {type:"short",label:"Qual foi seu principal aprendizado ou desafio? (uma ou duas frases)"},
- {type:"short",label:"Informe o link ou referência de uma evidência do que realizou"}
+ {type:"cards",label:"Como foi sua participação nesta prática?",options:[{emoji:"🚀",label:"Participei ativamente"},{emoji:"🤝",label:"Participei com orientação"},{emoji:"🌱",label:"Participei parcialmente"}]},
+ {type:"scale",label:"Quanto você confia na sua capacidade de aplicar o que aprendeu?",minLabel:"Ainda preciso praticar",maxLabel:"Consigo fazer sozinho"},
+ {type:"checklist",label:"O que você conseguiu desenvolver?",options:["Compreendi os conceitos apresentados","Acompanhei e realizei a prática guiada","Consegui aplicar o que aprendi","Testei e conferi meu resultado","Identifiquei algo que preciso melhorar"]},
+ {type:"radio",label:"Como você lidou com as dificuldades?",options:["Resolvi pesquisando ou tentando novamente","Precisei de orientação para avançar","Ainda tenho dúvidas que preciso esclarecer","Não encontrei dificuldades significativas"]},
+ {type:"short",label:"Qual foi sua principal conquista ou aprendizado? (uma ou duas frases)"},
+ {type:"url",label:"Link de uma evidência do que você realizou"}
 ];
-const edutechSelfReview=(p)=>({id:`p${p}-report`,type:"evidence",title:"Autoavaliação Individual — EduTech",summary:"Reflita sobre sua participação, aprendizagem e resultado. Responda com sinceridade e apresente uma evidência.",fields:EDUTECH_SELF_REVIEW_FIELDS});
+const edutechSelfReview=(p)=>({id:`p${p}-report`,type:"evidence",title:"Minha evolução na EduTech — Autoavaliação Individual",summary:"Avalie sua participação, confiança e aprendizagem e apresente uma evidência real.",answerKey:`p${p}-report::edutech-self-review-v2`,fields:EDUTECH_SELF_REVIEW_FIELDS});
 const guidedSteps=(p,topic,sub)=>p===1?phase1GuidedSteps:[
 {id:`p${p}-guided`,type:"guided",title:`Prática Guiada EduTech — ${sub}`,summary:"Faça junto com o instrutor no projeto real, usando o VS Code.",instructions:[`Abra o projeto EduTech no VS Code e localize onde a evolução ${sub} será implementada.`,`Acompanhe a demonstração do instrutor e implemente ${topic} no seu próprio projeto.`,"Relacione a implementação aos requisitos exibidos no briefing desta missão.","Execute e teste o resultado antes de prosseguir.","Revise o que mudou e registre a evolução com Git/GitHub quando pertinente à etapa."]},
 edutechSelfReview(p)
