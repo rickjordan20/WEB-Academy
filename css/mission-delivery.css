@@ -89,3 +89,8 @@
 .edutech-stage-navigation .btn{min-height:44px}
 .edutech-stage-content .learning-list{display:grid;gap:18px}
 @media(max-width:600px){.edutech-stage-navigation{display:grid;grid-template-columns:1fr 1fr}.edutech-stage-navigation .edutech-stage-counter{grid-column:1/-1;grid-row:1}.edutech-stage-navigation .btn{width:100%;justify-content:center}}
+
+/* Relatórios individuais com escolhas rápidas e respostas curtas */
+.learning-step .reflection-fields select,.learning-step .reflection-fields input[data-evidence]{display:block;width:100%;max-width:100%;min-height:44px;box-sizing:border-box;margin-top:8px;padding:10px 12px;border:1px solid rgba(148,163,184,.35);border-radius:10px;background:#091725;color:#edf3ff;font:inherit;color-scheme:dark}
+.learning-step .reflection-fields select option{background:#101e30;color:#edf3ff}
+.learning-step .reflection-fields select:focus-visible,.learning-step .reflection-fields input[data-evidence]:focus-visible{outline:2px solid #8e7bff;outline-offset:2px}
