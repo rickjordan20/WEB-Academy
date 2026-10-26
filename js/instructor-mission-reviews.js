@@ -222,11 +222,11 @@ function indicatorEvidenceSuggestions(box,codes,aiEntries=[]){
   const ai=aiEntries.find(item=>item.code===code);
   const evidenceCount=mentions.filter(x=>x==="A"||x==="PA").length;
   let suggestion=null;
-  if(mentions.length&&mentions.length===groups.length)suggestion=mentions.every(x=>x==="A")?"A":mentions.includes("NA")?"NA":"PA";
+  if(mentions.length&&mentions.length===groups.length)suggestion=mentions.every(x=>x==="A")?"A":mentions.includes("NA")?null:"PA";
   else if(mentions.length)suggestion="PA";
   if(ai&&["A","PA","NA"].includes(ai.mention)){
    if(suggestion==="A"&&ai.mention!=="A")suggestion="PA";
-   else if(!suggestion&&evidenceCount>0)suggestion=ai.mention==="A"&&mentions.length<groups.length?"PA":ai.mention;
+   else if(!suggestion&&evidenceCount>0&&ai.mention!=="NA")suggestion=ai.mention==="A"&&mentions.length<groups.length?"PA":ai.mention;
   }
   if(!evidenceCount&&suggestion==="A")suggestion=null;
   return {code,suggestion,evidenceCount,assessed:mentions.length,total:groups.length,ai:ai?.mention||null};
@@ -356,9 +356,11 @@ function openReview(box,id){
       const ai=aiBlocks.find(b=>b.review_key===item.key||(!b.review_key&&b.step_id===item.step.id));
       if(!ai||!item.answered)return item.suggested;
       const statuses=(ai.question_analysis||[]).map(q=>q.status);
-      const fraction=statuses.length?statuses.reduce((sum,v)=>sum+(v==="atendida"?1:v==="parcial"?0.5:0),0)/statuses.length:null;
-      if(ai.needs_review)return Math.min(item.suggested,Math.round(item.cap*0.5));
-      if(typeof ai.quality_score==="number"&&Number.isFinite(ai.quality_score))return Math.min(item.suggested,Math.round(item.cap*Math.max(0,Math.min(1,ai.quality_score))));
+      const valid=statuses.filter(v=>["atendida","parcial","incorreta"].includes(v));
+      const fraction=valid.length?valid.reduce((sum,v)=>sum+(v==="atendida"?1:v==="parcial"?0.5:0),0)/valid.length:null;
+      // A flag de revisão é informativa; nunca reduz XP automaticamente.
+      if(typeof ai.quality_score==="number"&&Number.isFinite(ai.quality_score)&&(!item.objective||!item.objective.passed))return Math.min(item.suggested,Math.round(item.cap*Math.max(0,Math.min(1,ai.quality_score))));
+      if(item.objective?.passed)return item.suggested;
       return fraction===null?item.suggested:Math.min(item.suggested,Math.round(item.cap*fraction));
      });
      const aiXp=Math.min(xpPlan.total,maxXp,scores.reduce((a,b)=>a+b,0));
@@ -369,8 +371,9 @@ function openReview(box,id){
      const xpNote=box.querySelector("[data-xp-plan]");
      if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA sugere "+aiXp+" XP com base em "+reviewedBlocks.length+" bloco(s) analisado(s); revise os demais antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
     }
+    // Não aplicar menções gerais da IA sem correspondência com evidências da missão.
     for(const i of entries){
-     if(!["A","PA","NA"].includes(i.mention))continue;
+     if(!["A","PA"].includes(i.mention))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
      if(radios.some(x=>x.checked))continue;
      const target=radios.find(x=>x.value===i.mention);
