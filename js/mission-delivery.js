@@ -45,7 +45,7 @@ export async function mountMissionDelivery(missionId,access,root){
  if(mission?.type==="guild"&&/^(?:[2-9]|1[0-4])B$/.test(mission.displayId||"")){
   const participation=section.querySelector("[data-mission-participation]");
   const justification=document.createElement("div");justification.className="guild-delivery-exception";justification.innerHTML='<label for="guildDeliveryJustification">Justificativa excepcional (somente se não houver tarefa atribuída ou existirem pendências)</label><textarea id="guildDeliveryJustification" name="guildDeliveryJustification" rows="3" maxlength="1500" placeholder="Explique sua participação e por que o Kanban ainda não registra a conclusão. O instrutor analisará as evidências."></textarea><p class="muted">A justificativa não comprova a execução nem garante menção A. O instrutor avaliará individualmente as evidências.</p>';
-  (participation||section).insertAdjacentElement("afterend",justification);
+  if(participation)participation.insertAdjacentElement("afterend",justification);else section.append(justification);
  }
  const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
