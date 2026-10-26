@@ -54,7 +54,29 @@ export async function mountMissionDelivery(missionId,access,root){
   if(isLate&&!late){feedback.textContent="O prazo terminou. Atualize a página para informar o motivo e a justificativa do atraso.";return}
   if(isLate&&(!reason?.value||explanation?.value.trim().length<10)){feedback.textContent="Selecione o motivo do atraso e escreva uma justificativa com pelo menos 10 caracteres.";return}
   try{
+   // Para missões da Guilda a partir da 2B, a ficha individual integra a entrega oficial.
+   let guildReview=null;
+   if(mission?.type==="guild"&&/^(?:[2-9]|1[0-4])B$/.test(mission.displayId||"")){
+    const membership=await sb.from("guild_members").select("guild_id").eq("user_id",session.user.id).maybeSingle();
+    if(membership.error)throw membership.error;
+    if(!membership.data?.guild_id){feedback.textContent="Você precisa estar vinculado a uma Guilda para entregar esta missão.";return}
+    const {data:taskRows,error:taskError}=await sb.from("guild_tasks").select("id,title,status,responsible_user_id,source").eq("guild_id",membership.data.guild_id).eq("mission_id",missionId);
+    if(taskError)throw taskError;
+    const myTasks=(taskRows||[]).filter(t=>t.source!=="mission"&&t.responsible_user_id===session.user.id);
+    if(!myTasks.length){feedback.textContent="Associe pelo menos uma tarefa à missão e atribua-a a você antes de entregar.";return}
+    if(myTasks.some(t=>t.status!=="done")){feedback.textContent="Conclua todas as suas tarefas atribuídas no Kanban antes de entregar.";return}
+    const reviewForm=section.querySelector(".mp-self-form");
+    if(!reviewForm){feedback.textContent="A ficha de autoavaliação ainda não carregou. Aguarde ou atualize a página.";return}
+    const reviewData=Object.fromEntries(new FormData(reviewForm));
+    for(let i=0;i<8;i++)reviewData["activity_"+i]=reviewForm.elements.namedItem("activity_"+i)?.checked?"yes":"no";
+    if(!reviewData.taskReflection||!reviewData.participation||!reviewData.learningLevel||!reviewData.collaboration||!reviewData.contribution?.trim()||!reviewData.challenges?.trim()){
+     feedback.textContent="Preencha todas as seções obrigatórias da ficha individual antes de entregar.";reviewForm.scrollIntoView({behavior:"smooth",block:"nearest"});return
+    }
+    if(reviewData.evidence&&!/^https:\/\//i.test(reviewData.evidence)){feedback.textContent="Informe um link HTTPS válido na ficha.";return}
+    guildReview={version:1,missionId,submittedAt:new Date().toISOString(),form:reviewData,tasks:myTasks.map(t=>({id:t.id,title:t.title,status:t.status}))};
+   }
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
+   if(guildReview)answers[missionId+":guild_self_review"]=guildReview;
    const phase=Number(String(missionId).match(/^\\d+/)?.[0]||0);
    const missionProgress=state?.journey?.missionProgress?.[missionId]||{};
    const fundamentalId="F"+phase;
