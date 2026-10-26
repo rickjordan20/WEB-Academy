@@ -17,7 +17,7 @@ async function loadModule(file, mocks={}) {
 }
 const fresh=()=>({meta:{updatedAt:'2026-10-20T10:00:00Z'},journey:{completedMissions:[],unlockedMissions:[],missionProgress:{},completedFundamentals:[],unlockedFundamentals:[],fundamentalProgress:{}},gamification:{xp:0,rewarded:[],xpHistory:[],achievements:[]},answers:{},evidence:[],competencies:{}});
 test('etapas exigem sequência e conclusão integral',async()=>{
- const rules=await loadModule('../js/mission-progress-rules.js');
+ const rules=await loadModule('../js/missions/mission-progress-rules.js');
  const steps=[{id:'a'},{id:'b'},{id:'c'}];
  assert.equal(rules.canCompleteSequentialStep(steps,[],'b'),false);
  assert.equal(rules.canCompleteSequentialStep(steps,[],'a'),true);
