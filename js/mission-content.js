@@ -13,12 +13,27 @@ export async function loadEditedMissionContent(missionId){
  return data?.content||null;
  }catch(error){console.error("Não foi possível carregar o conteúdo da missão:",error);throw error;}
 }
+function isGuildOnlyStep(step){
+ const title=String(step?.title||"").toLowerCase();
+ const text=[step?.title,step?.summary,step?.idea].filter(Boolean).join(" ").toLowerCase();
+ const id=String(step?.id||"");
+ // Identificadores históricos do conteúdo publicado da Aula 4.
+ if(["2b-p4","2b-p6"].includes(id))return true;
+ return /prática autônoma|desafio da guilda|checklist da guilda|entrega · github e evidências individuais/i.test(title)||
+  (step?.type==="visual-summary"&&/projeto restaurante|guilda|kanban/i.test(text));
+}
 export function applyEditedMissionContent(missionId,content){
  if(!content)return;
  const mission=[...MISSIONS,...EXTRA_MISSIONS].find(m=>m.id===missionId);if(!mission)return;
  if(typeof content.title==="string")mission.title=content.title;
  if(typeof content.subtitle==="string")mission.subtitle=content.subtitle;
- if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0))mission.steps=content.steps;
+ if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0)){
+  // Conteúdo publicado da turma pode ser anterior à separação EduTech/Guilda.
+  // Não permitir que o override reintroduza a prática autônoma em missões guiadas.
+  mission.steps=mission.type==="training"&&mission.displayId!=="1A"&&mission.displayId!=="1B"
+   ?content.steps.filter(step=>!isGuildOnlyStep(step))
+   :content.steps;
+ }
  // Infográfico original aprovado no construtor: mostrar também na revisão da primeira aula.
  if(missionId==="1A"){
   const image=content.draft?.fundamental?.steps?.find(step=>step.type==="image-review"&&typeof step.imageData==="string"&&step.imageData.startsWith("data:image/jpeg;base64,"));
