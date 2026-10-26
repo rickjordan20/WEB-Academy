@@ -70,3 +70,11 @@
 .mission-delivery .delivery-acknowledgement[hidden]{display:none}
 .mission-delivery .delivery-acknowledgement input{flex:0 0 auto;width:19px;height:19px;margin-top:3px;accent-color:#8574ff}
 .mission-delivery .delivery-acknowledgement input:focus-visible{outline:2px solid #a7baff;outline-offset:3px}
+
+/* Etapas da aula EduTech: uma seção visível por vez, sem navegar para outra página. */
+.edutech-stage-panel[hidden]{display:none!important}
+.edutech-stage-content{margin-top:16px;scroll-margin-top:100px}
+.lesson-flow .lesson-stage{cursor:pointer;transition:border-color .15s,background-color .15s}
+.lesson-flow .lesson-stage.active{border-color:#8270ff;background:rgba(110,94,245,.12);box-shadow:inset 0 0 0 1px rgba(130,112,255,.35)}
+.lesson-flow .lesson-stage:focus-visible{outline:3px solid #9d91ff;outline-offset:3px}
+.edutech-stage-panel>.learning-list{display:grid;gap:16px}
