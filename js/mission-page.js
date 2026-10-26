@@ -9,8 +9,46 @@ import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
 let projectContext=null,scheduledLesson=null,missionReadOnly=false,missionAccess=null,activeEduTechPanel=null;
+
+/* Rascunho local de campos ainda não concluídos: separado por aluno e missão.
+   Não altera XP, avaliação nem a entrega oficial. */
+function installMissionDrafts(missionId){
+ const owner=localStorage.getItem("uc7_web_academy_active_user")||"local";
+ const key="uc7:mission-draft:v1:"+owner+":"+missionId;
+ const selector='textarea, input:not([type="file"]):not([type="password"]):not([type="hidden"]), select';
+ const identify=el=>{
+  const card=el.closest("[data-step-card],[data-fundamental-step],form,section");
+  const scope=card?.getAttribute("data-step-card")||card?.getAttribute("data-fundamental-step")||card?.id||"mission";
+  const controls=[...(card||root).querySelectorAll(selector)];
+  return scope+"::"+(el.name||el.id||el.getAttribute("data-evidence")||"field")+"::"+controls.indexOf(el);
+ };
+ const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return {}}};
+ let cache=read();
+ const restore=()=>{
+  root.querySelectorAll(selector).forEach(el=>{
+   if(el.disabled||el.readOnly||el.closest('[data-complete-step]'))return;
+   const entry=cache[identify(el)];if(!entry)return;
+   if(el.type==="checkbox"||el.type==="radio"){if(el.checked!==entry.checked)el.checked=entry.checked;}
+   else if(!el.value&&entry.value)el.value=entry.value;
+  });
+ };
+ let restoring=false;
+ const observer=new MutationObserver(()=>{if(restoring)return;restoring=true;queueMicrotask(()=>{restore();restoring=false})});
+ observer.observe(root,{childList:true,subtree:true});
+ root.addEventListener("input",save,{capture:true});
+ root.addEventListener("change",save,{capture:true});
+ function save(event){
+  const el=event.target;if(!el.matches?.(selector)||el.disabled||el.readOnly)return;
+  cache[identify(el)]={value:el.value,checked:el.checked};
+  try{localStorage.setItem(key,JSON.stringify(cache))}catch(error){console.warn("Rascunho local indisponível:",error)}
+ }
+ restore();
+ window.addEventListener("pageshow",restore);
+}
+
 async function refreshMissionSchedule(){try{const sb=await getSupabase();if(!sb)return;const {data:auth}=await sb.auth.getUser();if(!auth?.user)return;const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",auth.user.id).eq("status","active");const preferred=localStorage.getItem("webacademy.student.activeClass");const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;const {data,error}=await sb.from("class_schedule").select("lesson_number,lesson_date,execution_mode,start_time_override,end_time_override,class_id").eq("class_id",classId).eq("uc","UC7").eq("mission_id",id).order("lesson_date").limit(1).maybeSingle();if(error)throw error;scheduledLesson=data;if(scheduledLesson){const {data:classData}=await sb.from("classes").select("lesson_start_time,lesson_end_time").eq("id",classId).maybeSingle();scheduledLesson.start=String(scheduledLesson.start_time_override||classData?.lesson_start_time||"").slice(0,5);scheduledLesson.end=String(scheduledLesson.end_time_override||classData?.lesson_end_time||"").slice(0,5)} if(mission&&missionAccess&&((missionAccess.state==="open"||missionAccess.state==="closed")))render(missionReadOnly,missionAccess)}catch(error){console.warn("Cronograma da missão:",error)}}
 const params=new URLSearchParams(location.search),id=params.get("id"),root=document.querySelector("#missionRoot");
+if(id&&root)installMissionDrafts(id);
 const state=getState();if(!state?.student?.name)location.replace("index.html");
 const initialAccess=await missionWindow(id);
 const mission=getMission(id),pad=n=>String(n).padStart(2,"0");
