@@ -218,3 +218,13 @@ details.eval-review-step>summary span{font-size:.78rem;color:var(--muted)}
 .eval-auto-line small{grid-column:1/-1;opacity:.8;overflow-wrap:anywhere}
 .eval-auto-panel .eval-comment-label{display:block;margin-top:1.2rem}
 @media(max-width:640px){.eval-auto-line{grid-template-columns:1fr}.eval-auto-line small{grid-column:1}}
+
+/* Ficha agrupada: checks únicos, objetivas e respostas discursivas */
+.eval-checks-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.5rem;margin:.65rem 0 1.25rem}
+.eval-auto-panel>h3:not(:first-child){margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid rgba(148,163,184,.25)}
+.eval-objective-item{padding:1rem 0;border-bottom:1px solid rgba(148,163,184,.22)}
+.eval-objective-item>strong{display:block;line-height:1.5;overflow-wrap:anywhere}
+.eval-objective-item p{margin:.45rem 0;overflow-wrap:anywhere}
+.eval-objective-item .eval-comment-label{display:block;margin-top:.7rem}
+@media(max-width:720px){.eval-checks-grid{grid-template-columns:1fr}}
+@media print{.eval-review-step{break-inside:avoid}.eval-auto-panel{break-inside:auto}.eval-objective-item{break-inside:avoid}}
