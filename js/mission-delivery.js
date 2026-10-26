@@ -101,11 +101,11 @@ export async function mountMissionDelivery(missionId,access,root){
     fundamentals:{id:fundamentalId,completedSteps:[...(fundamentalProgress.completedSteps||[])],startedAt:fundamentalProgress.startedAt||null,completed:!!state?.journey?.completedFundamentals?.includes(fundamentalId)},
     codeAttempts:Object.fromEntries(Object.entries(state?.codeAttempts||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith(fundamentalId+":")))
    };
-   const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(phase):null;
-   const steps=mission?.steps||[],completed=new Set(progressSnapshot.mission.completedSteps);
+   const currentMission=getMission(missionId),fundamental=currentMission?.type==="training"?getFundamental(phase):null;
+   const steps=currentMission?.steps||[],completed=new Set(progressSnapshot.mission.completedSteps);
    const pending=steps.filter(step=>!completed.has(step.id));
    const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
-   const estimate=estimateMissionXp(mission,progressSnapshot);
+   const estimate=estimateMissionXp(currentMission,progressSnapshot);
    const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value,lateConsent:consent?.checked});
    if(confirmedFingerprint!==fingerprint){
     confirmedFingerprint=fingerprint;
