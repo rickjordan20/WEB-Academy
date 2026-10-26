@@ -88,11 +88,21 @@ function render(){
 }
 async function loadRows(){
  feedback("");
- const {data,error}=await sb.from("class_schedule").select("id,class_id,uc,lesson_number,lesson_date,execution_mode,mission_id,start_time_override,end_time_override").in("class_id",classes.map(c=>c.id)).order("lesson_date").order("lesson_number");
+ const {data,error}=await sb.from("class_schedule").select("id,class_id,uc,lesson_number,lesson_date,execution_mode,mission_id,start_time_override,end_time_override,mission_open_at,mission_close_at").in("class_id",classes.map(c=>c.id)).order("lesson_date").order("lesson_number");
  if(error)throw error;
  rows=data||[];updateUcOptions();render();
 }
+function ensureMissionWindowFields(){
+ const form=$("scheduleForm");if(form.querySelector("[name=mission_open_at]"))return;
+ const wrapper=document.createElement("div");wrapper.className="schedule-mission-window-fields";wrapper.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0";
+ for(const [name,label] of [["mission_open_at","Abertura da missão (opcional)"],["mission_close_at","Prazo final da missão (opcional)"]]){const field=document.createElement("label");field.textContent=label;field.style.display="grid";field.style.gap="6px";const input=document.createElement("input");input.type="datetime-local";input.name=name;input.style.cssText="width:100%;padding:10px;background:#111c30;color:white;border:1px solid #667899;border-radius:8px";field.append(input);wrapper.append(field)}
+ const hint=document.createElement("p");hint.textContent="Sem datas específicas, a missão acompanha a data e os horários da aula. Defina as duas datas para usar um período próprio. Alterações não apagam entregas ou progresso.";hint.style.gridColumn="1 / -1";wrapper.append(hint);
+ form.insertBefore(wrapper,form.querySelector("button[type=submit]")||form.lastElementChild);
+}
+const toLocalInput=value=>{if(!value)return "";const d=new Date(value);const parts=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(d);return parts.replace(" ","T")};
+const toIso=value=>value?new Date(value+":00-03:00").toISOString():null;
 function openForm(row=null){
+ ensureMissionWindowFields();
  if(!instructor)return;
  editing=row?.id||null;
  $("scheduleDialogTitle").textContent=row?"Editar aula":"Nova aula";
@@ -107,6 +117,8 @@ function openForm(row=null){
  form.elements.namedItem("end_time").value=hours.end;
  refreshMissionOptions();
  form.elements.namedItem("mission_id").value=row?.mission_id||"";
+ form.elements.namedItem("mission_open_at").value=toLocalInput(row?.mission_open_at);
+ form.elements.namedItem("mission_close_at").value=toLocalInput(row?.mission_close_at);
  $("scheduleFormFeedback").textContent="";
  $("scheduleDialog").showModal();
 }
@@ -122,6 +134,10 @@ $("scheduleForm").addEventListener("submit",async e=>{
  const payload={class_id:form.elements.namedItem("class_id").value,uc:form.elements.namedItem("uc").value.trim().toUpperCase(),lesson_number:Number(form.elements.namedItem("lesson_number").value),lesson_date:form.elements.namedItem("lesson_date").value,execution_mode:form.elements.namedItem("execution_mode").value,mission_id:form.elements.namedItem("mission_id").value||null};
  const start=hhmm(form.elements.namedItem("start_time").value),end=hhmm(form.elements.namedItem("end_time").value);
  if(!start||!end||start>=end){$("scheduleFormFeedback").textContent="O horário de término deve ser posterior ao início.";return}
+ const openInput=form.elements.namedItem("mission_open_at").value,closeInput=form.elements.namedItem("mission_close_at").value;
+ if(Boolean(openInput)!==Boolean(closeInput)){ $("scheduleFormFeedback").textContent="Informe a abertura e o encerramento, ou deixe ambos vazios para acompanhar a aula.";return }
+ if(openInput&&new Date(openInput)>=new Date(closeInput)){ $("scheduleFormFeedback").textContent="O prazo final deve ser posterior à abertura.";return }
+ payload.mission_open_at=toIso(openInput);payload.mission_close_at=toIso(closeInput);
  const defaults=classHours(payload.class_id);
  payload.start_time_override=start===hhmm(defaults?.lesson_start_time)&&end===hhmm(defaults?.lesson_end_time)?null:start;
  payload.end_time_override=payload.start_time_override?end:null;
