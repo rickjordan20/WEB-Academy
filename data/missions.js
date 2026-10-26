@@ -194,9 +194,17 @@ const phase1GuidedSteps=[
  }
 ];
 
+const EDUTECH_SELF_REVIEW_FIELDS=[
+ {type:"select",label:"Como você avalia sua participação nesta prática?",options:["Participei ativamente e realizei as atividades","Participei e precisei de algumas orientações","Participei parcialmente e preciso retomar algumas etapas"]},
+ {type:"select",label:"Quanto você conseguiu compreender e aplicar?",options:["Compreendi e consegui aplicar com autonomia","Compreendi a maior parte, mas precisei de ajuda","Ainda tenho dúvidas e preciso praticar mais"]},
+ {type:"select",label:"Como você avalia o resultado do seu trabalho?",options:["Concluí e conferi o resultado","Concluí parcialmente e identifiquei melhorias","Ainda não consegui concluir"]},
+ {type:"short",label:"Qual foi seu principal aprendizado ou desafio? (uma ou duas frases)"},
+ {type:"short",label:"Informe o link ou referência de uma evidência do que realizou"}
+];
+const edutechSelfReview=(p)=>({id:`p${p}-report`,type:"evidence",title:"Autoavaliação Individual — EduTech",summary:"Reflita sobre sua participação, aprendizagem e resultado. Responda com sinceridade e apresente uma evidência.",fields:EDUTECH_SELF_REVIEW_FIELDS});
 const guidedSteps=(p,topic,sub)=>p===1?phase1GuidedSteps:[
 {id:`p${p}-guided`,type:"guided",title:`Prática Guiada EduTech — ${sub}`,summary:"Faça junto com o instrutor no projeto real, usando o VS Code.",instructions:[`Abra o projeto EduTech no VS Code e localize onde a evolução ${sub} será implementada.`,`Acompanhe a demonstração do instrutor e implemente ${topic} no seu próprio projeto.`,"Relacione a implementação aos requisitos exibidos no briefing desta missão.","Execute e teste o resultado antes de prosseguir.","Revise o que mudou e registre a evolução com Git/GitHub quando pertinente à etapa."]},
-{id:`p${p}-report`,type:"evidence",title:"Relatório Individual da Fase",summary:"Registre sua aprendizagem e uma evidência verificável da prática guiada.",fields:["O que eu fiz?","Como eu fiz?","O que eu aprendi?","Qual dificuldade encontrei?","Como resolvi ou tentei resolver?","Link do repositório, commit ou outra evidência da evolução"]}
+edutechSelfReview(p)
 ];
 const phase1GuildSteps=[
 {id:"g1-brief",type:"content",title:"Briefing da Guilda — Projeto Restaurante",summary:"Prepare a base colaborativa do projeto da equipe.",body:["A Guilda começará o Projeto Restaurante criando uma base de trabalho compartilhada. Nesta fase, o foco é organização, responsabilidades e versionamento — ainda não é necessário construir a interface do restaurante.","A contribuição de cada integrante deve permanecer identificável no histórico do repositório."]},
