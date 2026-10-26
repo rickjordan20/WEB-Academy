@@ -196,3 +196,16 @@ body:has(#activeClassSelect) .app-shell>.sidebar .sidebar-footer{flex:0 0 auto;m
 .eval-submitted{min-width:0;max-width:100%;overflow:hidden}
 .eval-submitted .eval-answer-fields .eval-answer-fields{margin-top:.4rem}
 @media(max-width:640px){.eval-answer-field{grid-template-columns:minmax(0,1fr);gap:.35rem}.eval-block{padding:.85rem}}
+
+/* Avaliação por etapas: leitura progressiva e alertas de versão histórica */
+.eval-history-warning{border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.08);border-radius:12px;padding:1rem;margin:1rem 0;color:var(--text)}
+.eval-history-warning strong{display:block;margin-bottom:.4rem}
+.eval-history-warning p{margin:.3rem 0;line-height:1.55;overflow-wrap:anywhere}
+details.eval-review-step{min-width:0}
+details.eval-review-step>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+details.eval-review-step>summary::-webkit-details-marker{display:none}
+details.eval-review-step>summary:after{content:"▾";font-size:1.1rem;flex-shrink:0;opacity:.8}
+details.eval-review-step:not([open])>summary:after{content:"▸"}
+details.eval-review-step>summary:focus-visible{outline:2px solid #60a5fa;outline-offset:4px;border-radius:6px}
+details.eval-review-step>summary strong{flex:1;min-width:0;overflow-wrap:anywhere}
+details.eval-review-step>summary span{font-size:.78rem;color:var(--muted)}
