@@ -336,8 +336,12 @@ function openReview(box,id){
     }).join(" · ");
     let evidenceNote=box.querySelector("[data-ai-indicator-evidence]");
     if(!evidenceNote){evidenceNote=document.createElement("p");evidenceNote.dataset.aiIndicatorEvidence="";evidenceNote.className="muted";box.querySelector("[data-eval-xp]")?.closest("label")?.before(evidenceNote)}
-    if(evidenceNote)evidenceNote.textContent="Indicadores: "+summary+". A menção só será sugerida quando houver evidência suficiente.";
+    if(evidenceNote)evidenceNote.textContent="Indicadores: "+summary+". "+(blocks.length?"Revise as evidências e as menções propostas por bloco.":"A IA não retornou análises por bloco; não é possível validar qualidade ou menções automaticamente.");
+    if(!blocks.length&&status)status.textContent="A IA retornou apenas um parecer geral. Feedbacks e menções dos blocos exigem revisão; tente gerar novamente.";
+
     const consolidation=indicatorEvidenceSuggestions(box,inds,entries);
+    // A general AI mention is a suggestion, never proof that every linked block was assessed.
+
     for(const item of consolidation){
      if(!item.suggestion)continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+item.code+'"]')];
@@ -358,9 +362,12 @@ function openReview(box,id){
       return fraction===null?item.suggested:Math.min(item.suggested,Math.round(item.cap*fraction));
      });
      const aiXp=Math.min(xpPlan.total,maxXp,scores.reduce((a,b)=>a+b,0));
-     if(g.xp==null){xpInput.value=String(aiXp);applied++}
+     const reviewedBlocks=aiBlocks.filter(b=>xpPlan.items.some(item=>item.answered&&(b.review_key===item.key||(!b.review_key&&String(b.step_id)===String(item.step.id)))));
+     const qualityMeasured=reviewedBlocks.some(b=>typeof b.quality_score==="number"||Array.isArray(b.question_analysis)&&b.question_analysis.length);
+
+     if(g.xp==null&&qualityMeasured){xpInput.value=String(aiXp);applied++}
      const xpNote=box.querySelector("[data-xp-plan]");
-     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". IA sugere "+aiXp+" XP após análise da qualidade; valor editável pelo instrutor.";
+     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA sugere "+aiXp+" XP com base em "+reviewedBlocks.length+" bloco(s) analisado(s); revise os demais antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
     }
     for(const i of entries){
      if(!["A","PA","NA"].includes(i.mention))continue;
