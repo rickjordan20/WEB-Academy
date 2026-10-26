@@ -55,9 +55,13 @@ export async function mountMissionDelivery(missionId,access,root){
  if(late&&previous?.late_reason)reason.value=previous.late_reason;if(late&&previous?.late_explanation)explanation.value=previous.late_explanation;
  if(previous?.status==="evaluated"){button.disabled=true;feedback.textContent="Entrega já avaliada. Consulte o feedback do instrutor."}
  button.onclick=async()=>{
-  const latestAccess=await missionWindow(missionId);
+  let latestAccess;
+  try{latestAccess=await missionWindow(missionId)}catch(error){feedback.textContent="Não foi possível consultar o prazo atualizado: "+error.message;return}
   if(latestAccess.state!=="open"&&latestAccess.state!=="closed"){feedback.textContent="Não foi possível confirmar a liberação da missão. Atualize a página.";return}
   const isLate=latestAccess.state==="closed"||(latestAccess.closesAt&&Date.now()>new Date(latestAccess.closesAt).getTime());
+  if(!isLate&&late){
+   feedback.textContent="O instrutor prorrogou o prazo. A entrega agora está dentro do prazo; atualize a página para continuar sem justificativa.";return;
+  }
   if(isLate&&!late){
    const fields=section.querySelector(".delivery-fields");
    if(!fields){feedback.textContent="O prazo terminou durante o preenchimento. Atualize a página para informar a justificativa e a ciência do atraso.";return}
