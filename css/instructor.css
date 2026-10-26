@@ -228,3 +228,5 @@ details.eval-review-step>summary span{font-size:.78rem;color:var(--muted)}
 .eval-objective-item .eval-comment-label{display:block;margin-top:.7rem}
 @media(max-width:720px){.eval-checks-grid{grid-template-columns:1fr}}
 @media print{.eval-review-step{break-inside:avoid}.eval-auto-panel{break-inside:auto}.eval-objective-item{break-inside:avoid}}
+
+.eval-suggestion-toolbar{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:1.25rem}.eval-suggestion-toolbar small{line-height:1.4}
