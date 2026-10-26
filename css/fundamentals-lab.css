@@ -100,3 +100,11 @@
 .image-review-upload{display:grid;gap:10px;margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:12px}
 .image-review-upload input[type=file]{width:100%;padding:10px;border:1px dashed var(--line);border-radius:8px}
 .image-review-preview{max-width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:#102035}
+
+/* Botões de copiar: contraste consistente com o tema escuro da missão. */
+.learning-step .learning-copy-btn{background:#192b45;color:#edf5ff;border:1px solid #496486;opacity:1;box-shadow:none;transition:background .15s,border-color .15s}
+.learning-step .learning-copy-btn:hover{background:#263f62;color:#fff;border-color:#9b8cff}
+.learning-step .learning-copy-btn:active{background:#344d74}
+.learning-step .learning-copy-btn:focus-visible{outline:2px solid #a18cff;outline-offset:3px}
+.learning-step .guided-code-example pre{max-width:100%;overflow-x:auto;white-space:pre;tab-size:2}
+.learning-step .guided-code-example code{color:#e5f1ff}
