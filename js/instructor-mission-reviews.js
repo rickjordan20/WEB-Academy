@@ -168,6 +168,13 @@ function autoPanel(r,mission,fundamental){
   return '<div class="eval-objective-item"><strong>'+(i+1)+'. '+esc(question)+'</strong><p class="muted">Resposta: '+esc(selected)+'</p><p class="muted">Gabarito: '+esc(step.options[result.correct])+'</p><p class="eval-check-status">'+(result.answered?(result.passed?'✓ Correta':'✗ Incorreta'):'Não respondida')+'</p><label class="eval-comment-label">Feedback desta questão (opcional)<textarea class="admin-input" rows="2" data-block-comment="'+esc(key)+'" placeholder="Orientação específica desta questão">'+esc(saved[key]||"")+'</textarea></label></div>';
  }).join(""):'<p class="muted">Não há questões objetivas com gabarito configurado.</p>')+'</section>';
 }
+function guildSelfReviewPanel(r){
+ const record=r.answers?.[r.mission_id+":guild_self_review"];
+ if(!record||typeof record!=="object")return "";
+ const form=record.form||{},activities=["Desenvolvi artefatos","Organizei tarefas no Kanban","Contribuí com ideias","Realizei pesquisas","Ajudei colegas","Participei de reuniões","Fiz testes","Outra contribuição"];
+ const field=(label,value)=>'<p><strong>'+esc(label)+':</strong> '+esc(value||"Não informado")+'</p>';
+ return '<section class="eval-block"><h3>Ficha individual de autoavaliação — Projeto Restaurante</h3><p class="muted">Respostas registradas na entrega oficial. Conferir com as evidências do Kanban antes de atribuir menções.</p>'+field("Missão",r.mission_id)+field("Concluídas na entrega",(record.tasks||[]).filter(t=>t.status==="done").length+" de "+(record.tasks||[]).length)+'<h4>Tarefas atribuídas</h4>'+(record.tasks||[]).map(t=>'<p>'+esc(t.title)+' — '+esc(t.status)+'</p>').join("")+'<h4>Participação declarada</h4><p>'+esc(activities.filter((_,i)=>form["activity_"+i]==="yes").join(" · ")||"Não informada")+'</p>'+field("Tarefas",form.taskReflection)+field("Participação",form.participation)+field("Aprendizado",form.learningLevel)+field("Colaboração",form.collaboration)+field("Contribuição",form.contribution)+field("Desafios",form.challenges)+(form.evidence&&/^https:\/\//.test(form.evidence)?'<p><a href="'+esc(form.evidence)+'" target="_blank" rel="noopener noreferrer">Consultar evidência complementar</a></p>':"")+'</section>';
+}
 function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const response=responseForStep(r.answers,unitId,step);
  const answer=response.value;
