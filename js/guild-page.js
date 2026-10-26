@@ -62,7 +62,7 @@ function releasedGuildMissions(){
 }
 async function syncReleasedMissionTasks(){
  if(!officialGuild||officialGuild.role!=="leader")return;
- const released=releasedGuildMissions(),existing=new Set(sharedTasks.filter(t=>t.mission_id).map(t=>t.mission_id));
+ const released=releasedGuildMissions(),existing=new Set(sharedTasks.filter(t=>t.mission_id&&t.source==="mission").map(t=>t.mission_id));
  const missing=released.filter(m=>!existing.has(m.id));
  if(!missing.length)return;
  for(const m of missing){
