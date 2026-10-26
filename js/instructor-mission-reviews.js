@@ -234,7 +234,7 @@ function openReview(box,id){
   if(status)status.textContent="Analisando as evidências por indicador. Nenhuma menção será aplicada automaticamente.";
   try{
    const sb=window.__evalSupabase;
-   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:reviewMission.steps,competencies:inds}}});
+   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:[...(reviewFundamental?.steps||[]).map(step=>({...step,reviewKey:(reviewFundamental?.id||"fundamental")+":"+step.id})),...(reviewMission.steps||[]).map(step=>({...step,reviewKey:reviewMission.id+":"+step.id}))],competencies:inds}}});
    if(error){let detail=data?.error;try{if(!detail&&error.context?.json){const body=await error.context.json();detail=body?.error||body?.message}}catch{}throw new Error(detail||error.message||"Falha de conexão")}
    if(data?.error)throw new Error(data.error);
    const result=box.querySelector("[data-ai-review-result]");
@@ -243,6 +243,7 @@ function openReview(box,id){
     '<p>'+esc(data.summary||"")+'</p>'+
     entries.map(i=>'<article class="eval-ai-indicator"><strong>'+esc(i.code)+' · '+esc(i.mention==="SEM_EVIDENCIA"?"Menção pendente de revisão":i.mention)+'</strong><p>'+esc(i.justification||"")+'</p>'+(i.evidence?.length?'<small>Evidências: '+esc(i.evidence.join("; "))+'</small>':"")+(i.gaps?.length?'<small>Lacunas: '+esc(i.gaps.join("; "))+'</small>':"")+'</article>').join("")+
     (Array.isArray(data.blocks)&&data.blocks.length?'<details class="eval-ai-blocks"><summary>Análise por etapa ('+data.blocks.length+')</summary>'+data.blocks.map(b=>'<article class="eval-ai-indicator"><strong>'+esc(reviewMission.steps?.find(step=>String(step.id)===String(b.step_id))?.title||b.step_id)+'</strong>'+(Array.isArray(b.question_analysis)?b.question_analysis.map(q=>'<p><b>'+esc(q.question||"Questão")+' — '+esc(q.status||"")+'</b>: '+esc(q.note||"")+'</p>').join(""):"")+(b.feedback?'<p>'+esc(b.feedback)+'</p>':"")+(b.needs_review?'<small>Revisão docente necessária</small>':"")+'</article>').join("")+'</details>':"")+
+    (Array.isArray(data.alerts)&&data.alerts.length?'<p class="muted">'+esc(data.alerts.join(" · "))+'</p>':"")+
     '<label class="eval-comment-label">Feedback geral sugerido<textarea class="admin-input" rows="5" data-ai-feedback-draft>'+esc(data.feedback||"")+'</textarea></label>'+
     '<div class="eval-suggestion-toolbar"><button type="button" class="btn btn-secondary btn-small" data-ai-apply>Aplicar sugestões aos campos vazios</button></div>';
    result.hidden=false;
@@ -250,6 +251,26 @@ function openReview(box,id){
     let applied=0;
     const general=box.querySelector("[data-eval-feedback]");
     if(general&&!general.value.trim()){general.value=result.querySelector("[data-ai-feedback-draft]").value;applied++}
+    const blockFields=[...box.querySelectorAll("[data-block-comment]")];
+    const blocks=Array.isArray(data.blocks)?data.blocks:[];
+    for(const block of blocks){
+     const key=String(block.review_key||block.reviewKey||"");
+     const matching=blockFields.filter(el=>key?el.dataset.blockComment===key:el.dataset.blockComment?.endsWith(":"+block.step_id));
+     if(matching.length!==1)continue;
+     const field=matching[0];
+     if(!field.value.trim()&&block.feedback?.trim()){field.value=block.feedback.trim();applied++}
+     const codeList=Array.isArray(block.indicators)?block.indicators:[];
+     for(const suggestion of codeList){
+      if(!["A","PA","NA"].includes(suggestion.mention))continue;
+      const name="block-ind-"+matching[0].dataset.blockComment+":"+suggestion.code;
+      const radios=[...box.querySelectorAll('input[name="'+name+'"]')];
+      if(radios.some(x=>x.checked))continue;
+      const radio=radios.find(x=>x.value===suggestion.mention);
+      if(radio){radio.checked=true;applied++}
+     }
+    }
+    const checks=box.querySelector("[data-checks-feedback]");
+    if(checks&&!checks.value.trim()&&data.checks_feedback?.trim()){checks.value=data.checks_feedback.trim();applied++}
     for(const i of entries){
      if(!["A","PA","NA"].includes(i.mention))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
