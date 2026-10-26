@@ -58,20 +58,30 @@ function organizeEduTechPanels(){
  const project=root.querySelector(".mission-project-brief");
  // O documento do projeto é referência permanente: fica antes da estrutura da aula.
  if(project)flow.insertAdjacentElement("beforebegin",project);
- const guided=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
- if(guided){
-  const reportIds=new Set(mission.steps.filter(step=>step.type==="evidence").map(step=>step.id));
-  const guidedList=document.createElement("div");guidedList.className="learning-list";
-  const reportList=document.createElement("div");reportList.className="learning-list";
-  [...guided.children].forEach(el=>{
-   const isReport=reportIds.has(el.dataset.missionStep)||el.id==="individualReport";
-   (isReport?reportList:guidedList).append(el);
-  });
-  guided.remove();
-  if(guidedList.children.length)panels[1].append(guidedList);
-  if(reportList.children.length)panels[2].append(reportList);
- }
- if(!panels[2].querySelector(".learning-list"))panels[2].insertAdjacentHTML("beforeend",'<p>Revise a prática e registre suas evidências na entrega da missão.</p>');
+ // Os blocos são vinculados aos IDs oficiais da missão, não à posição no DOM.
+ // Assim, a etapa Relatório não desaparece quando o layout é reorganizado.
+ const reportSteps=mission.steps.filter(step=>step.type==="evidence");
+ const reportIds=new Set(reportSteps.map(step=>step.id));
+ const guidedList=document.createElement("div");guidedList.className="learning-list";
+ const reportList=document.createElement("div");reportList.className="learning-list";
+ const originalSteps=[...root.querySelectorAll("[data-mission-step]")];
+ originalSteps.forEach(el=>{
+  const target=reportIds.has(el.dataset.missionStep)?reportList:guidedList;
+  target.append(el);
+ });
+ // Proteção: renderizar o relatório a partir da definição da missão caso
+ // algum bloco ainda não tenha sido montado na página.
+ reportSteps.forEach(step=>{
+  if(reportList.querySelector('[data-mission-step="'+step.id+'"]'))return;
+  const item=document.createElement("div");item.dataset.missionStep=step.id;item.id="individualReport";
+  item.innerHTML=renderStep(step,id,(getState().journey.missionProgress[id]?.completedSteps||[]).includes(step.id),{editableCompleted:true});
+  reportList.append(item);
+ });
+ const oldList=root.querySelector(".learning-list:not(#missionFundamentals .learning-list)");
+ if(oldList&&oldList!==guidedList&&oldList!==reportList)oldList.remove();
+ if(guidedList.children.length)panels[1].append(guidedList);
+ if(reportList.children.length)panels[2].append(reportList);
+ else panels[2].insertAdjacentHTML("beforeend",'<p>Esta missão ainda não possui campos de relatório configurados. Avise o instrutor.</p>');
  const controls=document.createElement("nav");controls.className="edutech-stage-navigation";controls.setAttribute("aria-label","Navegação entre etapas");
  controls.innerHTML='<button type="button" class="btn btn-secondary" data-edu-prev>← Etapa anterior</button><span class="edutech-stage-counter" aria-live="polite"></span><button type="button" class="btn btn-primary" data-edu-next>Próxima etapa →</button>';
  host.append(controls);
