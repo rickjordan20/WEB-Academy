@@ -96,6 +96,7 @@ export async function mountMissionDelivery(missionId,access,root){
    const fundamentalProgress=state?.journey?.fundamentalProgress?.[fundamentalId]||{};
    const progressSnapshot={
     version:1,capturedAt:new Date().toISOString(),
+    lateAcknowledgement:isLate?{confirmed:true,confirmedAt:new Date().toISOString(),notice:"Ciente do registro de atraso e da análise docente"}:null,
     mission:{completedSteps:[...(missionProgress.completedSteps||[])],startedAt:missionProgress.startedAt||null,completed:!!state?.journey?.completedMissions?.includes(missionId)},
     fundamentals:{id:fundamentalId,completedSteps:[...(fundamentalProgress.completedSteps||[])],startedAt:fundamentalProgress.startedAt||null,completed:!!state?.journey?.completedFundamentals?.includes(fundamentalId)},
     codeAttempts:Object.fromEntries(Object.entries(state?.codeAttempts||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith(fundamentalId+":")))
