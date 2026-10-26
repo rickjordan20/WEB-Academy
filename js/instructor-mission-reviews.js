@@ -269,8 +269,13 @@ function openReview(box,id){
       if(radio){radio.checked=true;applied++}
      }
     }
+    const autoSuggestions=feedbackSuggestions(r,reviewMission,reviewFundamental);
+    for(const [key,value] of Object.entries(autoSuggestions.objectives)){
+     const field=blockFields.find(el=>el.dataset.blockComment===key);
+     if(field&&!field.value.trim()&&value){field.value=value;applied++}
+    }
     const checks=box.querySelector("[data-checks-feedback]");
-    if(checks&&!checks.value.trim()&&data.checks_feedback?.trim()){checks.value=data.checks_feedback.trim();applied++}
+    if(checks&&!checks.value.trim()){const suggested=data.checks_feedback?.trim()||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
     for(const i of entries){
      if(!["A","PA","NA"].includes(i.mention))continue;
      const radios=[...box.querySelectorAll('input[name="eval-ind-'+i.code+'"]')];
