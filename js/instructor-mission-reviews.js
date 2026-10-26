@@ -313,6 +313,15 @@ function openReview(box,id){
       if(radio){radio.checked=true;applied++}
      }
     }
+    // If a free-text response is evaluable but the model omits a block, offer a cautious draft.
+    for(const item of xpPlan.items){
+     if(!item.answered)continue;
+     const field=blockFields.find(el=>el.dataset.blockComment===item.key);
+     if(!field||field.value.trim())continue;
+     const ai=blocks.find(b=>b.review_key===item.key||(!b.review_key&&String(b.step_id)===String(item.step.id)));
+     const notes=(ai?.question_analysis||[]).map(q=>q.note).filter(Boolean);
+     if(notes.length){field.value=notes.join(" ").slice(0,1600);applied++}
+    }
     const autoSuggestions=feedbackSuggestions(r,reviewMission,reviewFundamental);
     for(const [key,value] of Object.entries(autoSuggestions.objectives)){
      const field=blockFields.find(el=>el.dataset.blockComment===key);
@@ -320,6 +329,14 @@ function openReview(box,id){
     }
     const checks=box.querySelector("[data-checks-feedback]");
     if(checks&&!checks.value.trim()){const suggested=data.checks_feedback?.trim()||autoSuggestions.checks;if(suggested){checks.value=suggested;applied++}}
+    const summary=inds.map(code=>{
+     const relevant=blocks.filter(b=>(b.indicators||[]).some(i=>i.code===code));
+     const evidence=relevant.filter(b=>b.evidence_used?.length||b.question_analysis?.some(q=>q.status==="atendida"||q.status==="parcial"));
+     return code+": "+evidence.length+" bloco(s) com evidência, "+relevant.length+" analisado(s) pela IA";
+    }).join(" · ");
+    let evidenceNote=box.querySelector("[data-ai-indicator-evidence]");
+    if(!evidenceNote){evidenceNote=document.createElement("p");evidenceNote.dataset.aiIndicatorEvidence="";evidenceNote.className="muted";box.querySelector("[data-eval-xp]")?.closest("label")?.before(evidenceNote)}
+    if(evidenceNote)evidenceNote.textContent="Indicadores: "+summary+". A menção só será sugerida quando houver evidência suficiente.";
     const consolidation=indicatorEvidenceSuggestions(box,inds,entries);
     for(const item of consolidation){
      if(!item.suggestion)continue;
@@ -337,6 +354,7 @@ function openReview(box,id){
       const statuses=(ai.question_analysis||[]).map(q=>q.status);
       const fraction=statuses.length?statuses.reduce((sum,v)=>sum+(v==="atendida"?1:v==="parcial"?0.5:0),0)/statuses.length:null;
       if(ai.needs_review)return Math.min(item.suggested,Math.round(item.cap*0.5));
+      if(typeof ai.quality_score==="number"&&Number.isFinite(ai.quality_score))return Math.min(item.suggested,Math.round(item.cap*Math.max(0,Math.min(1,ai.quality_score))));
       return fraction===null?item.suggested:Math.min(item.suggested,Math.round(item.cap*fraction));
      });
      const aiXp=Math.min(xpPlan.total,maxXp,scores.reduce((a,b)=>a+b,0));
