@@ -88,3 +88,25 @@
 .guild-detail-contribution-form textarea{resize:vertical;min-height:100px}
 .guild-detail-contribution-form .btn{justify-self:start;min-height:42px}
 @media(max-width:650px){.guild-detail-backdrop{padding:.5rem}.guild-detail-dialog{max-height:96dvh;border-radius:12px}.guild-detail-header,.guild-detail-content{padding:1rem}.guild-detail-grid{grid-template-columns:1fr}.guild-detail-contribution-form .btn{width:100%}}
+
+
+/* Campos de seleção da Guilda: mesma identidade escura dos demais controles. */
+#guildRoot .project-form select,
+#taskEditModal .guild-task-edit-form select{
+ appearance:none;-webkit-appearance:none;
+ width:100%;min-width:0;max-width:100%;box-sizing:border-box;
+ border:1px solid var(--line);border-radius:11px;
+ background-color:#091625;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a9b8d0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 13px center;
+ color:var(--text);font:inherit;font-weight:600;
+ padding:.8rem 2.6rem .8rem .85rem;min-height:46px;
+ color-scheme:dark;
+}
+#guildRoot .project-form select option,
+#taskEditModal .guild-task-edit-form select option{background:#101d2d;color:#e8efff}
+#guildRoot .project-form select:focus-visible,
+#taskEditModal .guild-task-edit-form select:focus-visible{
+ outline:2px solid var(--primary-2);outline-offset:2px;border-color:var(--primary-2)
+}
+#taskEditModal .guild-task-edit-form select:disabled{opacity:.65;cursor:not-allowed}
