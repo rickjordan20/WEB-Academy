@@ -28,3 +28,18 @@ test('F3: todos os checks corretos nao possuem pendencias',async()=>{
  assert.deepEqual(summary.needsReview,[]);
  assert.equal(nextF3Index(answers,slides),1);
 });
+
+test('F3: motor compartilhado preserva primeiro erro e historico',async()=>{
+ const {evaluateF3Choice,f3Feedback}=await import('../js/f3-slide-core.js');
+ const slide={id:'s',correct:1,options:['A','B'],explanation:'Use B.'};
+ const first=evaluateF3Choice(slide,0,null,'2026-10-27T10:00:00.000Z');
+ const second=evaluateF3Choice(slide,1,first,'2026-10-27T10:01:00.000Z');
+ assert.equal(first.correct,false);
+ assert.equal(second.correct,true);
+ assert.equal(second.firstTryCorrect,false);
+ assert.equal(second.attempts,2);
+ assert.equal(second.history.length,2);
+ assert.match(f3Feedback(slide,first),/Use B/);
+ assert.equal(evaluateF3Choice(slide,0,second),second);
+ assert.throws(()=>evaluateF3Choice(slide,5),/invalida/);
+});
