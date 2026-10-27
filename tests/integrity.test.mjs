@@ -72,3 +72,29 @@ test('janela em cache não autoriza registrar progresso após o vencimento',asyn
  engine.setVerifiedMissionWindow('1A',{state:'closed'});
  assert.equal(engine.canRecordMissionProgress('1A'),false);
 });
+
+test('sincronização não duplica histórico de XP por chave de recompensa',async()=>{
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const remote=fresh(),local=fresh();
+ remote.gamification.xp=150;
+ local.gamification.xp=150;
+ remote.gamification.rewarded=['mission:1A'];
+ local.gamification.rewarded=['mission:1A'];
+ remote.gamification.xpHistory=[{key:'mission:1A',amount:150,at:'2026-10-20T10:00:00Z',reason:'Missão concluída'}];
+ local.gamification.xpHistory=[{key:'mission:1A',amount:150,at:'2026-10-20T10:01:00Z',reason:'Missão concluída'}];
+ const merged=sync.mergeStudentStates(remote,local);
+ assert.equal(merged.gamification.xp,150);
+ assert.equal(merged.gamification.rewarded.length,1);
+ assert.equal(merged.gamification.xpHistory.length,1);
+ assert.equal(merged.gamification.xpHistory[0].key,'mission:1A');
+ const again=sync.mergeStudentStates(merged,local);
+ assert.equal(again.gamification.xpHistory.length,1);
+});
+test('sincronização mantém eventos de XP de chaves diferentes',async()=>{
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const remote=fresh(),local=fresh();
+ remote.gamification.xpHistory=[{key:'mission:1A',amount:150}];
+ local.gamification.xpHistory=[{key:'mission:1B',amount:150}];
+ const merged=sync.mergeStudentStates(remote,local);
+ assert.equal(merged.gamification.xpHistory.length,2);
+});
