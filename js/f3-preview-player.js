@@ -1,0 +1,16 @@
+import {evaluateF3Choice,f3Feedback} from "./f3-slide-core.js";
+import {F3_SLIDES} from "../data/f3-slides.js";
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Previa isolada: estado apenas em memoria do iframe, sem storage, Supabase ou XP.
+export function mountF3Preview(root){
+ let index=0;
+ const answers=new Map();
+ function draw(){
+  const s=F3_SLIDES[index],record=answers.get(s.id),correct=[...answers.values()].filter(v=>v.correct).length;
+  root.innerHTML=`<section class="f3-shell"><header class="f3-header"><p class="eyebrow">WEB ACADEMY · FASE 03 · PRÉVIA DO INSTRUTOR</p><h1>Fundamentos — Dando Significado às Páginas</h1><p>HTML semântico e conteúdo para a EduTech · 1h30</p><div class="f3-meta"><strong>Slide ${index+1} de ${F3_SLIDES.length}</strong><span>${correct} checks corretos (simulação)</span></div><div class="f3-progress"><span style="width:${Math.round(correct/F3_SLIDES.length*100)}%"></span></div></header><p class="f3-notice" role="status">Prévia isolada: respostas e tentativas não são salvas nem afetam alunos, XP ou avaliações.</p><article class="f3-card"><p class="eyebrow">APRENDA O CONCEITO</p><h2>${esc(s.title)}</h2><p class="f3-explanation">${esc(s.explanation)}</p><div class="f3-example"><p class="eyebrow">EXEMPLO COMENTADO</p><pre><code>${esc(s.code)}</code></pre></div><section class="f3-check"><p class="eyebrow">AGORA É SUA VEZ</p><h3>${esc(s.question)}</h3><div class="f3-choices">${s.options.map((o,i)=>`<label><input type="radio" name="f3-preview-answer" value="${i}" ${record?.selected===i?"checked":""} ${record?.correct?"disabled":""}><span>${esc(o)}</span></label>`).join("")}</div><button type="button" class="btn btn-primary" id="f3-preview-verify" ${record?.correct?"disabled":""}>Verificar resposta</button><div aria-live="polite">${record?`<p class="f3-feedback ${record.correct?"f3-ok":"f3-review"}">${esc(f3Feedback(s,record))} Tentativas: ${record.attempts}.</p>`:""}</div></section></article><nav class="f3-actions"><button type="button" class="btn btn-secondary" id="f3-preview-prev" ${index===0?"disabled":""}>← Anterior</button><span>${index+1} / ${F3_SLIDES.length}</span><button type="button" class="btn btn-primary" id="f3-preview-next" ${!record?.correct?"disabled":""}>${index===F3_SLIDES.length-1?"Finalizar simulação":"Próximo →"}</button></nav></section>`;
+  root.querySelector("#f3-preview-prev").onclick=()=>{index=Math.max(0,index-1);draw()};
+  root.querySelector("#f3-preview-next").onclick=()=>{if(!answers.get(s.id)?.correct)return;if(index<F3_SLIDES.length-1){index++;draw()}else root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<p class="f3-finished">Simulação finalizada. Nenhum progresso real foi registrado.</p>')};
+  root.querySelector("#f3-preview-verify").onclick=()=>{if(answers.get(s.id)?.correct)return;const selected=root.querySelector('input[name="f3-preview-answer"]:checked');if(!selected)return;const value=Number(selected.value),old=answers.get(s.id);answers.set(s.id,evaluateF3Choice(s,value,old));draw()};
+ }
+ draw();
+}

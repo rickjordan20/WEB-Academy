@@ -21,12 +21,22 @@ const hasConflictingFields=(remote,local)=>{
  if(!plain(remote)||!plain(local))return !same(remote,local);
  return Object.keys(remote).some(key=>key in local&&hasConflictingFields(remote[key],local[key]));
 };
+const mergeF3Check=(remote,local)=>{
+ const history=[...(Array.isArray(remote?.history)?remote.history:[]),...(Array.isArray(local?.history)?local.history:[])];
+ const seen=new Set();const mergedHistory=history.filter(a=>{const id=JSON.stringify([a.at,a.selected,a.correct]);if(seen.has(id))return false;seen.add(id);return true}).sort((a,b)=>String(a.at||"").localeCompare(String(b.at||""))).slice(-30);
+ const latest=String(local?.updatedAt||"")>=String(remote?.updatedAt||"")?local:remote;
+ const attempts=Math.max(Number(remote?.attempts)||0,Number(local?.attempts)||0,mergedHistory.length);
+ const first=mergedHistory[0]?.correct;
+ const firstTryCorrect=(Number(remote?.attempts)>mergedHistory.length||Number(local?.attempts)>mergedHistory.length)?(remote?.firstTryCorrect??local?.firstTryCorrect??false):(typeof first==="boolean"?first:(remote?.firstTryCorrect??local?.firstTryCorrect??false));
+ return {...remote,...local,...latest,history:mergedHistory,attempts,firstTryCorrect,correct:remote?.correct===true||local?.correct===true};
+};
 const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
  const answers={},conflicts=records(previous);
  for(const key of new Set([...Object.keys(remote),...Object.keys(local)])){
   if(!(key in remote)){answers[key]=local[key];continue}
   if(!(key in local)){answers[key]=remote[key];continue}
   if(same(remote[key],local[key])){answers[key]=remote[key];continue}
+  if(key.startsWith("F3:f3-slide-")&&plain(remote[key])&&plain(local[key])){answers[key]=mergeF3Check(remote[key],local[key]);continue}
   answers[key]=mergeAnswerFields(remote[key],local[key],preferLocal);
   if(!hasConflictingFields(remote[key],local[key]))continue;
   const losing=preferLocal?remote[key]:local[key];

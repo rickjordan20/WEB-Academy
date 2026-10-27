@@ -1,3 +1,4 @@
+import {F3_SLIDES} from "../data/f3-slides.js";
 import { JOURNEY } from "../data/journey.js";
 import { MISSIONS,EXTRA_MISSIONS,getMission,getPhaseMissions } from "../data/missions.js";
 import { FUNDAMENTALS,getFundamental } from "../data/fundamentals.js";
@@ -44,3 +45,18 @@ function updateProgress(s){const total=JOURNEY.length*2,done=s.journey.completed
 export function completeMission(id,s=ensureJourneyState()){if(!canRecordMissionProgress(id))return false;const mission=getMission(id);if(!mission||!allStepsCompleted(mission.steps,s.journey.missionProgress?.[id]?.completedSteps))return false;const already=s.journey.completedMissions.includes(id);if(!already)s.journey.completedMissions.push(id);const m=getMission(id);if(!m){saveState(s);return false}if(!already)rewardMission(m,s);registerMissionEvidence(s,m);if(id.endsWith("A")){const b=`${m.phase}B`;if(!s.journey.unlockedMissions.includes(b))s.journey.unlockedMissions.push(b)}else{const next=m.phase+1;if(next<=JOURNEY.length){const nf=fId(next),a=`${next}A`;if(!s.journey.unlockedFundamentals.includes(nf))s.journey.unlockedFundamentals.push(nf);if(!s.journey.unlockedMissions.includes(a))s.journey.unlockedMissions.push(a);s.journey.currentPhase=Math.max(s.journey.currentPhase,next)}}updateProgress(s);saveState(s);return true}
 export function getJourneyView(){const s=ensureJourneyState();return JOURNEY.map(p=>({...p,status:phaseStatus(p.phase,s),fundamental:{...getFundamental(p.phase),status:fundamentalStatus(p.phase,s)},missions:getPhaseMissions(p.phase).map(m=>({...m,status:missionStatus(m.id,s)}))}))}
 export {JOURNEY,MISSIONS,FUNDAMENTALS,getMission,getFundamental};
+
+// Conclusao dos slides F3: exige evidencia em todos os checks sem fabricar etapas legadas.
+export function completeF3SlideChecks(){
+ const s=ensureJourneyState();
+ if(!s||!canRecordFundamental(3))return false;
+ if(!F3_SLIDES.length||!F3_SLIDES.every(slide=>s.answers?.[`F3:${slide.id}`]?.correct===true))return false;
+ const id="F3";
+ s.journey.fundamentalProgress[id]||={currentStep:0,completedSteps:[],startedAt:new Date().toISOString()};
+ s.journey.fundamentalProgress[id].slideChecksCompletedAt||=new Date().toISOString();
+ s.journey.fundamentalProgress[id].slideChecksVersion="f3-slides-v1";
+ if(!s.journey.completedFundamentals.includes(id))s.journey.completedFundamentals.push(id);
+ if(!s.journey.unlockedMissions.includes("3A"))s.journey.unlockedMissions.push("3A");
+ updateProgress(s);saveState(s);
+ return true;
+}
