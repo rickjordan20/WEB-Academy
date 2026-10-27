@@ -163,7 +163,7 @@ import {renderStep,bindStep} from "./js/step-renderer.js";
 import {mountF3Preview} from "./js/f3-preview-player.js";
 const data=${payload};
 const root=document.querySelector("#studentRoot");
-let moment=data.fundamental?"fundamentals":"practice",current=0,showF3Slides=false;
+let moment=data.fundamental?"fundamentals":"practice",current=0,showF3Slides=data.displayId==="3A"&&Boolean(data.fundamental);
 const stores={fundamentals:{answers:new Map(),attempts:new Map(),done:new Set()},practice:{answers:new Map(),attempts:new Map(),done:new Set()}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function draw(){
