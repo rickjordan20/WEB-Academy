@@ -1,6 +1,6 @@
 import {summarizeF3Checks,nextF3Index} from "./f3-check-summary.js";
 import {F3_SLIDES} from "../data/f3-slides.js";
-import {getAnswer,saveAnswer,completeFundamentalStep} from "./mission-engine.js";
+import {getAnswer,saveAnswer,completeF3SlideChecks} from "./mission-engine.js";
 import {getState} from "./storage.js";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slidePositions=new WeakMap();
@@ -21,8 +21,7 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
   root.querySelector("#f3-next").onclick=()=>{
    if(index<all.length-1){if(!readOnly&&!passed(s))return;index++;redraw();return}
    if(!readOnly&&all.every(passed)){
-    // Mantém os IDs e a sequência das etapas legadas, sem alterar respostas anteriores.
-    for(const step of unit.steps){const current=getState()?.journey?.fundamentalProgress?.F3?.completedSteps||[];if(!current.includes(step.id)&&!completeFundamentalStep(3,step.id))break}
+    if(!completeF3SlideChecks()){root.querySelector("#f3-feedback").textContent="Não foi possível concluir. Verifique os checks e o prazo da atividade.";return;}
     redraw();
    }
   };
