@@ -26,7 +26,7 @@ const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
   answers[key]=mergeAnswerFields(remote[key],local[key],preferLocal);
   const losing=preferLocal?remote[key]:local[key];
   const id=key+":"+JSON.stringify(losing);
-  if(!conflicts.some(item=>item.id===id))conflicts.push({id,answerKey:key,value:losing});
+  if(!conflicts.some(item=>item.answerKey===key&&same(item.value,losing))&&!conflicts.some(item=>item.answerKey===key&&same(item.value,answers[key])))conflicts.push({id,answerKey:key,value:losing});
  }
  return {answers,conflicts};
 };
