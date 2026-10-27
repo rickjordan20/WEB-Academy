@@ -31,3 +31,29 @@ test("UC7: missao final identifica claramente o projeto de origem",()=>{
  assert.match(m.title,/Restaurante/);
  assert.match(m.subtitle,/publique/);
 });
+
+test("UC7: sequência pedagógica, projetos e fases coerentes",()=>{
+ const expected=["1A","1B","1C",...Array.from({length:12},(_,i)=>[String(i+2)+"A",String(i+2)+"B"]).flat(),"14A"];
+ assert.deepEqual(MISSIONS.map(m=>m.displayId),expected);
+ assert.deepEqual(MISSIONS.map(m=>m.id),Array.from({length:14},(_,i)=>[String(i+1)+"A",String(i+1)+"B"]).flat());
+ for(const [index,m] of MISSIONS.entries()){
+  const expectedProject=index===0||index===1||index>=3&&index%2===1?"edutech":"restaurante";
+  assert.equal(m.project,expectedProject,m.displayId);
+  assert.equal(m.type,expectedProject==="edutech"?"training":"guild",m.displayId);
+  assert.equal(m.phase,index<3?1:Math.floor((index-3)/2)+2,m.displayId);
+ }
+});
+test("UC7: indicadores e requisitos têm códigos válidos, sem repetições",()=>{
+ const validIndicator=/^I[1-6]$/;
+ const validRequirement=/^(RF(?:0[1-9]|10)|RNF0[1-8])$/;
+ for(const m of MISSIONS){
+  assert.ok(m.competencies.every(i=>validIndicator.test(i)),m.displayId);
+  assert.ok(m.requirements.every(i=>validRequirement.test(i)),m.displayId);
+  assert.equal(new Set(m.competencies).size,m.competencies.length,m.displayId);
+  assert.equal(new Set(m.requirements).size,m.requirements.length,m.displayId);
+ }
+ for(const m of EXTRA_MISSIONS){
+  assert.ok(m.title?.trim()&&m.official?.trim(),m.id);
+  assert.ok(m.competencies.length&&m.competencies.every(i=>validIndicator.test(i)),m.id);
+ }
+});
