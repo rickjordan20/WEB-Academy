@@ -17,6 +17,10 @@ const mergeAnswerFields=(remote,local,preferLocal)=>{
  }
  return result;
 };
+const hasConflictingFields=(remote,local)=>{
+ if(!plain(remote)||!plain(local))return !same(remote,local);
+ return Object.keys(remote).some(key=>key in local&&hasConflictingFields(remote[key],local[key]));
+};
 const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
  const answers={},conflicts=records(previous);
  for(const key of new Set([...Object.keys(remote),...Object.keys(local)])){
@@ -24,6 +28,7 @@ const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
   if(!(key in local)){answers[key]=remote[key];continue}
   if(same(remote[key],local[key])){answers[key]=remote[key];continue}
   answers[key]=mergeAnswerFields(remote[key],local[key],preferLocal);
+  if(!hasConflictingFields(remote[key],local[key]))continue;
   const losing=preferLocal?remote[key]:local[key];
   const id=key+":"+JSON.stringify(losing);
   if(!conflicts.some(item=>item.answerKey===key&&same(item.value,losing))&&!conflicts.some(item=>item.answerKey===key&&same(item.value,answers[key])))conflicts.push({id,answerKey:key,value:losing});
