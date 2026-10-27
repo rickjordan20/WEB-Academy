@@ -608,7 +608,8 @@ export const MISSIONS=originalMissions.map((original,index)=>{
  const phase=index<3?1:Math.floor((index-3)/2)+2;
  const displayId=index<3?["1A","1B","1C"][index]:`${phase}${(index-3)%2===0?"A":"B"}`;
  const special=index===1?{title:"Ambiente de desenvolvimento e Git/GitHub — retomada",subtitle:"Continuação da aula 1A: revisão da prática guiada",type:"training",project:"edutech"}:
- index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:{};
+ index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:
+ index===27?{title:"Integração e Publicação — Projeto Restaurante",subtitle:"Consolide as funcionalidades, revise os requisitos, documente e publique a versão final do Projeto Restaurante.",type:"guild",project:"restaurante"}:{};
  return {...original,...source,id:original.id,number:index+1,lesson:index+1,phase,displayId,...special,...(displayId==="3A"?{type:"training",project:"edutech",title:"HTML Semântico e Navegação",subtitle:"Aprenda HTML semântico, links e imagens para criar a página Sobre e conectar as páginas do EduTech."}:displayId==="3B"?{type:"guild",project:"restaurante",title:"HTML Semântico e Navegação",subtitle:"Organize conteúdo e navegação do Restaurante com elementos semânticos e links."}:{}),
   // Os blocos personalizados continuam vinculados ao identificador interno original.
   steps:displayId==="3A"?structuredClone(MISSION_3A_STEPS):displayId==="3B"?structuredClone(MISSION_3B_STEPS):index<3?retrospectiveSteps[index]:displayId==="2A"?MISSION_2B_STEPS.filter(step=>["2b-p1","2b-p2","2b-p3","2b-p5","2b-p7"].includes(step.id)):displayId==="2B"?MISSION_2B_STEPS.filter(step=>["2b-p4","2b-p6"].includes(step.id)):original.steps};
