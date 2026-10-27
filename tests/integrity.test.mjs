@@ -48,6 +48,7 @@ test('leituras não salvam novamente uma jornada já inicializada',async()=>{
   '../data/journey.js':{JOURNEY:[]},
   '../data/missions.js':{MISSIONS:[],EXTRA_MISSIONS:[],getMission:()=>null,getPhaseMissions:()=>[]},
   '../data/fundamentals.js':{FUNDAMENTALS:[],getFundamental:()=>null},
+  '../data/f3-slides.js':{F3_SLIDES:[]},
   './storage.js':{getState:()=>structuredClone(state),saveState:s=>{saves++;state=structuredClone(s)}},
   './gamification.js':{rewardMission:()=>{}},
   './mission-progress-rules.js':{canCompleteSequentialStep:()=>true,allStepsCompleted:()=>true}
@@ -61,6 +62,7 @@ test('janela em cache não autoriza registrar progresso após o vencimento',asyn
   '../data/journey.js':{JOURNEY:[]},
   '../data/missions.js':{MISSIONS:[],EXTRA_MISSIONS:[{id:'1A'}],getMission:()=>null,getPhaseMissions:()=>[]},
   '../data/fundamentals.js':{FUNDAMENTALS:[],getFundamental:()=>null},
+  '../data/f3-slides.js':{F3_SLIDES:[]},
   './storage.js':{getState:()=>fresh(),saveState:()=>{}},
   './gamification.js':{rewardMission:()=>{}},
   './mission-progress-rules.js':{canCompleteSequentialStep:()=>true,allStepsCompleted:()=>true}
