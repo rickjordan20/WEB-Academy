@@ -28,7 +28,8 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
    if(readOnly)return;
    const checked=root.querySelector('input[name="f3-answer"]:checked');if(!checked)return;
    const selected=Number(checked.value),previous=saved(s),correct=selected===s.correct;
-   const record={selected,correct,attempts:(Number(previous?.attempts)||0)+1,updatedAt:new Date().toISOString()};
+   const at=new Date().toISOString();
+   const record={selected,correct,attempts:(Number(previous?.attempts)||0)+1,firstTryCorrect:previous?.firstTryCorrect??correct,history:[...(previous?.history||[]),{selected,correct,at}].slice(-30),updatedAt:at};
    if(saveAnswer("F3",key(s),record)===false){root.querySelector("#f3-feedback").textContent="Não foi possível salvar. Verifique o prazo de acesso.";return}
    redraw();
   };
