@@ -10,6 +10,7 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
  let index=0;
  const all=F3_SLIDES;
  const isCompleted=()=>getState()?.journey?.completedFundamentals?.includes("F3")===true;
+ const completedForSlides=()=>getState()?.journey?.fundamentalProgress?.F3?.slideChecksVersion==="f3-slides-v1";
  const passed=s=>saved(s)?.correct===true;
  index=slidePositions.has(root)?Math.min(all.length-1,slidePositions.get(root)):(isCompleted()?all.length-1:nextF3Index(getState()?.answers||{},all));
  const redraw=()=>{
@@ -24,7 +25,7 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
     redraw();
    }
   };
-  if(getState()?.journey?.completedFundamentals?.includes("F3")&&index===all.length-1){root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<div class="f3-finished"><strong>Fundamentos concluídos!</strong><p>Continue para a prática guiada da EduTech.</p><a class="btn btn-primary" href="mission.html?id=3A">Ir para a Missão 3A</a></div>')}
+  if(completedForSlides()&&index===all.length-1){root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<div class="f3-finished"><strong>Fundamentos concluídos!</strong><p>Continue para a prática guiada da EduTech.</p><a class="btn btn-primary" href="mission.html?id=3A">Ir para a Missão 3A</a></div>')}
   root.querySelector("#f3-verify").onclick=()=>{
    if(readOnly||isCompleted()||saved(s)?.correct===true)return;
    const checked=root.querySelector('input[name="f3-answer"]:checked');if(!checked)return;
