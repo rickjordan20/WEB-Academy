@@ -17,3 +17,14 @@ test('F3: calcula checks sem modificar respostas',async()=>{
  assert.equal(nextF3Index(answers,slides),1);
  assert.equal(JSON.stringify(answers),before);
 });
+
+test('F3: todos os checks corretos nao possuem pendencias',async()=>{
+ const {summarizeF3Checks}=await import('../js/f3-check-summary.js');
+ const slides=[{id:'s1',title:'Primeiro'},{id:'s2',title:'Segundo'}];
+ const answers={'F3:s1':{correct:true,attempts:1,firstTryCorrect:true},'F3:s2':{correct:true,attempts:2,firstTryCorrect:false}};
+ const summary=summarizeF3Checks(answers,slides);
+ assert.equal(summary.correct,2);
+ assert.equal(summary.firstTryCorrect,1);
+ assert.deepEqual(summary.needsReview,[]);
+ assert.equal(nextF3Index(answers,slides),1);
+});
