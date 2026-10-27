@@ -14,7 +14,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const {data:members}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active");
  const preferred=localStorage.getItem("webacademy.student.activeClass");
  const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;
- const {data:previous}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades,progress_snapshot").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
+ const {data:previous,error:previousError}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades,progress_snapshot").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -48,13 +48,18 @@ export async function mountMissionDelivery(missionId,access,root){
   const justification=document.createElement("div");justification.className="guild-delivery-exception";justification.innerHTML='<label for="guildDeliveryJustification">Justificativa excepcional (somente se não houver tarefa atribuída ou existirem pendências)</label><textarea id="guildDeliveryJustification" name="guildDeliveryJustification" rows="3" maxlength="1500" placeholder="Explique sua participação e por que o Kanban ainda não registra a conclusão. O instrutor analisará as evidências."></textarea><p class="muted">A justificativa não comprova a execução nem garante menção A. O instrutor avaliará individualmente as evidências.</p>';
   if(participation)participation.insertAdjacentElement("afterend",justification);else section.append(justification);
  }
- const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;
+ const preflight=section.querySelector("[data-delivery-preflight]");let confirmedFingerprint=null;let sending=false;
  const consent=section.querySelector("[data-late-consent]"),acknowledgement=section.querySelector("[data-late-acknowledgement]");
  const reason=section.querySelector("[data-late-reason]"),explanation=section.querySelector("[data-late-explanation]"),button=section.querySelector("[data-submit-mission]"),feedback=section.querySelector("[data-delivery-feedback]");
  if(late){reason.closest("label").hidden=false;explanation.closest("label").hidden=false;}
  if(late&&previous?.late_reason)reason.value=previous.late_reason;if(late&&previous?.late_explanation)explanation.value=previous.late_explanation;
  if(previous?.status==="evaluated"){button.disabled=true;feedback.textContent="Entrega já avaliada. Consulte o feedback do instrutor."}
  button.onclick=async()=>{
+  if(sending)return;
+  sending=true;button.disabled=true;
+  try{await submitDelivery();}finally{sending=false;if(button.textContent!=="Entrega enviada"&&button.textContent!=="Entregue em atraso"&&previous?.status!=="evaluated")button.disabled=false;}
+ };
+ async function submitDelivery(){
   let latestAccess;
   try{const latestAccessResult=await missionWindow(missionId);latestAccess=latestAccessResult}catch(error){feedback.textContent="Não foi possível consultar o prazo atualizado: "+error.message;return}
   if(latestAccess.state!=="open"&&latestAccess.state!=="closed"){feedback.textContent="Não foi possível confirmar a liberação da missão. Atualize a página.";return}
@@ -124,11 +129,16 @@ export async function mountMissionDelivery(missionId,access,root){
    }
    button.disabled=true;feedback.textContent="Enviando...";
    const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!isLate,deadline_at:latestAccess.closesAt||null,late_reason:isLate?reason.value:null,late_explanation:isLate?explanation.value.trim():"",submitted_at:new Date().toISOString()};
-   const result=previous?.id?await sb.from("mission_submissions").update(payload).eq("id",previous.id):await sb.from("mission_submissions").insert(payload);
+   // Upsert atômico evita corrida entre a consulta inicial e a gravação.
+   // Nunca sobrescreva uma entrega já avaliada: a política RLS também impede isso.
+   const {data:current,error:currentError}=await sb.from("mission_submissions").select("id,status").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
+   if(currentError)throw currentError;
+   if(current?.status==="evaluated")throw new Error("Esta missão já foi avaliada. Atualize a página para consultar a devolutiva.");
+   const result=await sb.from("mission_submissions").upsert(payload,{onConflict:"class_id,student_id,mission_id"});
    if(result.error)throw result.error;
    feedback.textContent=isLate?"Missão entregue em atraso e registrada para avaliação do instrutor.":"Entrega registrada para avaliação do instrutor.";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
- };
+ }
  root.append(section);
 }
 
