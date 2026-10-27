@@ -37,7 +37,7 @@ test("UC7: sequência pedagógica, projetos e fases coerentes",()=>{
  assert.deepEqual(MISSIONS.map(m=>m.displayId),expected);
  assert.deepEqual(MISSIONS.map(m=>m.id),Array.from({length:14},(_,i)=>[String(i+1)+"A",String(i+1)+"B"]).flat());
  for(const [index,m] of MISSIONS.entries()){
-  const expectedProject=index===0||index===1||index>=3&&index%2===1?"edutech":"restaurante";
+  const expectedProject=index===0||index===1||(index>=3&&index<27&&index%2===1)?"edutech":"restaurante";
   assert.equal(m.project,expectedProject,m.displayId);
   assert.equal(m.type,expectedProject==="edutech"?"training":"guild",m.displayId);
   assert.equal(m.phase,index<3?1:Math.floor((index-3)/2)+2,m.displayId);
