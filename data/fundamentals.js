@@ -783,5 +783,155 @@ const PHASE_2_FOUNDATIONS=[
     "feedback": "../ sobe de pages/ para a raiz do projeto."
   }
 ];
-export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:phase===2?1:1.5,steps:phase===2?[{id:"2b-f-infografico",type:"image-review",title:"Aula 4 · Infográfico completo dos Fundamentos HTML5",summary:"Leia o infográfico: estrutura, tags, atributos, caminhos e objetivos. Depois marque Concluir etapa para iniciar a prática.",imageUrl:"assets/infografico-aula4-html5.svg",imageCaption:"Fundamentos da Aula 4 · Todas as tags e seus conceitos · EduTech e Projeto Restaurante"}]:[]}));
+const PHASE_3_FUNDAMENTALS=[
+ {
+  "id": "3a-intro",
+  "type": "content",
+  "title": "Missão 3A · Evolução da TechEduca",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Objetivo: desenvolver a estrutura HTML das páginas Início, Sobre e Cursos, seguindo os três protótipos fornecidos pelo instrutor.",
+   "Carga horária: Fundamentos 1h30; Prática Guiada 2h; Relatório Individual 30min. Indicador I2.",
+   "Você já criou header, nav, main vazio e footer na missão anterior. Preserve essa estrutura: agora vamos preencher main, sem antecipar CSS, JavaScript ou formulários.",
+   "Os protótipos mostram o resultado visual futuro. Nesta aula, é normal que os conteúdos apareçam um abaixo do outro, sem cores, bordas ou alinhamento em cartões."
+  ]
+ },
+ {
+  "id": "3a-f1",
+  "type": "content",
+  "title": "Fundamentos 1 · HTML semântico (15 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "HTML semântico é escolher tags que explicam a função de cada parte do documento. Pense em uma escola: identificar biblioteca, secretaria e salas torna o espaço compreensível. No HTML, header, main e footer também identificam regiões.",
+   "div é útil para agrupar, mas não informa por si só a função do conteúdo. main identifica o conteúdo principal. Isso melhora a organização e ajuda tecnologias assistivas a interpretar a página.",
+   "Exemplo: <header>TechEduca</header> <main><h1>Formação em Tecnologia</h1><p>Aprenda na prática.</p></main> <footer>© 2026 TechEduca</footer>."
+  ]
+ },
+ {
+  "id": "3a-q1",
+  "type": "quiz",
+  "title": "Verificação 1 · Semântica",
+  "question": "Qual elemento identifica o conteúdo principal da página?",
+  "options": [
+   "div",
+   "main",
+   "footer"
+  ],
+  "answer": 1,
+  "feedback": "main identifica a região principal. div é um agrupador genérico.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f2",
+  "type": "content",
+  "title": "Fundamentos 2 · Elementos semânticos (20 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "header: cabeçalho; nav: navegação; main: conteúdo principal; section: agrupamento temático; article: conteúdo independente; aside: conteúdo complementar; footer: rodapé.",
+   "Na TechEduca, a seção 'Nossos cursos' pode conter três articles, um para cada curso. Nem toda página precisa usar todos os elementos.",
+   "Exemplo: <section><h2>Nossos cursos</h2><article><h3>Desenvolvimento WEB</h3><p>Aprenda HTML, CSS e JavaScript.</p></article></section>."
+  ]
+ },
+ {
+  "id": "3a-q2",
+  "type": "quiz",
+  "title": "Verificação 2 · Elementos",
+  "question": "Qual tag é adequada para um curso independente?",
+  "options": [
+   "article",
+   "nav",
+   "footer"
+  ],
+  "answer": 0,
+  "feedback": "article representa conteúdo que faz sentido independentemente.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f3",
+  "type": "content",
+  "title": "Fundamentos 3 · Textos, listas e imagens (20 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "h1 identifica o título principal da página; h2 identifica seções; h3 identifica subseções. p cria parágrafos. A hierarquia dos títulos representa a organização do assunto, não apenas o tamanho da letra.",
+   "ul cria lista sem ordem; ol cria sequência ordenada; li cria cada item. Exemplo: <ul><li>Compromisso</li><li>Inovação</li><li>Transparência</li></ul>.",
+   "img insere imagens: src aponta para o arquivo e alt fornece texto alternativo informativo. Exemplo: <img src=\"../assets/images/desenvolvimento-web.jpg\" alt=\"Ilustração sobre desenvolvimento web\">. A imagem precisa existir no caminho indicado."
+  ]
+ },
+ {
+  "id": "3a-q3",
+  "type": "quiz",
+  "title": "Verificação 3 · Imagens",
+  "question": "Qual atributo fornece uma alternativa textual para a imagem?",
+  "options": [
+   "href",
+   "alt",
+   "target"
+  ],
+  "answer": 1,
+  "feedback": "alt descreve o conteúdo relevante da imagem.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f4",
+  "type": "content",
+  "title": "Fundamentos 4 · Links e navegação (15 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "a cria um link; href define seu destino. Links internos conectam páginas do projeto e links externos apontam para outros sites.",
+   "nav agrupa os links principais. Exemplo: <nav aria-label=\"Menu principal\"><a href=\"../index.html\">Início</a><a href=\"sobre.html\">Sobre</a><a href=\"cursos.html\">Cursos</a></nav>.",
+   "Um link só funciona quando seu destino existe e o caminho está correto. Nesta aula, páginas de Login, Contato e detalhes podem permanecer previstas, sem implementação funcional."
+  ]
+ },
+ {
+  "id": "3a-q4",
+  "type": "quiz",
+  "title": "Verificação 4 · Links",
+  "question": "Qual atributo define o destino de um link?",
+  "options": [
+   "src",
+   "alt",
+   "href"
+  ],
+  "answer": 2,
+  "feedback": "href indica o destino do link.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f5",
+  "type": "content",
+  "title": "Fundamentos 5 · Caminhos relativos e comentários (10 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Estrutura usada na aula anterior: index.html na raiz; pages/sobre.html, pages/cursos.html e pages/contato.html dentro de pages; assets/images para imagens.",
+   "De index.html para Sobre: href=\"pages/sobre.html\". De pages/sobre.html para Início: href=\"../index.html\". De pages/cursos.html para imagem na raiz/assets/images: src=\"../assets/images/arquivo.jpg\".",
+   "./ indica a pasta atual; ../ sobe um nível. Comentários <!-- exemplo --> documentam o código, mas podem ser vistos no código-fonte: não coloque segredos neles."
+  ]
+ },
+ {
+  "id": "3a-q5",
+  "type": "quiz",
+  "title": "Verificação 5 · Caminhos",
+  "question": "O que significa ../ em um caminho relativo?",
+  "options": [
+   "Voltar uma pasta",
+   "Criar uma pasta",
+   "Abrir outro site"
+  ],
+  "answer": 0,
+  "feedback": "../ indica o diretório acima da pasta atual.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f6",
+  "type": "content",
+  "title": "Fundamentos 6 · Revisão e diagnóstico (10 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Revise: cada página deve ter um h1, títulos de seções em h2, links com href correto e imagens com alt adequado.",
+   "Desafio: explique por que <main><h1>TechEduca</h1><section><h2>Cursos</h2></section></main> é uma organização mais informativa do que usar div para todas as regiões.",
+   "Agora abra seu projeto no VS Code: vamos transformar os três protótipos em HTML progressivamente."
+  ]
+ }
+];
+export const FUNDAMENTALS=DATA.map(([phase,title,axis,objective])=>({id:`F${phase}`,phase,title,axis,objective,hours:phase===2?1:1.5,steps:phase===3?structuredClone(PHASE_3_FUNDAMENTALS):phase===2?[{id:"2b-f-infografico",type:"image-review",title:"Aula 4 · Infográfico completo dos Fundamentos HTML5",summary:"Leia o infográfico: estrutura, tags, atributos, caminhos e objetivos. Depois marque Concluir etapa para iniciar a prática.",imageUrl:"assets/infografico-aula4-html5.svg",imageCaption:"Fundamentos da Aula 4 · Todas as tags e seus conceitos · EduTech e Projeto Restaurante"}]:[]}));
 export const getFundamental=phase=>FUNDAMENTALS.find(f=>f.phase===Number(phase));
