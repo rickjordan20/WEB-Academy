@@ -8,7 +8,7 @@ test("todos os 21 slides possuem comentario didatico",()=>{
 });
 test("indenta tags e destaca atributos e valores",()=>{
  const result=formatF3Example('<nav><a href="cursos.html">Cursos</a></nav>');
- assert.match(result,/\\n  /);
+ assert.match(result,/\n  /);
  assert.match(result,/f3-syntax-tag/);
  assert.match(result,/f3-syntax-attr/);
  assert.match(result,/f3-syntax-value/);
@@ -22,5 +22,5 @@ test("escapa conteudo de exemplo sem executar HTML",()=>{
 });
 test("preserva comentarios e estrutura de pastas",()=>{
  assert.match(formatF3Example('<!-- comentário -->'),/f3-syntax-comment/);
- assert.match(formatF3Example('index.html\\npages/cursos.html'),/pages\\/cursos.html/);
+ assert.match(formatF3Example('index.html\npages/cursos.html'),/pages\/cursos.html/);
 });
