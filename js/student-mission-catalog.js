@@ -13,6 +13,8 @@ export async function loadStudentMissionCatalog(){
  for(const row of data||[]){
   const m=MISSIONS.find(m=>m.id===row.mission_id),c=row.content;
   if(!m||!c||!["published","closed"].includes(c.status))continue;
+  // Um override legado da Guilda não deve renomear a missão guiada 3A.
+  if(row.mission_id==="3A"&&(c.guild_template_version||c.guild_config||c.steps?.some(step=>String(step.id||"").startsWith("guild-3A-"))))continue;
   if(typeof c.title==="string")m.title=c.title;
   if(typeof c.subtitle==="string")m.subtitle=c.subtitle;
  }
