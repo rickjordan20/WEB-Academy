@@ -27,7 +27,7 @@ const mergeF3Check=(remote,local)=>{
  const latest=String(local?.updatedAt||"")>=String(remote?.updatedAt||"")?local:remote;
  const attempts=Math.max(Number(remote?.attempts)||0,Number(local?.attempts)||0,mergedHistory.length);
  const first=mergedHistory[0]?.correct;
- return {...remote,...local,...latest,history:mergedHistory,attempts,firstTryCorrect:typeof first==="boolean"?first:(remote?.firstTryCorrect===true||local?.firstTryCorrect===true),correct:remote?.correct===true||local?.correct===true};
+ return {...remote,...local,...latest,history:mergedHistory,attempts,firstTryCorrect:typeof first==="boolean"?first:(remote?.firstTryCorrect??local?.firstTryCorrect??false),correct:remote?.correct===true||local?.correct===true};
 };
 const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
  const answers={},conflicts=records(previous);
