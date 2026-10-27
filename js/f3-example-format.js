@@ -24,30 +24,30 @@ const notes=[
  "Preserve a estrutura e preencha main com o conteúdo da EduTech."
 ];
 export function f3ExampleNote(slide){
- const number=Number(String(slide?.id??"").match(/(\\d+)$/)?.[1]);
+ const number=Number(String(slide?.id??"").match(/(\d+)$/)?.[1]);
  return notes[number-1]||"Observe a função de cada elemento e como eles se relacionam.";
 }
 export function formatF3Example(source){
  const input=String(source??"").trim();
  // Estrutura de pastas: preservar linhas, sem simular tags HTML.
  if(!input.includes("<"))return escapeHTML(input);
- const tokens=input.match(/<!--[\\s\\S]*?-->|<[^>]*>|[^<]+/g)||[];
+ const tokens=input.match(/<!--[\s\S]*?-->|<[^>]*>|[^<]+/g)||[];
  let depth=0;
  const rows=[];
  for(const token of tokens){
-  if(/^<\\//.test(token))depth=Math.max(0,depth-1);
+  if(/^<\//.test(token))depth=Math.max(0,depth-1);
   const isComment=token.startsWith("<!--");
   const isTag=token.startsWith("<")&&!isComment;
   const rendered=isComment?'<span class="f3-syntax-comment">'+escapeHTML(token)+'</span>':isTag?highlightTag(token):escapeHTML(token);
   if(token.trim())rows.push("  ".repeat(depth)+rendered);
-  if(/^<(?!\\/|!)[^>]+>$/.test(token)&&!/^<(?:img|br|hr|input|meta|link)\\b/i.test(token)&&!token.endsWith("/>"))depth++;
+  if(/^<(?!\/|!)[^>]+>$/.test(token)&&!/^<(?:img|br|hr|input|meta|link)\b/i.test(token)&&!token.endsWith("/>"))depth++;
  }
  return rows.join("\n");
 }
 function highlightTag(token){
- const match=token.match(/^(<\\/?)([\\w-]+)([\\s\\S]*?)(\\/?>)$/);
+ const match=token.match(/^(<\/?)([\w-]+)([\s\S]*?)(\/?>)$/);
  if(!match)return escapeHTML(token);
- const attrs=match[3].replace(/([\\w-]+)(\\s*=\\s*)("[^"]*"|'[^']*')/g,(_all,name,eq,value)=>'@@ATTR@@'+name+'@@EQ@@'+eq+'@@VALUE@@'+value+'@@END@@');
- let safe=escapeHTML(attrs).replace(/@@ATTR@@([\\w-]+)@@EQ@@([\\s\\S]*?)@@VALUE@@([\\s\\S]*?)@@END@@/g,(_all,name,eq,value)=>'<span class="f3-syntax-attr">'+name+'</span>'+eq+'<span class="f3-syntax-value">'+value+'</span>');
+ const attrs=match[3].replace(/([\w-]+)(\s*=\s*)("[^"]*"|'[^']*')/g,(_all,name,eq,value)=>'@@ATTR@@'+name+'@@EQ@@'+eq+'@@VALUE@@'+value+'@@END@@');
+ let safe=escapeHTML(attrs).replace(/@@ATTR@@([\w-]+)@@EQ@@([\s\S]*?)@@VALUE@@([\s\S]*?)@@END@@/g,(_all,name,eq,value)=>'<span class="f3-syntax-attr">'+name+'</span>'+eq+'<span class="f3-syntax-value">'+value+'</span>');
  return '<span class="f3-syntax-punct">'+escapeHTML(match[1])+'</span><span class="f3-syntax-tag">'+escapeHTML(match[2])+'</span>'+safe+'<span class="f3-syntax-punct">'+escapeHTML(match[4])+'</span>';
 }
