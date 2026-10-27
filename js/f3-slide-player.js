@@ -24,7 +24,7 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
     if(getState()?.journey?.completedFundamentals?.includes("F3")&&!root.querySelector("#f3-finished"))root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<div id="f3-finished" class="f3-finished"><strong>Fundamentos concluídos!</strong><p>Continue para a prática guiada da EduTech.</p><a class="btn btn-primary" href="mission.html?id=3A">Ir para a Missão 3A</a></div>');
    }
   };
-  if(completed&&index===all.length-1){root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<div class="f3-finished"><strong>Fundamentos concluídos!</strong><p>Continue para a prática guiada da EduTech.</p><a class="btn btn-primary" href="mission.html?id=3A">Ir para a Missão 3A</a></div>')}
+  if(getState()?.journey?.completedFundamentals?.includes("F3")&&index===all.length-1){root.querySelector(".f3-actions").insertAdjacentHTML("afterend",'<div class="f3-finished"><strong>Fundamentos concluídos!</strong><p>Continue para a prática guiada da EduTech.</p><a class="btn btn-primary" href="mission.html?id=3A">Ir para a Missão 3A</a></div>')}
   root.querySelector("#f3-verify").onclick=()=>{
    if(readOnly)return;
    const checked=root.querySelector('input[name="f3-answer"]:checked');if(!checked)return;
