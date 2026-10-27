@@ -25,6 +25,9 @@ function isGuildOnlyStep(step){
 export function applyEditedMissionContent(missionId,content){
  if(!content)return;
  const mission=[...MISSIONS,...EXTRA_MISSIONS].find(m=>m.id===missionId);if(!mission)return;
+ // A versão histórica de 3A foi publicada como Guilda do Restaurante.
+ // Preserve-a no banco para auditoria, sem substituir a prática guiada EduTech.
+ if(missionId==="3A"&&(content.guild_template_version||content.guild_config||content.steps?.some(step=>String(step.id||"").startsWith("guild-3A-"))))return;
  if(typeof content.title==="string")mission.title=content.title;
  if(typeof content.subtitle==="string")mission.subtitle=content.subtitle;
  if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0)){

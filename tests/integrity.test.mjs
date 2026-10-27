@@ -98,3 +98,19 @@ test('sincronização mantém eventos de XP de chaves diferentes',async()=>{
  const merged=sync.mergeStudentStates(remote,local);
  assert.equal(merged.gamification.xpHistory.length,2);
 });
+
+test('override legado de Guilda não substitui a prática guiada 3A',async()=>{
+ const mission={id:'3A',displayId:'3A',type:'training',project:'edutech',title:'HTML Semântico e Navegação',steps:[{id:'3a-g1'}]};
+ const mod=await loadModule('../js/mission-content.js',{
+  './supabase-client.js':{getSupabase:async()=>null},
+  '../data/missions.js':{MISSIONS:[mission],EXTRA_MISSIONS:[]}
+ });
+ mod.applyEditedMissionContent('3A',{title:'Fundamentos de HTML',guild_template_version:2,steps:[{id:'guild-3A-brief'}]});
+ assert.equal(mission.title,'HTML Semântico e Navegação');
+ assert.equal(mission.steps[0].id,'3a-g1');
+});
+test('catálogo ignora metadados de Guilda publicados no ID 3A',async()=>{
+ const source=await readFile(new URL('../js/student-mission-catalog.js',import.meta.url),'utf8');
+ assert.match(source,/row\.mission_id==="3A"/);
+ assert.match(source,/c\.guild_template_version\|\|c\.guild_config/);
+});
