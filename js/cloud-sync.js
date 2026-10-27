@@ -19,7 +19,15 @@ export function mergeStudentStates(remote,local){
  const gamification={...secondary.gamification,...primary.gamification};
  gamification.rewarded=unique(remote.gamification?.rewarded,local.gamification?.rewarded);
  gamification.achievements=records(remote.gamification?.achievements,local.gamification?.achievements);
- gamification.xpHistory=records(remote.gamification?.xpHistory,local.gamification?.xpHistory);
+ // XP events have a stable reward key, not an id. Merge by key to avoid
+ // duplicating the same award when the local and cloud copies are reconciled.
+ // Preserve legacy events without a key using their original identity.
+ const xpEvents=new Map();
+ for(const event of [...(Array.isArray(remote.gamification?.xpHistory)?remote.gamification.xpHistory:[]),...(Array.isArray(local.gamification?.xpHistory)?local.gamification.xpHistory:[])]){
+  const identity=event?.key!=null&&String(event.key).length?'key:'+String(event.key):event?.id!=null?'id:'+String(event.id):'legacy:'+JSON.stringify(event);
+  if(!xpEvents.has(identity))xpEvents.set(identity,event);
+ }
+ gamification.xpHistory=[...xpEvents.values()];
  // XP acumulado não pode diminuir ao reconciliar dispositivos; eventos continuam deduplicados.
  gamification.xp=Math.max(remote.gamification?.xp||0,local.gamification?.xp||0);
  const competencies={...remote.competencies,...local.competencies};
