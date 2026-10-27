@@ -114,3 +114,20 @@ test('catálogo ignora metadados de Guilda publicados no ID 3A',async()=>{
  assert.match(source,/row\.mission_id==="3A"/);
  assert.match(source,/c\.guild_template_version\|\|c\.guild_config/);
 });
+
+test('sincronização conserva respostas conflitantes de dois dispositivos',async()=>{
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const remote=fresh(),local=fresh();
+ remote.meta.updatedAt='2026-10-20T10:00:00Z';
+ local.meta.updatedAt='2026-10-21T10:00:00Z';
+ remote.answers={'3A:report':{a:'resposta remota',b:'preservada'}};
+ local.answers={'3A:report':{a:'resposta local',c:'nova'}};
+ const merged=sync.mergeStudentStates(remote,local);
+ assert.equal(merged.answers['3A:report'].a,'resposta local');
+ assert.equal(merged.answers['3A:report'].b,'preservada');
+ assert.equal(merged.answers['3A:report'].c,'nova');
+ assert.equal(merged.answerConflicts.length,1);
+ assert.equal(merged.answerConflicts[0].value.a,'resposta remota');
+ const again=sync.mergeStudentStates(merged,local);
+ assert.equal(again.answerConflicts.length,1);
+});
