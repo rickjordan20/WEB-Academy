@@ -2,9 +2,9 @@
 export const F3_SLIDES=[
   {
     "id": "f3-slide-01",
-    "title": "Bem-vindo à evolução da TechEduca",
+    "title": "Bem-vindo à evolução da EduTech",
     "explanation": "Você já construiu header, nav, main e footer. Agora vai preencher as páginas Início, Sobre e Cursos com conteúdo HTML. Nesta aula, não precisamos de CSS ou JavaScript.",
-    "code": "<main><h1>Bem-vindo à TechEduca</h1></main>",
+    "code": "<main><h1>Bem-vindo à EduTech</h1></main>",
     "question": "O foco desta aula é: ",
     "options": [
       "Criar a estrutura e o conteúdo HTML",
@@ -43,7 +43,7 @@ export const F3_SLIDES=[
     "id": "f3-slide-04",
     "title": "header: o cabeçalho",
     "explanation": "O header apresenta informações de abertura, como nome, identidade e título da página. Um header pode conter um nav, mas não é a mesma coisa que um menu.",
-    "code": "<header><h1>TechEduca</h1></header>",
+    "code": "<header><h1>EduTech</h1></header>",
     "question": "O que caracteriza header?",
     "options": [
       "É o conteúdo principal",
@@ -81,7 +81,7 @@ export const F3_SLIDES=[
   {
     "id": "f3-slide-07",
     "title": "section: dividir por assunto",
-    "explanation": "Uma section agrupa conteúdo de um mesmo tema e normalmente possui um título. Na TechEduca, podemos criar uma seção para cursos e outra para depoimentos.",
+    "explanation": "Uma section agrupa conteúdo de um mesmo tema e normalmente possui um título. Na EduTech, podemos criar uma seção para cursos e outra para depoimentos.",
     "code": "<section><h2>Nossos cursos</h2></section>",
     "question": "Quando usar section?",
     "options": [
@@ -108,7 +108,7 @@ export const F3_SLIDES=[
     "id": "f3-slide-09",
     "title": "footer e aside",
     "explanation": "Footer reúne informações de encerramento, como créditos e contatos. Aside representa conteúdo complementar, como uma dica relacionada. Nem toda página precisa de aside.",
-    "code": "<footer><p>© 2026 TechEduca</p></footer>",
+    "code": "<footer><p>© 2026 EduTech</p></footer>",
     "question": "Qual tag é mais apropriada para créditos finais?",
     "options": [
       "aside",
@@ -121,7 +121,7 @@ export const F3_SLIDES=[
     "id": "f3-slide-10",
     "title": "Títulos: h1, h2 e h3",
     "explanation": "Títulos organizam a hierarquia do assunto: h1 apresenta o tema principal, h2 abre seções e h3 subdivide essas seções. Não escolha o nível apenas pelo tamanho visual.",
-    "code": "<h1>TechEduca</h1>\n<h2>Cursos</h2>\n<h3>HTML básico</h3>",
+    "code": "<h1>EduTech</h1>\n<h2>Cursos</h2>\n<h3>HTML básico</h3>",
     "question": "Qual tag é adequada para o título de uma seção?",
     "options": [
       "h2",
@@ -173,11 +173,11 @@ export const F3_SLIDES=[
     "id": "f3-slide-14",
     "title": "Acessibilidade: alt",
     "explanation": "O atributo alt fornece uma alternativa textual para imagens que transmitem informação. Descreva o que importa no contexto; imagens puramente decorativas podem usar alt vazio.",
-    "code": "<img src=\"equipe.jpg\" alt=\"Equipe da TechEduca reunida\">",
+    "code": "<img src=\"equipe.jpg\" alt=\"Equipe da EduTech reunida\">",
     "question": "Qual alternativa descreve melhor uma foto informativa da equipe?",
     "options": [
       "alt=\"imagem\"",
-      "alt=\"Equipe da TechEduca reunida\"",
+      "alt=\"Equipe da EduTech reunida\"",
       "sem alt"
     ],
     "correct": 1
@@ -264,7 +264,7 @@ export const F3_SLIDES=[
     "id": "f3-slide-21",
     "title": "Preparação para a prática guiada",
     "explanation": "Você vai transformar os protótipos de Início, Sobre e Cursos em HTML. Preserve header, nav e footer já criados; preencha main com títulos, seções, textos, listas, imagens e links. Não antecipe CSS, JS ou formulários.",
-    "code": "<main><h1>TechEduca</h1><section><h2>Cursos</h2><p>Conheça nossas formações.</p></section></main>",
+    "code": "<main><h1>EduTech</h1><section><h2>Cursos</h2><p>Conheça nossas formações.</p></section></main>",
     "question": "Qual é o próximo passo correto?",
     "options": [
       "Aplicar animações JS",
