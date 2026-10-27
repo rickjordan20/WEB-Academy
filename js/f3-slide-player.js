@@ -11,7 +11,6 @@ export function mountF3Slides(root,unit,{readOnly=false,access=null}={}){
  const all=F3_SLIDES;
  const completed=getState()?.journey?.completedFundamentals?.includes("F3");
  const passed=s=>saved(s)?.correct===true;
- const firstPending=()=>{const n=all.findIndex(s=>!passed(s));return n<0?all.length-1:n};
  index=slidePositions.has(root)?Math.min(all.length-1,slidePositions.get(root)):(completed?all.length-1:nextF3Index(getState()?.answers||{},all));
  const redraw=()=>{
   slidePositions.set(root,index);
