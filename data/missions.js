@@ -410,6 +410,338 @@ const retrospectiveSteps=[
 {id:"retro-3-evidence",type:"evidence",title:"Registro da Aula 3",summary:"Não duplique cadastros já realizados.",fields:["Qual é sua Guilda na WEB-Academy?","O repositório Projeto Restaurante já foi cadastrado? Se não, informe a situação.","Qual responsabilidade foi combinada para você ou quais tarefas foram registradas no Kanban?","O que a equipe já conseguiu organizar e o que ficou pendente?"]}
 ]
 ];
+const MISSION_3A_STEPS=[
+ {
+  "id": "3a-intro",
+  "type": "content",
+  "title": "Missão 3A · Evolução da TechEduca",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Objetivo: desenvolver a estrutura HTML das páginas Início, Sobre e Cursos, seguindo os três protótipos fornecidos pelo instrutor.",
+   "Carga horária: Fundamentos 1h30; Prática Guiada 2h; Relatório Individual 30min. Indicador I2.",
+   "Você já criou header, nav, main vazio e footer na missão anterior. Preserve essa estrutura: agora vamos preencher main, sem antecipar CSS, JavaScript ou formulários.",
+   "Os protótipos mostram o resultado visual futuro. Nesta aula, é normal que os conteúdos apareçam um abaixo do outro, sem cores, bordas ou alinhamento em cartões."
+  ]
+ },
+ {
+  "id": "3a-f1",
+  "type": "content",
+  "title": "Fundamentos 1 · HTML semântico (15 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "HTML semântico é escolher tags que explicam a função de cada parte do documento. Pense em uma escola: identificar biblioteca, secretaria e salas torna o espaço compreensível. No HTML, header, main e footer também identificam regiões.",
+   "div é útil para agrupar, mas não informa por si só a função do conteúdo. main identifica o conteúdo principal. Isso melhora a organização e ajuda tecnologias assistivas a interpretar a página.",
+   "Exemplo: <header>TechEduca</header> <main><h1>Formação em Tecnologia</h1><p>Aprenda na prática.</p></main> <footer>© 2026 TechEduca</footer>."
+  ]
+ },
+ {
+  "id": "3a-q1",
+  "type": "quiz",
+  "title": "Verificação 1 · Semântica",
+  "question": "Qual elemento identifica o conteúdo principal da página?",
+  "options": [
+   "div",
+   "main",
+   "footer"
+  ],
+  "answer": 1,
+  "feedback": "main identifica a região principal. div é um agrupador genérico.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f2",
+  "type": "content",
+  "title": "Fundamentos 2 · Elementos semânticos (20 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "header: cabeçalho; nav: navegação; main: conteúdo principal; section: agrupamento temático; article: conteúdo independente; aside: conteúdo complementar; footer: rodapé.",
+   "Na TechEduca, a seção 'Nossos cursos' pode conter três articles, um para cada curso. Nem toda página precisa usar todos os elementos.",
+   "Exemplo: <section><h2>Nossos cursos</h2><article><h3>Desenvolvimento WEB</h3><p>Aprenda HTML, CSS e JavaScript.</p></article></section>."
+  ]
+ },
+ {
+  "id": "3a-q2",
+  "type": "quiz",
+  "title": "Verificação 2 · Elementos",
+  "question": "Qual tag é adequada para um curso independente?",
+  "options": [
+   "article",
+   "nav",
+   "footer"
+  ],
+  "answer": 0,
+  "feedback": "article representa conteúdo que faz sentido independentemente.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f3",
+  "type": "content",
+  "title": "Fundamentos 3 · Textos, listas e imagens (20 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "h1 identifica o título principal da página; h2 identifica seções; h3 identifica subseções. p cria parágrafos. A hierarquia dos títulos representa a organização do assunto, não apenas o tamanho da letra.",
+   "ul cria lista sem ordem; ol cria sequência ordenada; li cria cada item. Exemplo: <ul><li>Compromisso</li><li>Inovação</li><li>Transparência</li></ul>.",
+   "img insere imagens: src aponta para o arquivo e alt fornece texto alternativo informativo. Exemplo: <img src=\"../assets/images/desenvolvimento-web.jpg\" alt=\"Ilustração sobre desenvolvimento web\">. A imagem precisa existir no caminho indicado."
+  ]
+ },
+ {
+  "id": "3a-q3",
+  "type": "quiz",
+  "title": "Verificação 3 · Imagens",
+  "question": "Qual atributo fornece uma alternativa textual para a imagem?",
+  "options": [
+   "href",
+   "alt",
+   "target"
+  ],
+  "answer": 1,
+  "feedback": "alt descreve o conteúdo relevante da imagem.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f4",
+  "type": "content",
+  "title": "Fundamentos 4 · Links e navegação (15 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "a cria um link; href define seu destino. Links internos conectam páginas do projeto e links externos apontam para outros sites.",
+   "nav agrupa os links principais. Exemplo: <nav aria-label=\"Menu principal\"><a href=\"../index.html\">Início</a><a href=\"sobre.html\">Sobre</a><a href=\"cursos.html\">Cursos</a></nav>.",
+   "Um link só funciona quando seu destino existe e o caminho está correto. Nesta aula, páginas de Login, Contato e detalhes podem permanecer previstas, sem implementação funcional."
+  ]
+ },
+ {
+  "id": "3a-q4",
+  "type": "quiz",
+  "title": "Verificação 4 · Links",
+  "question": "Qual atributo define o destino de um link?",
+  "options": [
+   "src",
+   "alt",
+   "href"
+  ],
+  "answer": 2,
+  "feedback": "href indica o destino do link.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f5",
+  "type": "content",
+  "title": "Fundamentos 5 · Caminhos relativos e comentários (10 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Estrutura usada na aula anterior: index.html na raiz; pages/sobre.html, pages/cursos.html e pages/contato.html dentro de pages; assets/images para imagens.",
+   "De index.html para Sobre: href=\"pages/sobre.html\". De pages/sobre.html para Início: href=\"../index.html\". De pages/cursos.html para imagem na raiz/assets/images: src=\"../assets/images/arquivo.jpg\".",
+   "./ indica a pasta atual; ../ sobe um nível. Comentários <!-- exemplo --> documentam o código, mas podem ser vistos no código-fonte: não coloque segredos neles."
+  ]
+ },
+ {
+  "id": "3a-q5",
+  "type": "quiz",
+  "title": "Verificação 5 · Caminhos",
+  "question": "O que significa ../ em um caminho relativo?",
+  "options": [
+   "Voltar uma pasta",
+   "Criar uma pasta",
+   "Abrir outro site"
+  ],
+  "answer": 0,
+  "feedback": "../ indica o diretório acima da pasta atual.",
+  "xp": 0
+ },
+ {
+  "id": "3a-f6",
+  "type": "content",
+  "title": "Fundamentos 6 · Revisão e diagnóstico (10 min)",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Revise: cada página deve ter um h1, títulos de seções em h2, links com href correto e imagens com alt adequado.",
+   "Desafio: explique por que <main><h1>TechEduca</h1><section><h2>Cursos</h2></section></main> é uma organização mais informativa do que usar div para todas as regiões.",
+   "Agora abra seu projeto no VS Code: vamos transformar os três protótipos em HTML progressivamente."
+  ]
+ },
+ {
+  "id": "3a-g1",
+  "type": "guided",
+  "title": "Prática 1 · Preparar o projeto (10 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Preservar a estrutura desenvolvida anteriormente.",
+  "instructions": [
+   "Abra o repositório TechEduca no VS Code.",
+   "Localize index.html na raiz e sobre.html e cursos.html na pasta pages/.",
+   "Identifique header, nav, main e footer. Não recrie nem apague o cabeçalho e o rodapé.",
+   "Confirme os caminhos de navegação já existentes e salve o trabalho antes de modificar."
+  ],
+  "code": "<!-- Estrutura existente: preserve as regiões -->\n<header>...</header>\n<main>\n  <!-- Novo conteúdo será inserido aqui -->\n</main>\n<footer>...</footer>",
+  "tip": "Os três protótipos são referência visual. Nesta missão, implemente o HTML, não o CSS.",
+  "outcome": "Arquivos existentes localizados, estrutura preservada.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g2",
+  "type": "guided",
+  "title": "Prática 2 · Início: apresentação (15 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Construir a seção principal da página Início conforme o primeiro protótipo.",
+  "instructions": [
+   "Abra index.html e localize o main vazio.",
+   "Insira a seção hero com o título principal, os dois parágrafos e os links Fazer Login e Fale conosco.",
+   "Ajuste os links para pages/login.html e pages/contato.html, conforme os arquivos existentes. Não crie a funcionalidade de login.",
+   "Salve e abra index.html no navegador. Verifique o texto, mesmo sem CSS."
+  ],
+  "code": "<!-- Apresentação principal da TechEduca -->\n<section class=\"hero\">\n  <h1>Formação em Tecnologia para o mercado real</h1>\n  <p>Aprenda desenvolvimento web, lógica e banco de dados</p>\n  <p>Para visualizar os cursos, é necessário fazer login</p>\n  <a href=\"pages/login.html\">Fazer Login</a>\n  <a href=\"pages/contato.html\">Fale conosco</a>\n</section>",
+  "tip": "Insira este código DENTRO do main existente. O caminho de Login só será funcional se a página correspondente existir.",
+  "outcome": "A apresentação aparece na página Início.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g3",
+  "type": "guided",
+  "title": "Prática 3 · Início: três diferenciais (15 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Reproduzir os três blocos de diferenciais do primeiro protótipo.",
+  "instructions": [
+   "Abaixo da hero, ainda dentro de main, adicione a seção diferenciais.",
+   "Crie um h2 e três article com h3 e p.",
+   "Confira os textos Projetos Reais, Material Didático e Suporte do Instrutor.",
+   "Salve e teste: os artigos podem aparecer empilhados até a aula de CSS."
+  ],
+  "code": "<!-- Diferenciais da TechEduca -->\n<section class=\"diferenciais\">\n  <h2>Por que estudar na TechEduca?</h2>\n  <article><h3>Projetos Reais</h3><p>Você desenvolve sites com base em situações profissionais</p></article>\n  <article><h3>Material Didático</h3><p>Conteúdos e exercícios práticos</p></article>\n  <article><h3>Suporte do Instrutor</h3><p>Acompanhamento durante todo o processo</p></article>\n</section>",
+  "tip": "section organiza o assunto; cada article apresenta um diferencial independente.",
+  "outcome": "A página Início possui hero e três diferenciais.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g4",
+  "type": "guided",
+  "title": "Prática 4 · Sobre: apresentação, quem somos e missão (15 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Criar as três primeiras partes do segundo protótipo.",
+  "instructions": [
+   "Abra pages/sobre.html e mantenha header, nav e footer.",
+   "Dentro do main, insira a apresentação com h1 e parágrafo.",
+   "Adicione as seções Quem somos e Nossa missão com h2 e p.",
+   "Salve e teste no navegador."
+  ],
+  "code": "<!-- Conteúdo de pages/sobre.html: dentro do main existente -->\n<section class=\"apresentacao\">\n  <h1>Sobre a TechEduca</h1>\n  <p>Uma escola de tecnologia com foco em formação prática, metodologias atuais e compromisso com o crescimento profissional.</p>\n</section>\n<section class=\"quem-somos\">\n  <h2>Quem somos</h2>\n  <p>A TechEduca é uma escola de tecnologia focada em formação prática e desenvolvimento de competências para o mercado.</p>\n</section>\n<section class=\"missao\">\n  <h2>Nossa missão</h2>\n  <p>Transformar vidas por meio da educação tecnológica, entregando conteúdo acessível, dinâmico e alinhado com as demandas reais do mercado.</p>\n</section>",
+  "tip": "Não crie outro main: use o que já existe em sobre.html.",
+  "outcome": "Página Sobre apresenta a identidade e a missão da TechEduca.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g5",
+  "type": "guided",
+  "title": "Prática 5 · Sobre: valores e diferenciais (10 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Concluir os quatro agrupamentos institucionais do segundo protótipo.",
+  "instructions": [
+   "Depois da seção missão, crie Nossos valores com uma lista ul/li.",
+   "Use strong para destacar Compromisso, Inovação e Transparência.",
+   "Crie O que nos torna diferentes com três itens em lista.",
+   "Teste a hierarquia de títulos e o conteúdo."
+  ],
+  "code": "<!-- Valores institucionais -->\n<section class=\"valores\">\n  <h2>Nossos valores</h2>\n  <ul>\n    <li><strong>Compromisso</strong> com o sucesso dos nossos alunos.</li>\n    <li><strong>Inovação</strong> em cada curso e experiência de aprendizagem.</li>\n    <li><strong>Transparência</strong> em todo o processo educativo.</li>\n  </ul>\n</section>\n<section class=\"diferenciais\">\n  <h2>O que nos torna diferentes</h2>\n  <ul>\n    <li>Aulas práticas com projetos reais.</li>\n    <li>Equipe de suporte próxima e dedicada.</li>\n    <li>Conteúdos atualizados e focados no mercado.</li>\n  </ul>\n</section>",
+  "tip": "A apresentação em cartões ficará para CSS; a lista HTML já expressa corretamente o conteúdo.",
+  "outcome": "Página Sobre contém apresentação, quem somos, missão, valores e diferenciais.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g6",
+  "type": "guided",
+  "title": "Prática 6 · Cursos: título, busca e primeiro curso (15 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Iniciar o terceiro protótipo com um curso completo.",
+  "instructions": [
+   "Abra pages/cursos.html e preserve as regiões existentes.",
+   "No main, insira o título Nossos cursos e a busca visual (a filtragem com JavaScript será futura).",
+   "Crie section catalogo e insira o primeiro article.",
+   "Use o caminho ../assets/images/desenvolvimento-web.jpg; confira se a imagem existe.",
+   "O link de detalhes é apenas estrutural nesta etapa."
+  ],
+  "code": "<!-- Dentro do main existente em pages/cursos.html -->\n<h1>Nossos cursos</h1>\n<div class=\"busca\">\n  <label for=\"buscar-curso\">Buscar Cursos</label>\n  <input type=\"search\" id=\"buscar-curso\" name=\"busca\" placeholder=\"Buscar Cursos\">\n</div>\n<section class=\"catalogo\" aria-label=\"Catálogo de cursos\">\n  <article class=\"curso\">\n    <h2>Desenvolvimento WEB</h2>\n    <img src=\"../assets/images/desenvolvimento-web.jpg\" alt=\"Ilustração sobre desenvolvimento web\">\n    <p>Aprenda HTML, CSS, Javascript e práticas modernas de desenvolvimento</p>\n    <p>CH: 40</p>\n    <a href=\"detalhes-web.html\">Ver detalhes</a>\n  </article>\n  <!-- Insira os próximos cursos aqui -->\n</section>",
+  "tip": "A busca é somente estrutural, não um formulário de entrega. Não exija funcionalidade de pesquisa.",
+  "outcome": "Primeiro curso aparece com título, imagem, descrição, carga horária e link.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g7",
+  "type": "guided",
+  "title": "Prática 7 · Cursos: Informática e Games (20 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Completar os três cursos do protótipo.",
+  "instructions": [
+   "Dentro da mesma section catalogo, após o primeiro article, crie o curso Informática Básica.",
+   "Repita a estrutura para Desenvolvimento de Games.",
+   "Use imagens reais salvas em assets/images, com caminhos relativos e alt adequados.",
+   "Verifique as cargas horárias: WEB 40, Informática 30 e Games 80.",
+   "Não implemente páginas de detalhes nesta missão."
+  ],
+  "code": "<!-- Cole estes dois articles dentro de section.catalogo -->\n<article class=\"curso\">\n  <h2>Informática Básica</h2>\n  <img src=\"../assets/images/informatica-basica.jpg\" alt=\"Ilustração sobre informática básica\">\n  <p>Domine o uso do computador e aplicativos essenciais</p>\n  <p>CH: 30</p>\n  <a href=\"detalhes-informatica.html\">Ver detalhes</a>\n</article>\n<article class=\"curso\">\n  <h2>Desenvolvimento de Games</h2>\n  <img src=\"../assets/images/desenvolvimento-games.jpg\" alt=\"Ilustração sobre desenvolvimento de jogos\">\n  <p>Aprenda a desenvolver games de forma legal e criativa</p>\n  <p>CH: 80</p>\n  <a href=\"detalhes-games.html\">Ver detalhes</a>\n</article>",
+  "tip": "Os três cards podem ficar um abaixo do outro. A disposição em colunas será feita com CSS.",
+  "outcome": "Página Cursos apresenta os três cursos e seus dados corretos.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g8",
+  "type": "guided",
+  "title": "Prática 8 · Navegação e testes (10 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Testar os links e recursos das três páginas.",
+  "instructions": [
+   "Abra index.html e navegue para Sobre e Cursos pelo menu.",
+   "Em pages/sobre.html e pages/cursos.html, teste o retorno à raiz com ../index.html.",
+   "Confira se os arquivos de imagem existem e se o caminho começa com ../assets/images/ nas páginas internas.",
+   "Confirme um h1 por página, seções organizadas e nenhuma duplicação de header/main/footer.",
+   "Registre links previstos para páginas futuras como pendências, sem tratá-los como funcionais."
+  ],
+  "code": "<a href=\"pages/sobre.html\">Sobre (na raiz)</a>\n<a href=\"../index.html\">Início (dentro de pages/)</a>\n<img src=\"../assets/images/desenvolvimento-web.jpg\" alt=\"Ilustração sobre desenvolvimento web\">",
+  "tip": "Não confunda link existente com funcionalidade futura de Login, Contato ou detalhes.",
+  "outcome": "Links implementados testados; pendências futuras identificadas.",
+  "xp": 0
+ },
+ {
+  "id": "3a-g9",
+  "type": "guided",
+  "title": "Prática 9 · Versionamento (10 min)",
+  "summary": "Prática guiada · construa, salve e teste no navegador",
+  "goal": "Registrar as alterações no GitHub.",
+  "instructions": [
+   "Salve os arquivos e confira git status.",
+   "Revise as alterações antes de executar git add .",
+   "Crie um commit descritivo e envie ao repositório remoto.",
+   "Abra o GitHub e confirme a presença do commit e dos arquivos atualizados."
+  ],
+  "code": "git status\ngit add .\ngit commit -m \"feat: estruturar paginas da TechEduca\"\ngit push",
+  "tip": "Não repita git init nem altere o remoto de um repositório já configurado.",
+  "outcome": "As três páginas estão versionadas no GitHub.",
+  "xp": 0
+ },
+ {
+  "id": "3a-report",
+  "type": "evidence",
+  "title": "Relatório individual · Missão 3A (30 min)",
+  "summary": "Descreva suas aprendizagens, contribuições, dificuldades e evidências.",
+  "fields": [
+   "O que você aprendeu sobre HTML semântico? Explique como utilizou os elementos nas páginas.",
+   "Quais páginas e elementos você desenvolveu? Identifique suas contribuições em Início, Sobre e Cursos.",
+   "Quais dificuldades encontrou e como tentou resolvê-las? Comente tags, links, imagens ou organização.",
+   "Quais evidências comprovam sua participação? Informe links do repositório, commits ou outras evidências verificáveis."
+  ],
+  "xp": 0
+ },
+ {
+  "id": "3a-criteria",
+  "type": "content",
+  "title": "Critérios de avaliação e encerramento",
+  "summary": "Fundamentos · explicação e exemplo",
+  "body": [
+   "Estrutura semântica: uso coerente de main, section, article e hierarquia de títulos.",
+   "Página Início: apresentação, links e três diferenciais; Sobre: identidade, missão, valores e diferenciais; Cursos: três cursos, descrições, imagens e cargas horárias.",
+   "Navegação: caminhos relativos adequados; versionamento: commit publicado; participação: relatório com evidências verificáveis.",
+   "O preenchimento não garante automaticamente o indicador atendido. A qualidade e a autoria das evidências serão avaliadas pelo instrutor.",
+   "Próxima evolução: CSS para reproduzir cores, cartões, espaçamentos, alinhamentos e responsividade dos protótipos."
+  ]
+ }
+];
 const MISSION_3B_STEPS=[
  {id:"3b-contexto",type:"content",title:"1 · Entenda o desafio da Guilda",summary:"O Restaurante precisa de páginas organizadas, fáceis de navegar e com HTML semântico.",body:["Nesta missão, o grupo vai revisar a estrutura criada anteriormente e organizar o conteúdo usando header, nav, main, section, article e footer.","HTML semântico descreve a função de cada parte da página. A navegação deve permitir que o visitante encontre as páginas do Restaurante."],xp:0},
  {id:"3b-planejamento",type:"guided",title:"2 · Planejamento no Kanban",goal:"Distribuir tarefas e registrar quem fez cada parte.",instructions:["Abra o Kanban do Projeto Restaurante e revise as tarefas da Guilda.","Distribua as responsabilidades: navegação, estrutura semântica, conteúdo e revisão.","Cada integrante deve registrar sua contribuição individual e, quando possível, um link de evidência.","Confirme que a página index.html continua na raiz e as demais páginas estão na pasta pages."],outcome:"Tarefas organizadas e responsáveis identificados.",xp:15},
@@ -427,7 +759,7 @@ export const MISSIONS=originalMissions.map((original,index)=>{
  index===2?{title:"Git/GitHub — consolidação colaborativa",subtitle:"Prática em grupo com Kanban e versionamento",type:"guild",project:"restaurante"}:{};
  return {...original,...source,id:original.id,number:index+1,lesson:index+1,phase,displayId,...special,
   // Os blocos personalizados continuam vinculados ao identificador interno original.
-  steps:displayId==="3B"?structuredClone(MISSION_3B_STEPS):index<3?retrospectiveSteps[index]:displayId==="2A"?MISSION_2B_STEPS.filter(step=>["2b-p1","2b-p2","2b-p3","2b-p5","2b-p7"].includes(step.id)):displayId==="2B"?MISSION_2B_STEPS.filter(step=>["2b-p4","2b-p6"].includes(step.id)):original.steps};
+  steps:displayId==="3A"?structuredClone(MISSION_3A_STEPS):displayId==="3B"?structuredClone(MISSION_3B_STEPS):index<3?retrospectiveSteps[index]:displayId==="2A"?MISSION_2B_STEPS.filter(step=>["2b-p1","2b-p2","2b-p3","2b-p5","2b-p7"].includes(step.id)):displayId==="2B"?MISSION_2B_STEPS.filter(step=>["2b-p4","2b-p6"].includes(step.id)):original.steps};
 });
 export const EXTRA_MISSIONS=[
 {id:"R1",title:"Controle de Versão",official:"Ambiente Dev e Versionamento: Revisão e Prática",hours:4,competencies:["I1","I6"]},
