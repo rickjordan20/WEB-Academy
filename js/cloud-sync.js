@@ -4,6 +4,32 @@ import {getSupabase,getSession} from "./supabase-client.js";
 // Merge independently collected learning evidence; never discard either device's work.
 const unique=(a=[],b=[])=>[...new Set([...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])])];
 const records=(a=[],b=[])=>{const out=new Map();for(const item of [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])])out.set(item?.id||JSON.stringify(item),item);return [...out.values()]};
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
+const mergeAnswerFields=(remote,local,preferLocal)=>{
+ if(!plain(remote)||!plain(local))return preferLocal?local:remote;
+ const result={...remote,...local};
+ for(const key of new Set([...Object.keys(remote),...Object.keys(local)])){
+  if(!(key in remote))result[key]=local[key];
+  else if(!(key in local))result[key]=remote[key];
+  else if(plain(remote[key])&&plain(local[key]))result[key]=mergeAnswerFields(remote[key],local[key],preferLocal);
+  else result[key]=preferLocal?local[key]:remote[key];
+ }
+ return result;
+};
+const mergeAnswers=(remote={},local={},preferLocal,previous=[])=>{
+ const answers={},conflicts=records(previous);
+ for(const key of new Set([...Object.keys(remote),...Object.keys(local)])){
+  if(!(key in remote)){answers[key]=local[key];continue}
+  if(!(key in local)){answers[key]=remote[key];continue}
+  if(same(remote[key],local[key])){answers[key]=remote[key];continue}
+  answers[key]=mergeAnswerFields(remote[key],local[key],preferLocal);
+  const losing=preferLocal?remote[key]:local[key];
+  const id=key+":"+JSON.stringify(losing);
+  if(!conflicts.some(item=>item.id===id))conflicts.push({id,answerKey:key,value:losing});
+ }
+ return {answers,conflicts};
+};
 export function mergeStudentStates(remote,local){
  if(!remote)return local;if(!local)return remote;
  const newer=Date.parse(local.meta?.updatedAt||0)>=Date.parse(remote.meta?.updatedAt||0);
@@ -30,10 +56,11 @@ export function mergeStudentStates(remote,local){
  gamification.xpHistory=[...xpEvents.values()];
  // XP acumulado não pode diminuir ao reconciliar dispositivos; eventos continuam deduplicados.
  gamification.xp=Math.max(remote.gamification?.xp||0,local.gamification?.xp||0);
+ const mergedAnswers=mergeAnswers(remote.answers||{},local.answers||{},newer,records(remote.answerConflicts,local.answerConflicts));
  const competencies={...remote.competencies,...local.competencies};
  for(const key of unique(Object.keys(remote.competencies||{}),Object.keys(local.competencies||{})))competencies[key]=records(remote.competencies?.[key],local.competencies?.[key]);
  return {...secondary,...primary,journey,gamification,competencies,
-  answers:{...secondary.answers,...primary.answers},
+  answers:mergedAnswers.answers,answerConflicts:mergedAnswers.conflicts,
   evidence:records(remote.evidence,local.evidence),
   extraMissions:{...secondary.extraMissions,...primary.extraMissions,completed:unique(remote.extraMissions?.completed,local.extraMissions?.completed)},
   meta:{...secondary.meta,...primary.meta,updatedAt:primary.meta?.updatedAt||secondary.meta?.updatedAt||new Date().toISOString()}};
@@ -58,20 +85,23 @@ export async function pushCloudState(){
   if(readError)throw readError;
   const current=getState(session.user.id);if(!current)return {synced:false};
   const merged=mergeStudentStates(data?.state,current);
-  let candidate=merged,saved=false;
+  let candidate=merged,saved=false,expectedVersion=data?.updated_at||null;
   for(let attempt=0;attempt<5;attempt++){
-   const expected=attempt===0?(data?.updated_at||null):null;
+   const expected=expectedVersion;
    const result=await sb.rpc("save_student_state_cas",{p_state:candidate,p_expected_updated_at:expected});
    if(result.error)throw result.error;
    const row=Array.isArray(result.data)?result.data[0]:result.data;
    if(row?.saved){saved=true;break}
    if(!row?.cloud_state)throw new Error("Resposta de sincronização inválida.");
    candidate=mergeStudentStates(row.cloud_state,candidate);
+   expectedVersion=row.cloud_updated_at;
    const retry=await sb.rpc("save_student_state_cas",{p_state:candidate,p_expected_updated_at:row.cloud_updated_at});
    if(retry.error)throw retry.error;
    const retried=Array.isArray(retry.data)?retry.data[0]:retry.data;
    if(retried?.saved){saved=true;break}
-   candidate=mergeStudentStates(retried?.cloud_state,candidate);
+   if(!retried?.cloud_state)throw new Error("Resposta de sincronização inválida.");
+   candidate=mergeStudentStates(retried.cloud_state,candidate);
+   expectedVersion=retried.cloud_updated_at;
   }
   if(!saved)throw new Error("Conflito de sincronização persistente; progresso local preservado.");
   // Preserve edits made while the asynchronous sync was running.
