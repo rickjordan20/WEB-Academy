@@ -1,3 +1,4 @@
+import {loadAchievementRules} from "./gamification.js";
 import {getState,cacheCloudState,setActiveUser} from "./storage.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 
@@ -87,6 +88,9 @@ export function mergeStudentStates(remote,local){
 }
 export async function pullCloudState(){
  const sb=await getSupabase(),session=await getSession();if(!sb||!session)return null;setActiveUser(session.user.id);
+ const {data:memberships,error:membershipError}=await sb.from("class_members").select("class_id").eq("user_id",session.user.id).eq("status","active").limit(1);
+ if(membershipError)throw membershipError;
+ if(memberships?.[0]?.class_id)await loadAchievementRules(sb,memberships[0].class_id);
  const {data,error}=await sb.from("student_states").select("state,updated_at").eq("user_id",session.user.id).maybeSingle();
  if(error)throw error;if(!data?.state)return null;
  const local=getState(session.user.id),merged=mergeStudentStates(data.state,local);
