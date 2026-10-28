@@ -1,0 +1,22 @@
+/* Conversa simples vinculada ao chamado de ajuda. */
+.angel-conversation{margin:16px 0;padding:16px;background:#0d1c31;border:1px solid #355579;border-radius:14px}
+.angel-chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:800;margin-bottom:12px}
+.angel-chat-messages{display:flex;flex-direction:column;gap:10px;max-height:320px;min-height:75px;overflow-y:auto;padding:12px;background:#0a1627;border:1px solid #2c4565;border-radius:11px}
+.angel-chat-bubble{max-width:85%;align-self:flex-start;background:#223a56;border:1px solid #375777;padding:10px 12px;border-radius:12px 12px 12px 3px;overflow-wrap:anywhere}
+.angel-chat-bubble.mine{align-self:flex-end;background:#234c86;border-color:#4275b5;border-radius:12px 12px 3px 12px}
+.angel-chat-bubble strong{font-size:.75rem;color:#b9d9ff}
+.angel-chat-bubble p{white-space:pre-wrap;margin:5px 0!important;color:#f0f6ff!important;font-size:.87rem;line-height:1.5}
+.angel-chat-bubble time{display:block;text-align:right;font-size:.66rem;color:#b9cbe3}
+.angel-chat-form{display:grid;gap:9px;margin-top:13px}
+.angel-chat-label{display:grid;gap:7px;color:#c8d9ee;font-weight:700;font-size:.85rem}
+.angel-chat-form textarea{width:100%;min-height:65px;background:#10243c;border:1px solid #44678e;color:#fff;border-radius:10px;padding:11px;resize:vertical;font:inherit}
+.angel-chat-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.angel-chat-controls label{display:flex;align-items:center;gap:7px;font-size:.8rem;color:#c7d9ee}
+.angel-chat-controls input{accent-color:#559cff}
+.angel-chat-history{margin-top:12px;border-top:1px solid #314e6d;padding-top:8px;font-size:.76rem;color:#a9bfd9}
+.angel-chat-history p{margin:5px 0}
+.angel-chat-empty,.angel-chat-event{color:#a9c2e2;font-size:.8rem;margin:4px}
+.angel-student-conversation{border:1px solid #36577a;border-radius:12px;padding:12px;margin-top:16px}
+.angel-student-conversation>summary{font-weight:800;color:#c1dfff;padding:4px;cursor:pointer}
+.angel-chat-events{margin-top:14px;border-top:1px solid #314e6d;padding:8px}
+@media(max-width:600px){.angel-conversation{padding:10px}.angel-chat-bubble{max-width:94%}.angel-chat-controls{align-items:stretch;flex-direction:column}.angel-chat-controls button{width:100%}}
