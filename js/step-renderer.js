@@ -36,32 +36,48 @@ const explanationHtml=value=>{
  };
  const output=document.createElement('div');
  [...doc.body.firstElementChild.childNodes].forEach(node=>output.append(clean(node)));
+ colorizeInlineCode(output);
  return output.innerHTML;
 };
+
 
 const formatHtmlExample=value=>{
  const source=String(value??"").trim();
  if(!source)return "";
- const tokens=source.replace(/>\s*</g,'>\n<').split('\n').map(x=>x.trim()).filter(Boolean);
+ const lines=source.replace(/>\s*</g,'>\n<').split('\n');
  let depth=0;
- return tokens.map(line=>{
-  if(/^<\//.test(line))depth=Math.max(0,depth-1);
-  const out='  '.repeat(depth)+line;
-  const opens=(line.match(/<(?!\/|!|\?)([a-z][\w-]*)\b[^>]*>/gi)||[]).filter(tag=>!(/\/>$/.test(tag)||/^<(?:meta|img|br|hr|input|link|source|area|base|embed|wbr)\b/i.test(tag))).length;
-  const closes=(line.match(/<\/[a-z][\w-]*\s*>/gi)||[]).length;
-  depth=Math.max(0,depth+opens-closes);
-  return out;
+ return lines.map(raw=>{
+  const line=raw.trim();if(!line)return "";
+  const closing=/^<\//.test(line);
+  if(closing)depth=Math.max(0,depth-1);
+  const output='  '.repeat(depth)+line;
+  const opens=(line.match(/<(?!\/|!|\?)[a-z][\w:-]*(?:\s[^<>]*?)?>/gi)||[]).filter(t=>!(/\/>$/.test(t)||/^<(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i.test(t))).length;
+  const closes=(line.match(/<\/[a-z][\w:-]*\s*>/gi)||[]).length;
+  depth=Math.max(0,depth+opens-closes+(closing?1:0));
+  return output;
  }).join('\n');
 };
 const highlightHtml=value=>{
- const source=esc(formatHtmlExample(value));
- return source.replace(/(&lt;!--[\s\S]*?--&gt;|&lt;\/?[a-z][\w-]*(?:\s+[^&]*?)?&gt;|&lt;!DOCTYPE[^&]*&gt;)/gi,token=>{
-  if(token.startsWith('&lt;!--'))return '<span class="syntax-comment">'+token+'</span>';
-  return token.replace(/^(&lt;\/?)([a-z][\w-]*)/i,'<span class="syntax-punctuation">$1</span><span class="syntax-tag">$2</span>').replace(/(\s)([a-z_:][\w:.-]*)(=)(&quot;[^&]*?&quot;|&#039;[^&]*?&#039;)/gi,'$1<span class="syntax-attribute">$2</span><span class="syntax-punctuation">$3</span><span class="syntax-string">$4</span>').replace(/(\/?&gt;)$/,'<span class="syntax-punctuation">$1</span>');
+ const source=formatHtmlExample(value);
+ const tokenizeTag=token=>{
+  if(/^<!--/.test(token))return '<span class="syntax-comment">'+esc(token)+'</span>';
+  if(/^<!/.test(token))return '<span class="syntax-punctuation">'+esc(token)+'</span>';
+  const match=token.match(/^(<\/?)([a-z][\w:-]*)([\s\S]*?)(\/?>)$/i);
+  if(!match)return esc(token);
+  const attributes=match[3].replace(/([^\s=\/]+)(\s*=\s*)("[^"]*"|'[^']*'|[^\s"'=<>]+)/g,(_,name,eq,val)=>'<span class="syntax-attribute">'+esc(name)+'</span><span class="syntax-punctuation">'+esc(eq)+'</span><span class="syntax-string">'+esc(val)+'</span>');
+  return '<span class="syntax-punctuation">'+esc(match[1])+'</span><span class="syntax-tag">'+esc(match[2])+'</span>'+attributes+'<span class="syntax-punctuation">'+esc(match[4])+'</span>';
+ };
+ return source.split(/(<!--[\s\S]*?-->|<![^>]*>|<\/?[a-z][^>]*>)/gi).map((part,i)=>i%2?tokenizeTag(part):esc(part)).join('');
+};
+const colorizeInlineCode=container=>{
+ container.querySelectorAll('code:not(pre code)').forEach(code=>{
+  const value=code.textContent;
+  if(/<[/!]?[a-z]|<!DOCTYPE/i.test(value))code.innerHTML=highlightHtml(value).replace(/\n/g,' ');
+  else if(/^(?:href|src|alt|id|class|lang)$/.test(value))code.classList.add('syntax-attribute');
  });
 };
-const explanationStyles='<style>.learning-explanation{display:grid;gap:14px;margin:16px 0 20px}.learning-explanation-paragraph{border-left:3px solid #609cde;background:rgba(92,145,214,.07);border-radius:9px;padding:16px 18px;line-height:1.8;overflow-wrap:anywhere}.learning-explanation-paragraph p{margin:0 0 10px}.learning-explanation-paragraph p:last-child{margin-bottom:0}.learning-explanation-paragraph h2,.learning-explanation-paragraph h3,.learning-explanation-paragraph h4{margin:0 0 10px;line-height:1.35}.learning-explanation-paragraph ul,.learning-explanation-paragraph ol{padding-left:22px;margin:8px 0}.learning-explanation-paragraph li{margin:6px 0}.learning-explanation-paragraph code{background:rgba(81,146,225,.2);color:#b7d8ff;border-radius:4px;padding:2px 5px;white-space:normal;overflow-wrap:anywhere}.learning-explanation-paragraph pre code{display:block;white-space:pre-wrap;padding:12px}.learning-example-code{margin:16px 0;border:1px solid rgba(130,171,224,.25);border-radius:12px;overflow:hidden}.learning-example-code-title{padding:10px 15px;background:rgba(91,143,213,.14);font-weight:700;font-size:13px}.learning-example-code pre{margin:0!important;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){.learning-explanation-paragraph{padding:12px 14px}}</style>';
-const syntaxStyles='<style>.learning-example-code{background:#0b1426!important;border-color:#294263!important;box-shadow:0 8px 20px rgba(0,0,0,.13)}.learning-example-code-title{color:#c5dcff!important;background:#162a45!important;border-bottom:1px solid #294263}.learning-example-code pre{color:#e2e8f0!important;overflow-x:auto;white-space:pre!important;tab-size:2;font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace}.learning-example-code code{font:inherit}.syntax-tag{color:#78b7ff}.syntax-attribute{color:#c9a5ff}.syntax-string{color:#a3e6bb}.syntax-comment{color:#8596ad}.syntax-punctuation{color:#94a3b8}.learning-explanation-paragraph{background:rgba(75,123,190,.09);border-left-color:#75b2f7}.learning-explanation-paragraph strong{color:#d3e6ff}.learning-explanation-paragraph a{color:#8fc6ff;text-decoration:underline}.learning-explanation-paragraph blockquote{border-left:3px solid #8fc6ff;padding-left:12px;margin:10px 0;color:#cbd5e1}@media(max-width:600px){.learning-example-code pre{font-size:12px}}</style>';
+const explanationStyles='<style>.learning-explanation{display:grid;gap:14px;margin:16px 0 20px}.learning-explanation-paragraph{border-left:3px solid #609cde;background:rgba(92,145,214,.07);border-radius:9px;padding:16px 18px;line-height:1.8;overflow-wrap:anywhere}.learning-explanation-paragraph p{margin:0 0 10px}.learning-explanation-paragraph p:last-child{margin-bottom:0}.learning-explanation-paragraph h2,.learning-explanation-paragraph h3,.learning-explanation-paragraph h4{margin:0 0 10px;line-height:1.35}.learning-explanation-paragraph ul,.learning-explanation-paragraph ol{padding-left:22px;margin:8px 0}.learning-explanation-paragraph li{margin:6px 0}.learning-explanation-paragraph code{background:#1e1e1e;color:#d4d4d4;border-radius:4px;padding:2px 5px;white-space:normal;overflow-wrap:anywhere}.learning-explanation-paragraph pre code{display:block;white-space:pre-wrap;padding:12px}.learning-example-code{margin:16px 0;border:1px solid rgba(130,171,224,.25);border-radius:12px;overflow:hidden}.learning-example-code-title{padding:10px 15px;background:rgba(91,143,213,.14);font-weight:700;font-size:13px}.learning-example-code pre{margin:0!important;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:600px){.learning-explanation-paragraph{padding:12px 14px}}</style>';
+const syntaxStyles='<style>.learning-example-code{background:#1e1e1e!important;border-color:#294263!important;box-shadow:0 8px 20px rgba(0,0,0,.13)}.learning-example-code-title{color:#d4d4d4!important;background:#252526!important;border-bottom:1px solid #294263}.learning-example-code pre{color:#d4d4d4!important;overflow-x:auto;white-space:pre!important;tab-size:2;font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace}.learning-example-code code{font:inherit}.syntax-tag{color:#569cd6}.syntax-attribute{color:#9cdcfe}.syntax-string{color:#ce9178}.syntax-comment{color:#8596ad}.syntax-punctuation{color:#94a3b8}.learning-explanation-paragraph{background:rgba(75,123,190,.09);border-left-color:#75b2f7}.learning-explanation-paragraph strong{color:#d3e6ff}.learning-explanation-paragraph a{color:#8fc6ff;text-decoration:underline}.learning-explanation-paragraph blockquote{border-left:3px solid #8fc6ff;padding-left:12px;margin:10px 0;color:#cbd5e1}@media(max-width:600px){.learning-example-code pre{font-size:12px}}</style>';
 const renderExplanation=step=>explanationStyles+syntaxStyles+'<div class="learning-explanation">'+(step.body||[]).map(p=>'<div class="learning-explanation-paragraph">'+explanationHtml(p)+'</div>').join('')+'</div>'+(step.callouts?.length?'<div class="concept-grid">'+step.callouts.map(x=>'<div><strong>'+esc(x.title)+'</strong><span>'+esc(x.text)+'</span></div>').join('')+'</div>':'')+(step.code?'<div class="learning-example-code"><div class="learning-example-code-title">Exemplo de código HTML</div><pre><code>'+highlightHtml(step.code)+'</code></pre></div>':'');
 const explainCommand=c=>{c=String(c);if(c==="git status")return"Veja os arquivos alterados";if(c==="git init")return"Inicie o Git nesta pasta";if(c==="git add .")return"Prepare os arquivos para o commit";if(c.startsWith("git commit"))return"Registre uma versão no computador";if(c.startsWith("git push"))return"Envie as versões ao GitHub";if(c.startsWith("git remote add"))return"Conecte ao repositório do GitHub";if(c==="git remote -v")return"Confira o endereço conectado";if(c.startsWith("git branch"))return"Defina a branch principal";if(c.startsWith("git config"))return"Confira seu nome ou e-mail";if(c.startsWith("git log"))return"Veja o histórico";return"Execute no terminal"};
 const renderCommand=command=>`<div class="learning-command"><div class="learning-command-details"><code>${esc(command)}</code><small>${esc(explainCommand(command))}</small></div><button type="button" class="learning-copy-btn" data-copy-command="${esc(command)}" aria-label="Copiar comando">Copiar</button></div>`;
