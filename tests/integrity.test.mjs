@@ -151,7 +151,7 @@ test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos inform
  assert.equal(engine.completeStep('R2','r2-01'),true);
  assert.equal(awards.length,0);
  assert.equal(engine.completeStep('R2','r2-02'),true);
- assert.equal(engine.completeStep('R2','r2-02'),false);
+ assert.equal(engine.completeStep('R2','r2-02'),true); // Repetição é idempotente: retorna sucesso, mas não concede XP novamente.
  assert.equal(engine.completeStep('R2','r2-03'),true);
  assert.deepEqual(awards.map(x=>x.xp),[20,25]);
  assert.deepEqual(awards.map(x=>x.key),['mission:R2:step:r2-02','mission:R2:step:r2-03']);
