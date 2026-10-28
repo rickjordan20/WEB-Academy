@@ -1,0 +1,24 @@
+/* Jornada cooperativa — WEB Academy */
+.help-journey{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.help-journey:has([data-journey-step="3"]:not([hidden])){grid-template-columns:repeat(3,minmax(0,1fr))}
+.help-journey-step{display:flex;gap:12px;align-items:center;border:1px solid #2d466b;background:#101d33;border-radius:15px;padding:15px;min-width:0;transition:border-color .2s,background .2s}
+.help-journey-step.is-current{border-color:#8c7aff;background:#222450}
+.help-journey-step.is-complete{border-color:#2f9f95;background:#102d36}
+.help-journey-step[hidden]{display:none!important}
+.help-journey-step strong{display:block;font-size:.94rem;color:#f2f5ff}
+.help-journey-step small{display:block;color:#aabbd4;font-size:.78rem;margin-top:4px}
+.help-journey-icon{font-size:1.35rem;flex-shrink:0}
+.help-section-heading{grid-column:1/-1;display:flex;gap:12px;align-items:center;border-top:1px solid #30415e;padding-top:18px;margin-top:4px}
+.help-section-heading:first-child{border-top:0;padding-top:0}
+.help-section-heading>span{background:#393b91;border:1px solid #6d72d9;color:#fff;border-radius:12px;display:grid;place-items:center;width:42px;height:42px;font-weight:800;flex-shrink:0}
+.help-section-heading h3{margin:0;color:#f1f5ff;font-size:1.1rem}
+.help-section-heading p{margin:3px 0 0!important;color:#aabbd4;font-size:.86rem}
+.help-progress{display:flex;gap:6px;margin:14px 0 9px}
+.help-progress span{height:7px;border-radius:20px;flex:1;background:#354866}
+.help-progress span.done{background:#36b5aa}
+.help-progress span.current{background:#8b78ff}
+.help-progress-label{font-size:.84rem;color:#c7d8ed}
+.help-achievement{margin-top:12px;padding:12px;border:1px solid #327c7b;border-radius:12px;background:#103238;color:#c4f6e8;font-weight:600}
+#helpSubmit{min-height:46px;font-weight:700}
+@media(max-width:720px){.help-journey,.help-journey:has([data-journey-step="3"]:not([hidden])){grid-template-columns:1fr}.help-journey-step{padding:11px 13px}.help-journey-step small{margin-top:2px}}
+@media(prefers-reduced-motion:reduce){.help-journey-step{transition:none}}
