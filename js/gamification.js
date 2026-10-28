@@ -36,7 +36,7 @@ export function defaultAchievementRule(id){
  if(id==="guild-start")return {type:"guild_completion"};
  const counts={"three-missions":3,"five-missions":5,"ten-missions":10,"three-phases":3,"five-phases":5};
  if(id in counts)return {type:id.endsWith("phases")?"phase_count":"mission_count",count:counts[id]};
- const phase=/^phase-(\\d+)-complete$/.exec(id);
+ const phase=/^phase-(\d+)-complete$/.exec(id);
  return phase?{type:"phase_complete",phase:Number(phase[1])}:null;
 }
 let configuredRules=new Map(),configuredClass=null;
@@ -58,7 +58,7 @@ export async function loadAchievementRules(sb,classId){
 function matchesAchievementRule(rule,completed,guildCompleted){
  if(!rule)return false;
  const pairs=new Set();
- for(const id of completed){const m=/^(\\d+)A$/.exec(id);if(m&&completed.has(m[1]+"B"))pairs.add(Number(m[1]))}
+ for(const id of completed){const m=/^(\d+)A$/.exec(id);if(m&&completed.has(m[1]+"B"))pairs.add(Number(m[1]))}
  switch(rule.type){
  case "mission_count":return completed.size>=Number(rule.count);
  case "phase_count":return pairs.size>=Number(rule.count);
