@@ -107,6 +107,7 @@ function render() {
   $("#levelName").textContent=state.gamification.levelName;
   $("#levelXp").textContent=li.next?`${state.gamification.xp} / ${li.next.min} XP`:`${state.gamification.xp} XP • Nível máximo`;
   $("#levelProgress").style.width=`${li.pct}%`;
+  reconcileAchievements(state);
   $("#achievementCount").textContent=state.gamification.achievements.length;
   $("#navAchievementCount").textContent=state.gamification.achievements.length;
   const journeyProgress = state.journey?.progress ?? 0;
