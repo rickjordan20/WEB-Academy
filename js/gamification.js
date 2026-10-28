@@ -10,7 +10,20 @@ export const ACHIEVEMENTS=[
 {id:"five-missions",icon:"🔥",name:"Ritmo de Desenvolvimento",description:"Concluiu cinco missões diferentes da Jornada."},
 {id:"ten-missions",icon:"🏆",name:"Maratonista Web",description:"Concluiu dez missões diferentes da Jornada."},
 {id:"three-phases",icon:"🗺️",name:"Explorador de Fases",description:"Concluiu as missões A e B de três fases diferentes."},
-{id:"five-phases",icon:"🌟",name:"Mestre da Jornada",description:"Concluiu as missões A e B de cinco fases diferentes."}
+{id:"five-phases",icon:"🌟",name:"Mestre da Jornada",description:"Concluiu as missões A e B de cinco fases diferentes."},
+{id:"phase-2-complete",icon:"🏗️",name:"Arquiteto HTML",description:"Concluiu as missões 2A e 2B: estrutura e elementos HTML."},
+{id:"phase-3-complete",icon:"🧭",name:"Navegador Semântico",description:"Concluiu as missões 3A e 3B: HTML semântico e navegação."},
+{id:"phase-4-complete",icon:"📝",name:"Mestre dos Formulários",description:"Concluiu as missões 4A e 4B: formulários HTML."},
+{id:"phase-5-complete",icon:"🎨",name:"Artista CSS",description:"Concluiu as missões 5A e 5B: seletores, cores e tipografia."},
+{id:"phase-6-complete",icon:"📱",name:"Designer Responsivo",description:"Concluiu as missões 6A e 6B: Flexbox, Grid e responsividade."},
+{id:"phase-7-complete",icon:"⚡",name:"Primeiros Passos em JavaScript",description:"Concluiu as missões 7A e 7B: lógica e fundamentos de JavaScript."},
+{id:"phase-8-complete",icon:"🖱️",name:"Domador do DOM",description:"Concluiu as missões 8A e 8B: DOM e eventos."},
+{id:"phase-9-complete",icon:"🐞",name:"Caçador de Bugs",description:"Concluiu as missões 9A e 9B: validação e depuração."},
+{id:"phase-10-complete",icon:"🌐",name:"Conector de APIs",description:"Concluiu as missões 10A e 10B: cliente-servidor e APIs."},
+{id:"phase-11-complete",icon:"🗄️",name:"Guardião dos Dados",description:"Concluiu as missões 11A e 11B: integração com banco de dados."},
+{id:"phase-12-complete",icon:"🔐",name:"Protetor de Acessos",description:"Concluiu as missões 12A e 12B: autenticação e autorização."},
+{id:"phase-13-complete",icon:"🛠️",name:"Engenheiro CRUD",description:"Concluiu as missões 13A e 13B: CRUD e testes."},
+{id:"phase-14-complete",icon:"🚀",name:"Desenvolvedor Web Completo",description:"Concluiu as missões 14A e 14B: integração e publicação."}
 ];
 export function ensureGamification(s=getState()){if(!s)return null;s.gamification||={};s.gamification.xp??=0;s.gamification.level??=1;s.gamification.levelName||="Novato Web";s.gamification.achievements||=[];s.gamification.xpHistory||=[];s.gamification.rewarded||=[];return s}
 export function levelForXp(xp){return [...LEVELS].reverse().find(l=>xp>=l.min)||LEVELS[0]}
@@ -27,6 +40,7 @@ export function earnedAchievementIds(s){
   if(match&&completed.has(match[1]+"B"))phases.add(match[1]);
  }
  if(phases.size){earned.add("first-phase")}
+ for(const phase of phases){const id="phase-"+phase+"-complete";if(ACHIEVEMENTS.some(a=>a.id===id))earned.add(id)}
  if(phases.size>=3)earned.add("three-phases");
  if(phases.size>=5)earned.add("five-phases");
  if(completed.size>=3)earned.add("three-missions");
