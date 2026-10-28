@@ -60,6 +60,8 @@ async function loadMissionOptions(){
  const overrides=new Map((data||[]).map(x=>[x.mission_id,x.content||{}]));
  const registered=new Map(base.map(m=>[m.id,{id:m.id,title:m.subtitle||m.title||m.official||m.id}]));
  for(const [id,content] of overrides){
+  if(!["published","closed"].includes(content.status))continue;
+  if(id==="3A"&&(content.guild_template_version||content.guild_config||content.steps?.some(step=>String(step.id||"").startsWith("guild-3A-"))))continue;
   if(registered.has(id)){
    if(typeof content.title==="string"&&content.title.trim())registered.get(id).title=content.title.trim();
    else if(typeof content.subtitle==="string"&&content.subtitle.trim())registered.get(id).title=content.subtitle.trim();
