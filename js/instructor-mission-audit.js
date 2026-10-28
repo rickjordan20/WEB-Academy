@@ -22,14 +22,14 @@ export function initMissionAudit(sb,getStudents){
   for(const x of matching){const g=grouped.get(x.class_id+":"+x.student_id);if(g)g.items.push(x)}
   rows.innerHTML=[...grouped.values()].map(({s,items})=>{
    const mismatches=items.filter(x=>!completed(s,x.mission_id)),empties=items.filter(x=>x.answers&&Object.keys(x.answers).length===0);
-   const detail=items.length?'<details><summary>Ver '+items.length+' entrega(s)</summary><div class="mission-audit-chips">'+items.sort((a,b)=>a.mission_id.localeCompare(b.mission_id,undefined,{numeric:true})).map(x=>'<div class="mission-audit-chip"><b>'+esc(x.mission_id)+'</b> · '+esc(x.status)+' · '+(completed(s,x.mission_id)?"Concluída no estado":"Não consta como concluída")+(x.answers&&Object.keys(x.answers).length===0?' · Respostas estruturadas vazias':'')+'<small>Enviada: '+esc(format(x.submitted_at))+'</small></div>').join("")+'</div></details>':'<span class="muted">Sem entregas registradas</span>';
+   const detail=items.length?'<details><summary>Ver '+items.length+' entrega(s)</summary><div class="mission-audit-chips">'+items.sort((a,b)=>a.mission_id.localeCompare(b.mission_id,undefined,{numeric:true})).map(x=>'<div class="mission-audit-chip"><b>'+esc(x.mission_id)+'</b> · '+esc(x.status)+' · '+(completed(s,x.mission_id)?"Concluída no estado":"Não consta como concluída")+' · Snapshot: '+(x.progress_snapshot?.mission?.completed===true?"concluído":"não concluído")+(x.answers&&Object.keys(x.answers).length===0?' · Respostas estruturadas vazias':'')+'<small>Enviada: '+esc(format(x.submitted_at))+'</small></div>').join("")+'</div></details>':'<span class="muted">Sem entregas registradas</span>';
    return '<tr><td><b>'+esc(s.full_name)+'</b><small>'+esc(s.class_code)+'</small></td><td>'+items.length+'</td><td>'+done(s).length+'</td><td>'+mismatches.length+'</td><td>'+empties.length+'</td><td>'+detail+'</td></tr>';
   }).join("")||'<tr><td colspan="6">Nenhum estudante encontrado no filtro.</td></tr>';
   status.textContent="Leitura concluída. Entrega submetida e missão concluída são estados diferentes; divergência não prova perda. Nenhum dado foi alterado.";
  }
  async function refresh(){
   status.textContent="Conferindo entregas no banco...";rows.innerHTML="";loaded=false;
-  const {data,error}=await sb.from("mission_submissions").select("class_id,student_id,mission_id,status,submitted_at,answers").order("submitted_at",{ascending:false}).limit(2000);
+  const {data,error}=await sb.from("mission_submissions").select("class_id,student_id,mission_id,status,submitted_at,answers,progress_snapshot").order("submitted_at",{ascending:false}).limit(2000);
   if(error){status.textContent="Não foi possível consultar as entregas: "+error.message;return}
   submissions=data||[];loaded=true;render();
  }
