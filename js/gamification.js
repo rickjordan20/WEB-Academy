@@ -28,26 +28,50 @@ export const ACHIEVEMENTS=[
 export function ensureGamification(s=getState()){if(!s)return null;s.gamification||={};s.gamification.xp??=0;s.gamification.level??=1;s.gamification.levelName||="Novato Web";s.gamification.achievements||=[];s.gamification.xpHistory||=[];s.gamification.rewarded||=[];return s}
 export function levelForXp(xp){return [...LEVELS].reverse().find(l=>xp>=l.min)||LEVELS[0]}
 export function awardXp(amount,reason,key,s=getState()){s=ensureGamification(s);if(!s||s.gamification.rewarded.includes(key))return {awarded:0,state:s};s.gamification.xp+=amount;s.gamification.rewarded.push(key);s.gamification.xpHistory.push({amount,reason,key,at:new Date().toISOString()});const lvl=levelForXp(s.gamification.xp);s.gamification.level=lvl.level;s.gamification.levelName=lvl.name;saveState(s);return {awarded:amount,state:s}}
-export function unlockAchievement(id,s=getState()){s=ensureGamification(s);const a=ACHIEVEMENTS.find(x=>x.id===id);if(!s||!a||s.gamification.achievements.includes(id))return false;s.gamification.achievements.push(id);saveState(s);return true}
+export function unlockAchievement(id,s=getState()){s=ensureGamification(s);const a=effectiveAchievements().find(x=>x.id===id&&x.active);if(!s||!a||s.gamification.achievements.includes(id))return false;s.gamification.achievements.push(id);saveState(s);return true}
+export function defaultAchievementRule(id){
+ if(id==="first-mission")return {type:"mission_count",count:1};
+ if(id==="first-commit")return {type:"mission_complete",mission_id:"1A"};
+ if(id==="first-phase")return {type:"phase_count",count:1};
+ if(id==="guild-start")return {type:"guild_completion"};
+ const counts={"three-missions":3,"five-missions":5,"ten-missions":10,"three-phases":3,"five-phases":5};
+ if(id in counts)return {type:id.endsWith("phases")?"phase_count":"mission_count",count:counts[id]};
+ const phase=/^phase-(\\d+)-complete$/.exec(id);
+ return phase?{type:"phase_complete",phase:Number(phase[1])}:null;
+}
+let configuredRules=new Map(),configuredClass=null;
+export function applyAchievementRules(classId,rows=[]){
+ configuredClass=classId||null;
+ configuredRules=new Map((rows||[]).filter(r=>ACHIEVEMENTS.some(a=>a.id===r.achievement_id)).map(r=>[r.achievement_id,r]));
+}
+export function effectiveAchievement(a){
+ const row=configuredRules.get(a.id);
+ return {...a,...(row?{name:row.name,description:row.description,icon:row.icon,active:row.active,rule:row.rule}:{active:true,rule:defaultAchievementRule(a.id)})};
+}
+export function effectiveAchievements(){return ACHIEVEMENTS.map(effectiveAchievement)}
+export async function loadAchievementRules(sb,classId){
+ if(!sb||!classId){applyAchievementRules(null);return}
+ const {data,error}=await sb.from("achievement_rule_overrides").select("achievement_id,name,description,icon,active,rule").eq("class_id",classId);
+ if(error)throw error;
+ applyAchievementRules(classId,data||[]);
+}
+function matchesAchievementRule(rule,completed,guildCompleted){
+ if(!rule)return false;
+ const pairs=new Set();
+ for(const id of completed){const m=/^(\\d+)A$/.exec(id);if(m&&completed.has(m[1]+"B"))pairs.add(Number(m[1]))}
+ switch(rule.type){
+ case "mission_count":return completed.size>=Number(rule.count);
+ case "phase_count":return pairs.size>=Number(rule.count);
+ case "mission_complete":return completed.has(String(rule.mission_id));
+ case "phase_complete":return pairs.has(Number(rule.phase));
+ case "guild_completion":return guildCompleted;
+ default:return false;
+ }
+}
 export function earnedAchievementIds(s){
  const completed=new Set(Array.isArray(s?.journey?.completedMissions)?s.journey.completedMissions:[]);
- const earned=new Set();
- if(completed.size)earned.add("first-mission");
- if(completed.has("1A"))earned.add("first-commit");
- const phases=new Set();
- for(const id of completed){
-  const match=/^(\d+)A$/.exec(id);
-  if(match&&completed.has(match[1]+"B"))phases.add(match[1]);
- }
- if(phases.size){earned.add("first-phase")}
- for(const phase of phases){const id="phase-"+phase+"-complete";if(ACHIEVEMENTS.some(a=>a.id===id))earned.add(id)}
- if(phases.size>=3)earned.add("three-phases");
- if(phases.size>=5)earned.add("five-phases");
- if(completed.size>=3)earned.add("three-missions");
- if(completed.size>=5)earned.add("five-missions");
- if(completed.size>=10)earned.add("ten-missions");
- // Guild achievements are granted by the existing mission completion event.
- return earned;
+ const guildCompleted=Boolean(s?.gamification?.guildCompleted||s?.gamification?.achievements?.includes("guild-start"));
+ return new Set(effectiveAchievements().filter(a=>a.active&&matchesAchievementRule(a.rule,completed,guildCompleted)).map(a=>a.id));
 }
 export function reconcileAchievements(s=getState()){
  s=ensureGamification(s);
@@ -56,6 +80,7 @@ export function reconcileAchievements(s=getState()){
  const current=new Set(s.gamification.achievements);
  let changed=false;
  for(const id of earned){if(!current.has(id)){current.add(id);changed=true}}
+ // Historical awards are retained when an instructor changes a rule.
  if(changed){s.gamification.achievements=[...current];saveState(s)}
  return changed;
 }
@@ -64,9 +89,9 @@ export function rewardMission(mission,s=getState()){
  if(!s)return {awarded:0,state:s};
  const base=mission.id==="R2"?0:150;
  const result=base>0?awardXp(base,`Missão ${mission.id} concluída`,`mission:${mission.id}`,s):{awarded:0,state:s};
- if(mission.type==="guild")unlockAchievement("guild-start",s);
+ if(mission.type==="guild"&&!s.gamification.guildCompleted){s.gamification.guildCompleted=true;saveState(s)}
  reconcileAchievements(s);
  return result;
 }
 export function nextLevelInfo(s=ensureGamification()){const current=levelForXp(s.gamification.xp),next=LEVELS.find(l=>l.level===current.level+1);return {current,next,into:s.gamification.xp-current.min,span:next?next.min-current.min:1,pct:next?Math.min(100,Math.round((s.gamification.xp-current.min)/(next.min-current.min)*100)):100}}
-export function achievementObjects(s=ensureGamification()){return (s.gamification.achievements||[]).map(id=>ACHIEVEMENTS.find(a=>a.id===id)).filter(Boolean)}
+export function achievementObjects(s=ensureGamification()){return (s.gamification.achievements||[]).map(id=>effectiveAchievements().find(a=>a.id===id)).filter(Boolean)}
