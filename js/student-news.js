@@ -1,13 +1,6 @@
 import {getSupabase} from "./supabase-client.js";
-export const NEWS_START=Date.parse("2026-10-28T00:00:00-03:00");
-export const NEWS_END=Date.parse("2026-10-31T00:00:00-03:00");
-export const NEWS_ID="web-academy-novidades-2026-10-28";
-export const NEWS_ITEMS=[];
-export function newsActive(now=Date.now()){return now>=NEWS_START&&now<NEWS_END}
-export function newsDismissKey(userId,popupId=NEWS_ID){return "webacademy.popup.dismissed:"+popupId+":"+(userId||"anon")}
+import {newsDismissKey,safePopupLink,popupIsLive} from "./popup-utils.js";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-export function safePopupLink(url){const v=String(url||"").trim();if(!v||v.startsWith("//")||v.startsWith("/")||v.includes("\\")||!/^([a-z0-9-]+\.html)(\?[a-z0-9_=&%-]+)?$/i.test(v))return null;return v}
-export function popupIsLive(p,now=Date.now()){return p.active&&Date.parse(p.starts_at)<=now&&now<Date.parse(p.ends_at)}
 function renderPopup(host,popup,userId){
  const items=Array.isArray(popup.items)?popup.items:[];
  const safeItems=items.filter(x=>x&&typeof x==="object").slice(0,12);
