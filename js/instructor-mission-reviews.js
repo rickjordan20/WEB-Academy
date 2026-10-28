@@ -10,7 +10,7 @@ const statuses={submitted:"Aguardando avaliação",changes_requested:"Ajustes so
 let rows=[],names=new Map(),classes=[],overrides=new Map(),current=null,filter="submitted",search="",missionFilter="";
 function missionOf(id,classId){
  const builtin=getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id);
- if(builtin)return builtin;
+ if(builtin){const stored=overrides.get(classId+":"+id)||{};const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;const steps=Array.isArray(configured.steps)?configured.steps:builtin.steps||[];return {...builtin,steps,competencies:[...new Set([...(builtin.competencies||[]),...steps.flatMap(step=>step.indicators||step.competencies||[])])],maxXp:id==="R2"?steps.reduce((sum,step)=>sum+Math.max(0,Number(step.xp)||0),0):builtin.maxXp};}
  const stored=overrides.get(classId+":"+id)||{};
  const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;
  const steps=Array.isArray(configured.steps)?configured.steps:[];
@@ -122,7 +122,7 @@ function automaticSummary(r,mission,fundamental){
 function isManualStep(step,response){
  if(["quiz","checkpoint"].includes(step.type))return false;
  if(["content","visual-summary","image-review","flashcards"].includes(step.type))return false;
- return ["evidence","practice","text","textarea","reflection","upload","form","code"].includes(step.type)||response.value!==undefined&&response.value!==null&&response.value!==""||response.extras.some(([key])=>!key.endsWith(":revealed"));
+ return ["evidence","practice","text","textarea","reflection","upload","form","code","editor","sequence"].includes(step.type)||response.value!==undefined&&response.value!==null&&response.value!==""||response.extras.some(([key])=>!key.endsWith(":revealed"));
 }
 function feedbackSuggestions(r,mission,fundamental){
  const {objectives,checks}=automaticSummary(r,mission,fundamental);
