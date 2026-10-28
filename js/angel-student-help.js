@@ -1,4 +1,5 @@
 import {getSupabase,getSession} from "./supabase-client.js";
+import {MISSIONS,EXTRA_MISSIONS} from "../data/missions.js";
 const $=s=>document.querySelector(s);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const labels={pending:"Aguardando Aluno Anjo",in_progress:"Em atendimento",escalated:"Encaminhado ao instrutor",awaiting_confirmation:"Aguardando sua confirmação",resolved:"Resolvido",reopened:"Reaberto",cancelled:"Cancelado"};
@@ -40,6 +41,25 @@ function validateFirstStep(){
 }
 function helpProgress(status){const stage=status==="resolved"?3:status==="pending"||status==="escalated"?1:2;const title=status==="resolved"?"Missão concluída! 🎉":status==="awaiting_confirmation"?"Sua confirmação é a próxima etapa":status==="cancelled"?"Pedido cancelado":stage===1?"Pedido enviado — aguardando atendimento":"Orientação em andamento";return '<div class="help-progress" aria-label="Progresso do atendimento"><span class="done"></span><span class="'+(stage>1?"done":"current")+'"></span><span class="'+(stage===3?"done":stage===2?"current":"")+'"></span></div><div class="help-progress-label">'+esc(title)+'</div>'}
 function feedback(msg,error=false){$("#helpFeedback").innerHTML='<div class="angel-feedback"'+(error?' style="border-color:#e57373"':'')+'>'+esc(msg)+'</div>'}
+async function loadMissionOptions(){
+ const select=$("#helpMission"),selected=select.value;
+ const base=[...MISSIONS,...EXTRA_MISSIONS];
+ const {data,error}=await sb.from("mission_content_overrides").select("mission_id,content").eq("class_id",classId);
+ if(error)throw error;
+ const overrides=new Map((data||[]).map(x=>[x.mission_id,x.content||{}]));
+ const registered=new Map(base.map(m=>[m.id,{id:m.id,title:m.subtitle||m.title||m.official||m.id}]));
+ for(const [id,content] of overrides){
+  if(registered.has(id)){
+   if(typeof content.title==="string"&&content.title.trim())registered.get(id).title=content.title.trim();
+   else if(typeof content.subtitle==="string"&&content.subtitle.trim())registered.get(id).title=content.subtitle.trim();
+  }else if(["published","closed"].includes(content.status)){
+   registered.set(id,{id,title:content.title||content.subtitle||id});
+  }
+ }
+ const options=[...registered.values()].sort((a,b)=>a.id.localeCompare(b.id,"pt-BR",{numeric:true}));
+ select.innerHTML='<option value="">Nenhuma missão relacionada</option>'+options.map(m=>'<option value="'+esc(m.id)+'">'+esc(m.id+" — "+m.title)+'</option>').join("");
+ if(options.some(m=>m.id===selected))select.value=selected;
+}
 async function loadClass(){
  classId=$("#helpClass").value;
  const [p,n]=await Promise.all([sb.from("learning_projects").select("id,name").eq("class_id",classId).eq("active",true).order("name"),sb.rpc("angel_available_monitor_names",{p_class_id:classId})]);
@@ -48,7 +68,7 @@ async function loadClass(){
  angels=(n.data||[]).filter(x=>x.user_id!==user.id);
  names=new Map(angels.map(x=>[x.user_id,x.full_name]));
  $("#helpAngel").innerHTML='<option value="">Selecione um monitor</option>'+angels.map(a=>'<option value="'+esc(a.user_id)+'">'+esc(a.full_name)+' · '+esc((a.specialties||[]).join(", ")||"Apoio geral")+'</option>').join("");
- updateRouting();await loadRequests();
+ await loadMissionOptions();updateRouting();await loadRequests();
 }
 function updateRouting(){
  const route=$("#helpRouting").value;
@@ -81,7 +101,7 @@ async function init(){
  $("#helpClass").innerHTML=classes.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.code)+' — '+esc(x.name)+'</option>').join("");
  const preferred=localStorage.getItem("webacademy.student.activeClass");$("#helpClass").value=classes.find(x=>x.id===preferred)?.id||classes.find(x=>x.code==="2026.36.8")?.id||classes[0].id;
  $("#helpClass").onchange=()=>loadClass().catch(e=>feedback(e.message,true));$("#helpRouting").onchange=()=>{updateRouting();renderReview()};$("#helpAngel").onchange=renderReview;$("#helpRefresh").onclick=()=>loadRequests().catch(e=>feedback(e.message,true));
- $("#helpNext").onclick=()=>{if(validateFirstStep()){setWizardStep(2);$("#helpWizard").scrollIntoView({behavior:"smooth",block:"start"})}};$("#helpBack").onclick=()=>setWizardStep(1);$("#helpForm").onsubmit=async e=>{e.preventDefault();if(wizardStep!==2||!validateFirstStep())return;const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value.trim()||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
+ $("#helpNext").onclick=()=>{if(validateFirstStep()){setWizardStep(2);$("#helpWizard").scrollIntoView({behavior:"smooth",block:"start"})}};$("#helpBack").onclick=()=>setWizardStep(1);$("#helpForm").onsubmit=async e=>{e.preventDefault();if(wizardStep!==2||!validateFirstStep())return;const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
  const {error}=await sb.rpc("angel_create_help_request",payload);button.disabled=false;if(error)return feedback("Não foi possível enviar: "+error.message,true);$("#helpForm").reset();updateRouting();setWizardStep(1);feedback("🚀 Pedido enviado! Acompanhe o atendimento abaixo e confirme quando sua dúvida for resolvida.");await loadRequests();updateJourney(3);$("#helpTracking").scrollIntoView({behavior:"smooth",block:"start"})};
  setWizardStep(1);await loadClass();
  }catch(e){feedback("Erro ao abrir Central de Ajuda: "+e.message,true)}
