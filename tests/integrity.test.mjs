@@ -50,7 +50,7 @@ test('leituras não salvam novamente uma jornada já inicializada',async()=>{
   '../data/fundamentals.js':{FUNDAMENTALS:[],getFundamental:()=>null},
   '../data/f3-slides.js':{F3_SLIDES:[]},
   './storage.js':{getState:()=>structuredClone(state),saveState:s=>{saves++;state=structuredClone(s)}},
-  './gamification.js':{rewardMission:()=>{}},
+  './gamification.js':{rewardMission:()=>{},awardXp:()=>({awarded:0})},
   './mission-progress-rules.js':{canCompleteSequentialStep:()=>true,allStepsCompleted:()=>true}
  });
  engine.ensureJourneyState();engine.ensureJourneyState();
@@ -64,7 +64,7 @@ test('janela em cache não autoriza registrar progresso após o vencimento',asyn
   '../data/fundamentals.js':{FUNDAMENTALS:[],getFundamental:()=>null},
   '../data/f3-slides.js':{F3_SLIDES:[]},
   './storage.js':{getState:()=>fresh(),saveState:()=>{}},
-  './gamification.js':{rewardMission:()=>{}},
+  './gamification.js':{rewardMission:()=>{},awardXp:()=>({awarded:0})},
   './mission-progress-rules.js':{canCompleteSequentialStep:()=>true,allStepsCompleted:()=>true}
  });
  engine.setVerifiedMissionWindow('1A',{state:'open',opensAt:new Date(now-60000).toISOString(),closesAt:new Date(now+60000).toISOString()});
