@@ -119,13 +119,13 @@ export async function mountMissionDelivery(missionId,access,root){
    const estimate=estimateMissionXp(currentMission,progressSnapshot);
    const historicalNote=estimate.hasUnmappedProgress?'<p><strong>Atenção:</strong> '+estimate.historicalSteps.length+' etapa(s) concluída(s) usam identificadores históricos e precisam de conferência do instrutor. O XP sugerido considera somente etapas atuais identificadas.</p>':'';
    const fingerprint=JSON.stringify({answers,missionSteps:progressSnapshot.mission.completedSteps,fundamentalSteps:progressSnapshot.fundamentals.completedSteps,lateReason:reason?.value,lateExplanation:explanation?.value,lateConsent:consent?.checked});
-   if(confirmedFingerprint!==fingerprint && !preflight.querySelector("[data-confirm-delivery]")?.checked){
+   if(confirmedFingerprint!==fingerprint || !preflight.querySelector("[data-confirm-delivery]")?.checked){
     confirmedFingerprint=fingerprint;
     const missing=[...pending.map(s=>"Missão: "+s.title),...fundamentalPending.map(s=>"Fundamentos: "+s.title)];
     preflight.hidden=false;
-    preflight.innerHTML='<strong>Revisão antes do envio</strong><p>Progresso registrado: '+estimate.completed+' de '+estimate.total+' etapas ('+estimate.percent+'%). XP sugerido: '+estimate.xp+' de '+estimate.max+'.</p>'+(missing.length?'<p><strong>'+missing.length+' item(ns) ainda sem check:</strong></p><ul>'+missing.map(t=>'<li>'+safe(t)+'</li>').join("")+'</ul><p>Você pode enviar assim mesmo. Os itens não concluídos serão apresentados ao instrutor.</p>':'<p>Todos os checks previstos estão registrados. Confirme para enviar.</p>')+historicalNote+'<label style="display:flex;gap:.6rem;align-items:flex-start;margin-top:1rem"><input type="checkbox" data-confirm-delivery> <span>Revisei o resumo e autorizo o envio desta entrega para avaliação.</span></label><p><strong>Marque a confirmação acima e clique em Enviar para avaliação.</strong></p>';
-    button.textContent="Enviar para avaliação →";
-    feedback.textContent="Revise o resumo, marque a caixa de confirmação e clique novamente para enviar.";
+    preflight.innerHTML='<strong>Etapa 1 de 2 — confira a entrega</strong><p>Progresso registrado: '+estimate.completed+' de '+estimate.total+' etapas ('+estimate.percent+'%). XP sugerido: '+estimate.xp+' de '+estimate.max+'.</p>'+(missing.length?'<p><strong>'+missing.length+' item(ns) ainda sem check:</strong></p><ul>'+missing.map(t=>'<li>'+safe(t)+'</li>').join("")+'</ul><p>Você pode enviar assim mesmo. Os itens não concluídos serão apresentados ao instrutor.</p>':'<p>Todos os checks previstos estão registrados. Confirme para enviar.</p>')+historicalNote+'<label style="display:flex;gap:.6rem;align-items:flex-start;margin-top:1rem"><input type="checkbox" data-confirm-delivery> <span>Revisei o resumo e autorizo o envio desta entrega para avaliação.</span></label><p><strong>Marque a confirmação acima e clique em Enviar para avaliação.</strong></p>';
+    button.textContent="Confirmar envio para avaliação →";
+    feedback.textContent="Ainda não foi enviado. Confira o resumo, marque a confirmação e clique em Confirmar envio para avaliação.";
     preflight.scrollIntoView({behavior:"smooth",block:"nearest"});
     return;
    }
