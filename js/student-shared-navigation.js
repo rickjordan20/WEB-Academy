@@ -6,6 +6,7 @@ const links=[
  ["missions.html","🎯","Missões","28 aulas"],
  ["projects.html","📁","Meus Projetos",""],
  ["guild.html","⚔","Minha Guilda","Kanban"],
+ ["angel-help.html","💙","Pedir Ajuda",""],
  ["extras.html","🧭","Missões Remotas","7 missões"],
  ["milestones.html","🏁","Marcos Avaliativos","4"],
  ["competencies.html","⚡","Competências","I1–I6"],
