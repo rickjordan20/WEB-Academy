@@ -1,3 +1,4 @@
+import {initMissionAudit} from "./instructor-mission-audit.js";
 import {renderLateSubmissions} from "./instructor-mission-reviews.js";
 import {renderGuildParticipation} from "./instructor-guild-participation.js";
 import {getSupabase,getSession} from "./supabase-client.js";
@@ -182,4 +183,5 @@ $("#studentMonitorExport").onclick=()=>{
 };
 $("#logoutButton").onclick=async()=>{await sb.auth.signOut();location.replace("auth.html")};
 try{await load();await loadAllStudents();if(localStorage.getItem("webacademy.instructor.activeClass")==="all"){students=allStudents;guilds=[];memberships=[];$("#activeClassSelect").value="all";$("#classTitle").textContent="Todas as turmas";$("#classMeta").textContent=managedClasses.length+" turma(s) • "+allStudents.length+" estudante(s)";renderOverview();$("#studentCount").textContent=allStudents.length;renderAllStudents()}else startRealtime()}catch(err){console.error(err);$("#classMeta").textContent="Não foi possível carregar a turma. Verifique o Console."}
+initMissionAudit(sb,()=>allStudents);
 renderLateSubmissions().catch(error=>console.warn('Entregas indisponíveis:',error));
