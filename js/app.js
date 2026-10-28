@@ -1,5 +1,5 @@
 import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
-import { ensureGamification,nextLevelInfo } from "./gamification.js";
+import { ensureGamification,nextLevelInfo,reconcileAchievements } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
 import {pullCloudState,pushCloudState} from "./cloud-sync.js";
 
