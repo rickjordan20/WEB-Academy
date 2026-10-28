@@ -137,10 +137,18 @@ export async function mountMissionDelivery(missionId,access,root){
    if(currentError)throw currentError;
    if(current?.status==="evaluated")throw new Error("Esta missão já foi avaliada. Atualize a página para consultar a devolutiva.");
    const result=await sb.from("mission_submissions").upsert(payload,{onConflict:"class_id,student_id,mission_id"}).select("id,status,submitted_at,is_late").single();
-   if(result.error)throw result.error;
-   if(!result.data?.id||result.data.status!=="submitted")throw new Error("O servidor não confirmou o registro da entrega. Consulte o histórico antes de tentar novamente.");
-   const confirmedAt=new Date(result.data.submitted_at).toLocaleString("pt-BR");
-   feedback.textContent=(isLate?"Missão entregue em atraso":"Entrega enviada")+" e confirmada pelo servidor em "+confirmedAt+". Protocolo: "+result.data.id+".";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
+   let receipt=result.data;
+   if(result.error||!receipt?.id||receipt.status!=="submitted"){
+    // A rede pode falhar depois de o banco gravar a entrega.
+    const verification=await sb.from("mission_submissions").select("id,status,submitted_at,is_late").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
+    if(!verification.error&&verification.data?.id&&verification.data.status==="submitted"&&verification.data.submitted_at===payload.submitted_at){
+     receipt=verification.data;
+    }else{
+     throw result.error||verification.error||new Error("O servidor não confirmou esta tentativa de envio. Consulte o histórico antes de tentar novamente.");
+    }
+   }
+   const confirmedAt=new Date(receipt.submitted_at).toLocaleString("pt-BR");
+   feedback.textContent=(isLate?"Missão entregue em atraso":"Entrega enviada")+" e confirmada pelo servidor em "+confirmedAt+". Protocolo: "+receipt.id+".";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  }
  root.append(section);
