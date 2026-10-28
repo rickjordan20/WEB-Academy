@@ -17,7 +17,7 @@ async function loadClass(){
 function updateRouting(){
  const route=$("#helpRouting").value;
  $("#helpAngelRow").hidden=route!=="chosen_angel";$("#helpReasonRow").hidden=route!=="instructor";
- $("#helpAngel").required=route==="chosen_angel";$("#helpReason").required=route==="instructor";
+ $("#helpAngel").required=route==="chosen_angel";$("#helpAngel").disabled=route!=="chosen_angel";$("#helpReason").required=route==="instructor";$("#helpReason").disabled=route!=="instructor";
  $("#helpRoutingHint").textContent=route==="automatic"?"O sistema atribuirá a um monitor disponível com menor carga. Se não houver monitores disponíveis, encaminhará ao instrutor.":route==="chosen_angel"?"Você pode escolher um monitor disponível. Se ele ficar indisponível antes do envio, escolha outro ou use distribuição automática.":"O pedido será enviado diretamente ao instrutor. Explique o motivo técnico do encaminhamento.";
 }
 async function loadRequests(){
