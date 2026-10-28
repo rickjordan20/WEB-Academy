@@ -22,3 +22,33 @@
 #helpSubmit{min-height:46px;font-weight:700}
 @media(max-width:720px){.help-journey,.help-journey:has([data-journey-step="3"]:not([hidden])){grid-template-columns:1fr}.help-journey-step{padding:11px 13px}.help-journey-step small{margin-top:2px}}
 @media(prefers-reduced-motion:reduce){.help-journey-step{transition:none}}
+
+/* Wizard de ajuda — navegação progressiva */
+.angel-wrap{max-width:1040px}
+.help-journey,.help-journey:has([data-journey-step="3"]:not([hidden])){grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.help-journey-step{position:relative;border-radius:17px;padding:17px 14px;background:linear-gradient(140deg,#172742,#101a2e);border:1px solid #33486a}
+.help-journey-step.is-current{background:linear-gradient(130deg,#30275f,#182c55);border-color:#9987ff;box-shadow:0 0 0 1px rgba(150,135,255,.15),0 12px 30px rgba(0,0,0,.12)}
+.help-journey-step.is-locked{opacity:.6}
+.help-wizard-card{padding:clamp(20px,4vw,36px);border-color:#354e74;box-shadow:0 16px 45px rgba(0,0,0,.16)}
+.help-wizard-header{padding-bottom:20px;border-bottom:1px solid #2c4161}
+.help-wizard-header h2{font-size:clamp(1.35rem,3vw,1.8rem);margin:9px 0}
+.help-wizard-header p{margin:0}
+.help-wizard-eyebrow{font-size:.72rem;letter-spacing:.14em;font-weight:800;color:#a99aff}
+#helpForm.angel-form{display:block;margin-top:22px}
+.help-wizard-pane{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.help-wizard-pane label{font-size:.91rem;font-weight:600}
+.help-wizard-pane input,.help-wizard-pane select,.help-wizard-pane textarea{margin-top:5px;min-height:43px;background:#0c1930;border-color:#405b80;font-size:.93rem}
+.help-wizard-pane input:focus-visible,.help-wizard-pane select:focus-visible,.help-wizard-pane textarea:focus-visible{outline:2px solid #a99aff;outline-offset:2px}
+.help-wizard-pane textarea{min-height:112px;line-height:1.55}
+#helpRoutingHint{grid-column:1/-1;margin:0;color:#b9c9e0;font-size:.87rem;line-height:1.6}
+.help-wizard-actions{display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:26px;padding-top:20px;border-top:1px solid #2c4161}
+.help-wizard-actions .btn{min-height:46px;padding:12px 24px}
+#helpSubmit{background:linear-gradient(100deg,#6557ee,#917bff);border:0}
+.help-review{grid-column:1/-1;background:#0d2038;border:1px solid #385675;border-radius:14px;padding:18px}
+.help-review-title{font-weight:800;color:#f4f6ff;margin-bottom:12px}
+.help-review dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}
+.help-review dt{color:#9eb3d1;font-size:.76rem;margin-bottom:4px}
+.help-review dd{margin:0;color:#f3f7ff;font-size:.93rem;overflow-wrap:anywhere}
+.help-tracking-card{scroll-margin-top:18px}
+.help-wizard-card{scroll-margin-top:18px}
+@media(max-width:720px){.help-journey,.help-journey:has([data-journey-step="3"]:not([hidden])){grid-template-columns:1fr 1fr 1fr;gap:6px}.help-journey-step{padding:10px 7px;flex-direction:column;align-items:center;text-align:center;gap:5px}.help-journey-step strong{font-size:.73rem}.help-journey-step small{display:none}.help-journey-icon{font-size:1.2rem}.help-wizard-pane{grid-template-columns:1fr}.help-wizard-pane label{grid-column:1!important}.help-review dl{grid-template-columns:1fr}.help-wizard-actions{flex-wrap:wrap}.help-wizard-actions .btn{flex:1}}
