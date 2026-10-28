@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {NEWS_START,NEWS_END,newsActive,newsDismissKey,popupIsLive,safePopupLink} from "../js/student-news.js";
+import {NEWS_START,NEWS_END,newsActive,newsDismissKey,popupIsLive,safePopupLink} from "../js/popup-utils.js";
 test("campanha inicial foi programada para 72 horas",()=>{
  assert.equal(NEWS_END-NEWS_START,72*60*60*1000);
  assert.equal(newsActive(Date.parse("2026-10-30T23:59:59-03:00")),true);
