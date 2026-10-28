@@ -1,0 +1,26 @@
+/* Novidades temporárias: mesma paleta azul-escura da WEB Academy. */
+.student-news-reopen{position:fixed;right:22px;bottom:22px;z-index:1050;padding:12px 17px;border:1px solid #597cbb;border-radius:999px;background:linear-gradient(125deg,#1b4e8b,#503db3);color:#fff;box-shadow:0 12px 35px #0008;font-weight:800;cursor:pointer}
+.student-news-overlay[hidden]{display:none!important}
+.student-news-overlay{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:18px;background:rgba(3,9,22,.82);backdrop-filter:blur(8px)}
+.student-news-dialog{width:min(760px,100%);max-height:min(90vh,850px);overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(145deg,#142840,#0a1729);border:1px solid #36577b;border-radius:22px;box-shadow:0 28px 100px #000a;color:#edf5ff;outline:none}
+.student-news-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:25px 26px 18px;border-bottom:1px solid #304765}
+.student-news-header h2{margin:7px 0 9px;font-size:clamp(1.35rem,3vw,1.8rem)}
+.student-news-header p{margin:0;color:#b7c9df;font-size:.91rem}
+.student-news-eyebrow{font-size:.68rem;font-weight:800;letter-spacing:.12em;color:#86bafc}
+.student-news-close{border:1px solid #49617c;background:#1e354f;color:#fff;border-radius:10px;width:36px;height:36px;flex-shrink:0;cursor:pointer}
+.student-news-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;padding:19px 25px}
+.student-news-item{padding:18px;border-radius:15px;background:#192f49;border:1px solid #34516f;display:flex;flex-direction:column;gap:10px}
+.student-news-item-top{display:flex;align-items:flex-start;gap:11px}
+.student-news-icon{font-size:1.7rem;line-height:1.2}
+.student-news-kind{display:block;color:#89c2fa;text-transform:uppercase;letter-spacing:.07em;font-size:.66rem;font-weight:800;margin-bottom:6px}
+.student-news-item h3{margin:0;font-size:1rem;line-height:1.35}
+.student-news-item p{font-size:.84rem;color:#c7d5e6;line-height:1.6;margin:0;flex:1}
+.student-news-where{font-size:.76rem;color:#b9d4f8;background:#0c2138;border-radius:9px;padding:9px 10px}
+.student-news-link{display:block;text-align:center;padding:10px;border-radius:9px;background:#2b5da5;color:white;font-weight:700;font-size:.82rem}
+.student-news-link:hover,.student-news-link:focus-visible{background:#3979c9}
+.student-news-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 25px 22px;border-top:1px solid #304765}
+.student-news-footer label{font-size:.8rem;color:#d1e1f1;display:flex;align-items:center;gap:7px;cursor:pointer}
+.student-news-footer input{accent-color:#5ca5f5;width:16px;height:16px}
+.student-news-ok{background:#2c73cf;border:0;color:white;padding:11px 17px;border-radius:10px;font-weight:800;cursor:pointer}
+.student-news-open{overflow:hidden}
+@media(max-width:620px){.student-news-overlay{padding:8px}.student-news-dialog{max-height:96dvh;border-radius:15px}.student-news-header{padding:18px}.student-news-items{grid-template-columns:1fr;padding:12px 16px}.student-news-footer{padding:14px 16px;align-items:stretch;flex-direction:column}.student-news-reopen{right:12px;bottom:12px}}
