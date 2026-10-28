@@ -20,7 +20,7 @@ export function initStudentNews(userId){
  '<footer class="student-news-footer"><label><input type="checkbox" id="studentNewsDontShow"> Não mostrar novamente</label><button type="button" id="studentNewsGotIt" class="student-news-ok">Entendi, vamos continuar!</button></footer></section></div>';
  const overlay=host.querySelector("#studentNewsOverlay"),dialog=host.querySelector(".student-news-dialog"),reopen=host.querySelector("#studentNewsReopen"),check=host.querySelector("#studentNewsDontShow"),key=newsDismissKey(userId);
  let previousFocus=null;
- function close(){if(check.checked){try{localStorage.setItem(key,"1")}catch{}}overlay.hidden=true;document.body.classList.remove("student-news-open");(previousFocus?.isConnected?previousFocus:reopen).focus()}
+ function close(){try{sessionStorage.setItem(sessionKey,"1")}catch{}if(check.checked){try{localStorage.setItem(key,"1")}catch{}}overlay.hidden=true;document.body.classList.remove("student-news-open");(previousFocus?.isConnected?previousFocus:reopen).focus()}
  function open(){if(!newsActive())return;previousFocus=document.activeElement;check.checked=false;overlay.hidden=false;document.body.classList.add("student-news-open");dialog.focus()}
  host.querySelector("#studentNewsClose").addEventListener("click",close);
  host.querySelector("#studentNewsGotIt").addEventListener("click",close);
@@ -28,5 +28,5 @@ export function initStudentNews(userId){
  overlay.addEventListener("click",event=>{if(event.target===overlay)close()});
  overlay.addEventListener("keydown",event=>{if(event.key==="Escape"){event.preventDefault();close()}if(event.key==="Tab"){const focusable=[...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled])')];if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
  if(!newsActive()){host.remove();return}
- try{if(localStorage.getItem(key)!=="1")setTimeout(open,450)}catch{setTimeout(open,450)}
+ try{if(localStorage.getItem(key)!=="1"&&sessionStorage.getItem(sessionKey)!=="1")setTimeout(open,450)}catch{setTimeout(open,450)}
 }
