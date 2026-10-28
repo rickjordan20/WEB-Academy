@@ -1,3 +1,4 @@
+import {initStudentNews} from "./student-news.js";
 import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
 import { ensureGamification,nextLevelInfo,reconcileAchievements } from "./gamification.js";
 import {getSupabase,getSession} from "./supabase-client.js";
@@ -14,6 +15,7 @@ if(cloudSession){
  if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
 }
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
+if(cloudSession)initStudentNews(cloudSession.user.id);
 // Synchronize student progress saved on the dashboard, without re-running cloud-bootstrap.
 // Mission, journey and catalog pages already install their own listener there.
 if(cloudSession){
