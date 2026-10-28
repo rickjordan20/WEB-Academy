@@ -3,7 +3,41 @@ const $=s=>document.querySelector(s);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const labels={pending:"Aguardando Aluno Anjo",in_progress:"Em atendimento",escalated:"Encaminhado ao instrutor",awaiting_confirmation:"Aguardando sua confirmação",resolved:"Resolvido",reopened:"Reaberto",cancelled:"Cancelado"};
 let sb,user,classes=[],angels=[],requests=[],names=new Map(),classId="";
-function updateJourney(step=1){document.querySelectorAll("[data-journey-step]").forEach(el=>{const n=Number(el.dataset.journeyStep);el.classList.toggle("is-current",n===step);el.classList.toggle("is-complete",n<step);el.hidden=n===3&&!requests.length})}
+let wizardStep=1;
+function updateJourney(step=wizardStep){
+ document.querySelectorAll("[data-journey-step]").forEach(el=>{
+  const n=Number(el.dataset.journeyStep);
+  el.classList.toggle("is-current",n===step);
+  el.classList.toggle("is-complete",n<step);
+  el.classList.toggle("is-locked",n===3&&!requests.length);
+  if(n===step)el.setAttribute("aria-current","step");else el.removeAttribute("aria-current");
+ });
+}
+function setWizardStep(step){
+ wizardStep=step;
+ document.querySelectorAll("[data-help-pane]").forEach(el=>{el.hidden=Number(el.dataset.helpPane)!==step});
+ $("#helpStepEyebrow").textContent="ETAPA "+step+" DE 3";
+ $("#helpStepTitle").textContent=step===1?"🧩 Minha dificuldade":"🤝 Quem vai me ajudar?";
+ $("#helpStepDescription").textContent=step===1?"Conte o que aconteceu e o que você já tentou fazer. Não compartilhe senhas ou dados sensíveis.":"Escolha como receber ajuda e confira os dados antes de enviar.";
+ $("#helpBack").hidden=step===1;$("#helpNext").hidden=step!==1;$("#helpSubmit").hidden=step!==2;
+ updateJourney(step);
+ if(step===2)renderReview();
+}
+function renderReview(){
+ const project=$("#helpProject").selectedOptions[0]?.textContent||"Dúvida geral";
+ const route=$("#helpRouting").value;
+ const destination=route==="automatic"?"Aluno Anjo escolhido automaticamente":route==="chosen_angel"?$("#helpAngel").selectedOptions[0]?.textContent||"Selecione um Aluno Anjo":"Instrutor";
+ $("#helpReview").innerHTML='<div class="help-review-title">📋 Confira seu pedido</div><dl><div><dt>Assunto</dt><dd>'+esc($("#helpTopic").selectedOptions[0]?.textContent)+'</dd></div><div><dt>Projeto</dt><dd>'+esc(project)+'</dd></div><div><dt>Título</dt><dd>'+esc($("#helpTitle").value.trim())+'</dd></div><div><dt>Ajuda escolhida</dt><dd>'+esc(destination)+'</dd></div></dl>';
+}
+function validateFirstStep(){
+ for(const id of ["helpClass","helpTitle","helpTopic","helpDescription"]){
+  const field=$("#"+id);
+  if(!field.checkValidity()){field.reportValidity();field.focus();return false}
+ }
+ if($("#helpTitle").value.trim().length<4){$("#helpTitle").setCustomValidity("Informe um título com pelo menos 4 caracteres.");$("#helpTitle").reportValidity();$("#helpTitle").setCustomValidity("");return false}
+ if($("#helpDescription").value.trim().length<10){$("#helpDescription").setCustomValidity("Descreva sua dificuldade com pelo menos 10 caracteres.");$("#helpDescription").reportValidity();$("#helpDescription").setCustomValidity("");return false}
+ return true;
+}
 function helpProgress(status){const stage=status==="resolved"?3:status==="pending"||status==="escalated"?1:2;const title=status==="resolved"?"Missão concluída! 🎉":status==="awaiting_confirmation"?"Sua confirmação é a próxima etapa":status==="cancelled"?"Pedido cancelado":stage===1?"Pedido enviado — aguardando atendimento":"Orientação em andamento";return '<div class="help-progress" aria-label="Progresso do atendimento"><span class="done"></span><span class="'+(stage>1?"done":"current")+'"></span><span class="'+(stage===3?"done":stage===2?"current":"")+'"></span></div><div class="help-progress-label">'+esc(title)+'</div>'}
 function feedback(msg,error=false){$("#helpFeedback").innerHTML='<div class="angel-feedback"'+(error?' style="border-color:#e57373"':'')+'>'+esc(msg)+'</div>'}
 async function loadClass(){
@@ -24,7 +58,7 @@ function updateRouting(){
 }
 async function loadRequests(){
  const {data,error}=await sb.from("angel_help_requests").select("*").eq("class_id",classId).eq("requester_id",user.id).order("created_at",{ascending:false});
- if(error)throw error;requests=data||[];render();updateJourney(requests.length?3:1);
+ if(error)throw error;requests=data||[];render();$("#helpTracking").hidden=!requests.length;updateJourney(wizardStep);
 }
 function render(){
  $("#helpRequests").innerHTML=requests.length?requests.map(r=>'<article class="angel-request"><div class="angel-item-head"><strong>'+esc(r.title)+'</strong><span class="angel-chip">'+esc(labels[r.status]||r.status)+'</span></div><p>'+esc(r.description)+'</p>'+helpProgress(r.status)+(r.status==='resolved'?'<div class="help-achievement">🏆 Missão de colaboração concluída! Sua confirmação ajuda a reconhecer quem orientou você.</div>':'')+'<small>'+new Date(r.created_at).toLocaleString("pt-BR")+' · '+esc(r.topic)+'</small><div class="angel-actions">'+(r.status==="awaiting_confirmation"?'<button class="btn btn-primary" data-action="confirm" data-id="'+esc(r.id)+'">Minha dúvida foi resolvida</button><button class="btn btn-secondary" data-action="reopen" data-id="'+esc(r.id)+'">Ainda preciso de ajuda</button>':'')+(r.status==="resolved"?'<button class="btn btn-secondary" data-action="reopen" data-id="'+esc(r.id)+'">Reabrir pedido</button>':'')+(!["resolved","cancelled"].includes(r.status)?'<button class="btn btn-secondary" data-action="cancel" data-id="'+esc(r.id)+'">Cancelar pedido</button>':'')+'</div><details data-request="'+esc(r.id)+'"><summary>Ver mensagens e histórico</summary><div data-history="'+esc(r.id)+'"></div>'+(!["resolved","cancelled"].includes(r.status)?'<form data-message="'+esc(r.id)+'" class="angel-form"><label style="grid-column:1/-1">Enviar complemento ou responder<textarea name="body" required rows="2" maxlength="5000"></textarea></label><button class="btn btn-secondary" type="submit">Enviar mensagem</button></form>':'')+'</details></article>').join(""):'<p class="angel-empty">Você ainda não abriu nenhum pedido de ajuda nesta turma.</p>';
@@ -46,10 +80,10 @@ async function init(){
  const cl=await sb.from("classes").select("id,code,name").in("id",ids);if(cl.error)throw cl.error;classes=cl.data||[];
  $("#helpClass").innerHTML=classes.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.code)+' — '+esc(x.name)+'</option>').join("");
  const preferred=localStorage.getItem("webacademy.student.activeClass");$("#helpClass").value=classes.find(x=>x.id===preferred)?.id||classes.find(x=>x.code==="2026.36.8")?.id||classes[0].id;
- $("#helpClass").onchange=()=>loadClass().catch(e=>feedback(e.message,true));$("#helpRouting").onchange=updateRouting;$("#helpRefresh").onclick=()=>loadRequests().catch(e=>feedback(e.message,true));
- $("#helpForm").addEventListener("focusin",e=>{if(e.target.closest("#helpForm"))updateJourney(e.target.id==="helpRouting"||e.target.id==="helpAngel"||e.target.id==="helpReason"?2:1)});$("#helpForm").onsubmit=async e=>{e.preventDefault();const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value.trim()||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
- const {error}=await sb.rpc("angel_create_help_request",payload);button.disabled=false;if(error)return feedback("Não foi possível enviar: "+error.message,true);$("#helpForm").reset();updateRouting();feedback("🚀 Missão enviada! Agora acompanhe o atendimento e confirme quando a dúvida for resolvida.");await loadRequests();$("#helpTracking").scrollIntoView({behavior:"smooth",block:"start"})};
- await loadClass();
+ $("#helpClass").onchange=()=>loadClass().catch(e=>feedback(e.message,true));$("#helpRouting").onchange=()=>{updateRouting();renderReview()};$("#helpAngel").onchange=renderReview;$("#helpRefresh").onclick=()=>loadRequests().catch(e=>feedback(e.message,true));
+ $("#helpNext").onclick=()=>{if(validateFirstStep()){setWizardStep(2);$("#helpWizard").scrollIntoView({behavior:"smooth",block:"start"})}};$("#helpBack").onclick=()=>setWizardStep(1);$("#helpForm").onsubmit=async e=>{e.preventDefault();if(wizardStep!==2||!validateFirstStep())return;const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value.trim()||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
+ const {error}=await sb.rpc("angel_create_help_request",payload);button.disabled=false;if(error)return feedback("Não foi possível enviar: "+error.message,true);$("#helpForm").reset();updateRouting();setWizardStep(1);feedback("🚀 Pedido enviado! Acompanhe o atendimento abaixo e confirme quando sua dúvida for resolvida.");await loadRequests();updateJourney(3);$("#helpTracking").scrollIntoView({behavior:"smooth",block:"start"})};
+ setWizardStep(1);await loadClass();
  }catch(e){feedback("Erro ao abrir Central de Ajuda: "+e.message,true)}
 }
 init();
