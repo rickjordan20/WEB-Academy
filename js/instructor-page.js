@@ -62,7 +62,7 @@ function renderOverview(){
 }
 async function loadAllStudents(){const {data,error}=await sb.rpc("instructor_all_students");if(error){console.warn("Não foi possível carregar acompanhamento geral.",error);allStudents=[];return}allStudents=(data||[]).map(r=>({id:r.user_id||"roster:"+r.roster_id,roster_id:r.roster_id||null,user_id:r.user_id||null,full_name:r.full_name,email:r.email||"",class_id:r.class_id,class_code:r.class_code,class_name:r.class_name,uc:r.uc||"",status:r.status||"active",state:r.state||null,updated_at:r.updated_at||null,pending:!r.user_id}));const cf=$("#studentClassFilter"),uf=$("#studentUcFilter"),active=localStorage.getItem("webacademy.instructor.activeClass");if(cf){cf.innerHTML="<option value=''>Todas as turmas</option>"+managedClasses.map(s=>"<option value='"+s.id+"'>"+esc(s.code)+" — "+esc(s.name)+"</option>").join("");cf.value=active&&active!=="all"?active:""}if(uf){uf.innerHTML="<option value=''>Todas as UCs</option>"+[...new Set(allStudents.map(s=>s.uc).filter(Boolean))].sort().map(u=>"<option value='"+esc(u)+"'>"+esc(u)+"</option>").join("")}}
 const monitorCompleted=s=>Array.isArray(s.state?.journey?.completedMissions)?s.state.journey.completedMissions:[];
-const monitorExtras=s=>s.state?.journey?.completedExtras||s.state?.extras?.completed||[];
+const monitorExtras=s=>{const value=s.state?.journey?.completedExtras||s.state?.extras?.completed;return Array.isArray(value)?value:[]};
 const monitorEvidence=s=>["I1","I2","I3","I4","I5","I6"].reduce((n,i)=>n+competencyEvidenceItems(s.state||{},i).length,0);
 const monitorDate=s=>s.updated_at?new Date(s.updated_at).toLocaleString("pt-BR"):"Sem sincronização";
 function monitorSummary(rows){
