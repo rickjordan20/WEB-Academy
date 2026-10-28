@@ -24,6 +24,8 @@ if(accessError){
  throw new Error("Schedule access unavailable: "+accessError.message);
 }
 const instructor=profile.role==="instructor";
+// A navegação lateral do estudante só é montada para o perfil student.
+if(!instructor)await import("./student-shared-navigation.js");
 $("instructorBack").hidden=!instructor;$("studentBack").hidden=instructor;
 $("newScheduleLesson").hidden=!instructor;$("scheduleActionsHeading").hidden=!instructor;
 let classes=[],rows=[],editing=null;
