@@ -156,3 +156,25 @@ test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos inform
  assert.deepEqual(awards.map(x=>x.xp),[20,25]);
  assert.deepEqual(awards.map(x=>x.key),['mission:R2:step:r2-02','mission:R2:step:r2-03']);
 });
+
+test('sincronização soma recompensas distintas sem duplicar a mesma chave',async()=>{
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const a=fresh(),b=fresh();
+ a.gamification.xp=150;a.gamification.rewarded=['mission:1A'];a.gamification.xpHistory=[{key:'mission:1A',amount:150}];
+ b.gamification.xp=150;b.gamification.rewarded=['mission:1B'];b.gamification.xpHistory=[{key:'mission:1B',amount:150}];
+ const merged=sync.mergeStudentStates(a,b);
+ assert.equal(merged.gamification.xp,300);
+ assert.equal(merged.gamification.xpHistory.length,2);
+ assert.equal(merged.gamification.xpReconciliation,undefined);
+ const repeat=sync.mergeStudentStates(merged,a);
+ assert.equal(repeat.gamification.xp,300);
+ assert.equal(repeat.gamification.xpHistory.length,2);
+});
+test('sincronização preserva saldo histórico não explicado e marca revisão',async()=>{
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const a=fresh(),b=fresh();
+ a.gamification.xp=500;a.gamification.xpHistory=[{key:'mission:1A',amount:150}];
+ const merged=sync.mergeStudentStates(a,b);
+ assert.equal(merged.gamification.xp,500);
+ assert.equal(merged.gamification.xpReconciliation.status,'review_required');
+});
