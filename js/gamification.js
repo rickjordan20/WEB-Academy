@@ -23,7 +23,7 @@ export function earnedAchievementIds(s){
  if(completed.has("1A"))earned.add("first-commit");
  const phases=new Set();
  for(const id of completed){
-  const match=/^(\\d+)A$/.exec(id);
+  const match=/^(\d+)A$/.exec(id);
   if(match&&completed.has(match[1]+"B"))phases.add(match[1]);
  }
  if(phases.size){earned.add("first-phase")}
