@@ -221,8 +221,8 @@ function suggestedXpPlan(mission,foundation,maxXp,submission){
  const weight=step=>["practice","code","evidence","upload","form"].includes(step.type)?3:["reflection","text","textarea","quiz","checkpoint"].includes(step.type)?2:1;
  const total=eligible.reduce((sum,{step})=>sum+weight(step),0);
  const raw=eligible.map(({step,unit})=>({key:unit+":"+step.id,raw:maxXp*weight(step)/Math.max(1,total)}));
- const allocated=new Map(raw.map(x=>[x.key,Math.floor(x.raw)]));
- let remainder=maxXp-[...allocated.values()].reduce((a,b)=>a+b,0);
+ const allocated=mission?.id==="R2"?new Map(units.map(({step,unit})=>[unit+":"+step.id,Math.max(0,Number(step.xp)||0)])):new Map(raw.map(x=>[x.key,Math.floor(x.raw)]));
+ let remainder=mission?.id==="R2"?0:maxXp-[...allocated.values()].reduce((a,b)=>a+b,0);
  for(const item of [...raw].sort((a,b)=>(b.raw-Math.floor(b.raw))-(a.raw-Math.floor(a.raw)))){if(remainder--<=0)break;allocated.set(item.key,allocated.get(item.key)+1)}
  const items=units.map(({step,unit})=>{
   const key=unit+":"+step.id;
