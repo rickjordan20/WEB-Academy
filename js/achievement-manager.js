@@ -19,9 +19,8 @@ function render(){
 }
 async function load(){
  const classId=$("#amClass").value;
- const [a,g,m]=await Promise.all([
+ const [a,m]=await Promise.all([
   sb.from("achievement_catalog").select("id,name,description,icon,active").eq("class_id",classId).order("created_at",{ascending:false}),
-  sb.from("achievement_grants").select("achievement_id,student_id,granted_at").in("achievement_id",["__none__",...catalog.map(x=>x.id)]),
   sb.from("class_members").select("user_id").eq("class_id",classId).eq("status","active")
  ]);
  if(a.error||m.error)throw a.error||m.error;
