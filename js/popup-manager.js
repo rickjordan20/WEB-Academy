@@ -1,5 +1,5 @@
 import {getSupabase,getSession} from "./supabase-client.js";
-import {safePopupLink} from "./student-news.js";
+import {safePopupLink} from "./popup-utils.js";
 const $=s=>document.querySelector(s),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const sb=await getSupabase(),session=await getSession();
 if(!sb||!session){location.replace("auth.html");throw new Error("AUTH_REQUIRED")}
