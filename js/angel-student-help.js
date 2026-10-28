@@ -6,13 +6,12 @@ let sb,user,classes=[],angels=[],requests=[],names=new Map(),classId="";
 function feedback(msg,error=false){$("#helpFeedback").innerHTML='<div class="angel-feedback"'+(error?' style="border-color:#e57373"':'')+'>'+esc(msg)+'</div>'}
 async function loadClass(){
  classId=$("#helpClass").value;
- const [p,a]=await Promise.all([sb.from("learning_projects").select("id,name").eq("class_id",classId).eq("active",true).order("name"),sb.from("class_angel_assignments").select("user_id,availability,specialties").eq("class_id",classId).eq("active",true).eq("availability","available")]);
- if(p.error||a.error)throw p.error||a.error;
+ const [p,n]=await Promise.all([sb.from("learning_projects").select("id,name").eq("class_id",classId).eq("active",true).order("name"),sb.rpc("angel_available_monitor_names",{p_class_id:classId})]);
+ if(p.error||n.error)throw p.error||n.error;
  $("#helpProject").innerHTML='<option value="">Dúvida geral</option>'+(p.data||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join("");
- angels=(a.data||[]).filter(x=>x.user_id!==user.id);
- names=new Map();
- if(angels.length){const n=await sb.from("profiles").select("id,full_name").in("id",angels.map(x=>x.user_id));if(n.error)throw n.error;names=new Map((n.data||[]).map(x=>[x.id,x.full_name]))}
- $("#helpAngel").innerHTML='<option value="">Selecione um monitor</option>'+angels.map(a=>'<option value="'+esc(a.user_id)+'">'+esc(names.get(a.user_id)||"Aluno Anjo")+' · '+esc((a.specialties||[]).join(", ")||"Apoio geral")+'</option>').join("");
+ angels=(n.data||[]).filter(x=>x.user_id!==user.id);
+ names=new Map(angels.map(x=>[x.user_id,x.full_name]));
+ $("#helpAngel").innerHTML='<option value="">Selecione um monitor</option>'+angels.map(a=>'<option value="'+esc(a.user_id)+'">'+esc(a.full_name)+' · '+esc((a.specialties||[]).join(", ")||"Apoio geral")+'</option>').join("");
  updateRouting();await loadRequests();
 }
 function updateRouting(){
