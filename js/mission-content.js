@@ -30,6 +30,8 @@ export function applyEditedMissionContent(missionId,content){
  if(missionId==="3A"&&(content.guild_template_version||content.guild_config||content.steps?.some(step=>String(step.id||"").startsWith("guild-3A-"))))return;
  if(typeof content.title==="string")mission.title=content.title;
  if(typeof content.subtitle==="string")mission.subtitle=content.subtitle;
+ // A R2 possui conteúdo didático versionado no código. Overrides antigos da turma não devem reintroduzir textos desformatados.
+ if(missionId==="R2")return;
  if(Array.isArray(content.steps)&&!(missionId==="1B"&&content.steps.length===0)){
   // Conteúdo publicado da turma pode ser anterior à separação EduTech/Guilda.
   // Não permitir que o override reintroduza a prática autônoma em missões guiadas.
