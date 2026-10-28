@@ -19,7 +19,7 @@ test('aluno: revisão obrigatória é invalidada ao alterar respostas',()=>{
 });
 test('aluno: envio exige resposta confirmada do banco e fornece protocolo',()=>{
  assert.match(delivery,/\.upsert\(payload,\{onConflict:"class_id,student_id,mission_id"\}\)\.select\("id,status,submitted_at,is_late"\)\.single\(\)/);
- assert.match(delivery,/result\.data\.status!=="submitted"/);
+ assert.match(delivery,/receipt\.status!=="submitted"/);
  assert.match(delivery,/Protocolo:/);
 });
 test('aluno: impede reenvio de avaliação já encerrada',()=>{
