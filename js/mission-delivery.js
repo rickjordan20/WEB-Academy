@@ -15,6 +15,7 @@ export async function mountMissionDelivery(missionId,access,root){
  const preferred=localStorage.getItem("webacademy.student.activeClass");
  const classId=(members?.find(m=>m.class_id===preferred)||members?.[0])?.class_id;if(!classId)return;
  const {data:previous,error:previousError}=await sb.from("mission_submissions").select("id,status,submitted_at,is_late,late_reason,late_explanation,feedback,grades,progress_snapshot").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
+ if(previousError){console.error("Falha ao consultar entrega anterior:",previousError);const warning=document.createElement("p");warning.className="delivery-feedback";warning.setAttribute("role","alert");warning.textContent="Não foi possível consultar sua última entrega. Atualize a página antes de tentar enviar novamente.";root.append(warning);return;}
  const mission=getMission(missionId),fundamental=mission?.type==="training"?getFundamental(mission.phase):null;
  const isRevision=previous?.status==="changes_requested";
  const safeText=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
@@ -41,7 +42,8 @@ export async function mountMissionDelivery(missionId,access,root){
  <div class="delivery-footer"><p class="delivery-help">A entrega ficará registrada com a data e o horário do envio para análise do instrutor.</p><button class="btn btn-primary delivery-submit" type="button" data-submit-mission>${late?"Enviar entrega atrasada":"Enviar para avaliação"} →</button></div>
  <p class="delivery-feedback" data-delivery-feedback role="status" aria-live="polite"></p>`;
 
- if(!late){section.querySelector(".delivery-fields").remove();}
+ // Preserve os campos de atraso: o prazo pode vencer enquanto a página está aberta.
+ if(!late){section.querySelector(".delivery-fields").hidden=true;}
  if(mission?.type==="guild")mountMissionParticipation(section.querySelector("[data-mission-participation]"),{missionId,classId}).catch(console.warn);
  if(mission?.type==="guild"&&/^(?:[2-9]|1[0-4])B$/.test(mission.displayId||"")){
   const participation=section.querySelector("[data-mission-participation]");
@@ -56,8 +58,8 @@ export async function mountMissionDelivery(missionId,access,root){
  if(previous?.status==="evaluated"){button.disabled=true;feedback.textContent="Entrega já avaliada. Consulte o feedback do instrutor."}
  button.onclick=async()=>{
   if(sending)return;
-  sending=true;button.disabled=true;
-  try{await submitDelivery();}finally{sending=false;if(button.textContent!=="Entrega enviada"&&button.textContent!=="Entregue em atraso"&&previous?.status!=="evaluated")button.disabled=false;}
+  sending=true;button.disabled=true;button.setAttribute("aria-busy","true");feedback.textContent="Verificando sua entrega...";
+  try{await submitDelivery();}finally{sending=false;button.removeAttribute("aria-busy");if(button.textContent!=="Entrega enviada"&&button.textContent!=="Entregue em atraso"&&previous?.status!=="evaluated")button.disabled=false;}
  };
  async function submitDelivery(){
   let latestAccess;
@@ -134,9 +136,11 @@ export async function mountMissionDelivery(missionId,access,root){
    const {data:current,error:currentError}=await sb.from("mission_submissions").select("id,status").eq("class_id",classId).eq("student_id",session.user.id).eq("mission_id",missionId).maybeSingle();
    if(currentError)throw currentError;
    if(current?.status==="evaluated")throw new Error("Esta missão já foi avaliada. Atualize a página para consultar a devolutiva.");
-   const result=await sb.from("mission_submissions").upsert(payload,{onConflict:"class_id,student_id,mission_id"});
+   const result=await sb.from("mission_submissions").upsert(payload,{onConflict:"class_id,student_id,mission_id"}).select("id,status,submitted_at,is_late").single();
    if(result.error)throw result.error;
-   feedback.textContent=isLate?"Missão entregue em atraso e registrada para avaliação do instrutor.":"Entrega registrada para avaliação do instrutor.";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
+   if(!result.data?.id||result.data.status!=="submitted")throw new Error("O servidor não confirmou o registro da entrega. Consulte o histórico antes de tentar novamente.");
+   const confirmedAt=new Date(result.data.submitted_at).toLocaleString("pt-BR");
+   feedback.textContent=(isLate?"Missão entregue em atraso":"Entrega enviada")+" e confirmada pelo servidor em "+confirmedAt+". Protocolo: "+result.data.id+".";button.textContent=isLate?"Entregue em atraso":"Entrega enviada";preflight.hidden=true;
   }catch(error){button.disabled=false;confirmedFingerprint=null;feedback.textContent="Não foi possível entregar: "+error.message}
  }
  root.append(section);
