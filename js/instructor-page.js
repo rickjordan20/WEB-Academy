@@ -177,7 +177,7 @@ $("#studentMonitorExport").onclick=()=>{
  const q=$("#studentSearch").value.trim().toLowerCase(),classId=$("#studentClassFilter").value,uc=$("#studentUcFilter").value;
  const scoped=allStudents.filter(s=>(!q||(s.full_name+" "+s.email).toLowerCase().includes(q))&&(!classId||s.class_id===classId)&&(!uc||s.uc===uc));
  const rows=monitorFiltered(scoped),headers=["Estudante","Email","Turma","UC","Situação","Progresso (%)","XP","Nível","Missões concluídas","Atividades extras","Evidências I1–I6","Última sincronização"];
- const csv=[headers,...rows.map(s=>[s.full_name,s.email,s.class_code,s.uc,s.pending?"Pré-cadastrado":"Vinculado",s.state?.journey?.progress||0,s.state?.gamification?.xp||0,s.state?.gamification?.level||1,monitorCompleted(s).length,monitorExtras(s).length,monitorEvidence(s),monitorDate(s)])].map(row=>row.map(v=>'"'+String(v??"").replace(/^[=+@\-\t\r]/,"'$("#logoutButton").onclick=").replace(/"/g,'""')+'"').join(";")).join("\r\n");
+ const csv=[headers,...rows.map(s=>[s.full_name,s.email,s.class_code,s.uc,s.pending?"Pré-cadastrado":"Vinculado",s.state?.journey?.progress||0,s.state?.gamification?.xp||0,s.state?.gamification?.level||1,monitorCompleted(s).length,monitorExtras(s).length,monitorEvidence(s),monitorDate(s)])].map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(";")).join("\r\n");
  const url=URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=url;a.download="acompanhamento-estudantes-"+new Date().toISOString().slice(0,10)+".csv";a.click();URL.revokeObjectURL(url);
 };
 $("#logoutButton").onclick=async()=>{await sb.auth.signOut();location.replace("auth.html")};
