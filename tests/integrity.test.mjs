@@ -26,7 +26,7 @@ test('etapas exigem sequência e conclusão integral',async()=>{
  assert.equal(rules.allStepsCompleted(steps,['a','b','c']),true);
 });
 test('sincronização preserva etapas, evidências e XP de ambos dispositivos',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const a=fresh(),b=fresh();
  a.journey.missionProgress['1A']={completedSteps:['a'],startedAt:'2026-10-19T09:00:00Z',currentStep:1};
  b.meta.updatedAt='2026-10-21T10:00:00Z';
@@ -76,7 +76,7 @@ test('janela em cache não autoriza registrar progresso após o vencimento',asyn
 });
 
 test('sincronização não duplica histórico de XP por chave de recompensa',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const remote=fresh(),local=fresh();
  remote.gamification.xp=150;
  local.gamification.xp=150;
@@ -93,7 +93,7 @@ test('sincronização não duplica histórico de XP por chave de recompensa',asy
  assert.equal(again.gamification.xpHistory.length,1);
 });
 test('sincronização mantém eventos de XP de chaves diferentes',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const remote=fresh(),local=fresh();
  remote.gamification.xpHistory=[{key:'mission:1A',amount:150}];
  local.gamification.xpHistory=[{key:'mission:1B',amount:150}];
@@ -118,7 +118,7 @@ test('catálogo ignora metadados de Guilda publicados no ID 3A',async()=>{
 });
 
 test('sincronização conserva respostas conflitantes de dois dispositivos',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const remote=fresh(),local=fresh();
  remote.meta.updatedAt='2026-10-20T10:00:00Z';
  local.meta.updatedAt='2026-10-21T10:00:00Z';
@@ -158,7 +158,7 @@ test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos inform
 });
 
 test('sincronização soma recompensas distintas sem duplicar a mesma chave',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const a=fresh(),b=fresh();
  a.gamification.xp=150;a.gamification.rewarded=['mission:1A'];a.gamification.xpHistory=[{key:'mission:1A',amount:150}];
  b.gamification.xp=150;b.gamification.rewarded=['mission:1B'];b.gamification.xpHistory=[{key:'mission:1B',amount:150}];
@@ -171,7 +171,7 @@ test('sincronização soma recompensas distintas sem duplicar a mesma chave',asy
  assert.equal(repeat.gamification.xpHistory.length,2);
 });
 test('sincronização preserva saldo histórico não explicado e marca revisão',async()=>{
- const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null}});
+ const sync=await loadModule('../js/cloud-sync.js',{'./storage.js':{getState:()=>null,cacheCloudState:()=>{},setActiveUser:()=>{}},'./supabase-client.js':{getSupabase:async()=>null,getSession:async()=>null},'./gamification.js':{loadAchievementRules:async()=>{}}});
  const a=fresh(),b=fresh();
  a.gamification.xp=500;a.gamification.xpHistory=[{key:'mission:1A',amount:150}];
  const merged=sync.mergeStudentStates(a,b);
