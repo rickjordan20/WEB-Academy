@@ -15,7 +15,7 @@ if(cloudSession){
  if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
 }
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
-if(cloudSession)initStudentNews(cloudSession.user.id);
+if(cloudSession){const {data:enrolled}=await sb.from("class_members").select("class_id").eq("user_id",cloudSession.user.id).eq("status","active").limit(1);if(enrolled?.[0]?.class_id)await initStudentNews(cloudSession.user.id,enrolled[0].class_id)}
 // Synchronize student progress saved on the dashboard, without re-running cloud-bootstrap.
 // Mission, journey and catalog pages already install their own listener there.
 if(cloudSession){
