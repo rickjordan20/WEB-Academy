@@ -133,3 +133,26 @@ test('sincronização conserva respostas conflitantes de dois dispositivos',asyn
  const again=sync.mergeStudentStates(merged,local);
  assert.equal(again.answerConflicts.length,1);
 });
+
+test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos informativos',async()=>{
+ let state=fresh(),awards=[];
+ const mission={id:'R2',type:'remote',steps:[{id:'r2-01',type:'content',xp:0},{id:'r2-02',type:'quiz',xp:20},{id:'r2-03',type:'editor',xp:25}]};
+ const engine=await loadModule('../js/mission-engine.js',{
+  '../data/journey.js':{JOURNEY:[]},
+  '../data/missions.js':{MISSIONS:[],EXTRA_MISSIONS:[mission],getMission:id=>id==='R2'?mission:null,getPhaseMissions:()=>[]},
+  '../data/fundamentals.js':{FUNDAMENTALS:[],getFundamental:()=>null},
+  '../data/f3-slides.js':{F3_SLIDES:[]},
+  './storage.js':{getState:()=>structuredClone(state),saveState:s=>{state=structuredClone(s)}},
+  './gamification.js':{rewardMission:()=>{},awardXp:(xp,reason,key,s)=>{awards.push({xp,key});s.gamification.xp+=xp;return {awarded:xp,state:s}}},
+  './mission-progress-rules.js':{canCompleteSequentialStep:(steps,completed,id)=>steps.find(step=>!completed.includes(step.id))?.id===id,allStepsCompleted:(steps,completed)=>steps.every(step=>completed.includes(step.id))}
+ });
+ const now=Date.now();
+ engine.setVerifiedMissionWindow('R2',{state:'open',opensAt:new Date(now-60000).toISOString(),closesAt:new Date(now+60000).toISOString()});
+ assert.equal(engine.completeStep('R2','r2-01'),true);
+ assert.equal(awards.length,0);
+ assert.equal(engine.completeStep('R2','r2-02'),true);
+ assert.equal(engine.completeStep('R2','r2-02'),false);
+ assert.equal(engine.completeStep('R2','r2-03'),true);
+ assert.deepEqual(awards.map(x=>x.xp),[20,25]);
+ assert.deepEqual(awards.map(x=>x.key),['mission:R2:step:r2-02','mission:R2:step:r2-03']);
+});
