@@ -15,7 +15,7 @@ let projectContext=null,scheduledLesson=null,missionReadOnly=false,missionAccess
 function installMissionDrafts(missionId){
  const owner=localStorage.getItem("uc7_web_academy_active_user")||"local";
  const key="uc7:mission-draft:v1:"+owner+":"+missionId;
- const selector='textarea, input:not([type="file"]):not([type="password"]):not([type="hidden"]), select';
+ const selector='textarea:not(.mission-delivery textarea), input:not([type="file"]):not([type="password"]):not([type="hidden"]):not(.mission-delivery input), select:not(.mission-delivery select)';
  const identify=el=>{
   const card=el.closest("[data-step-card],[data-fundamental-step],form,section");
   const scope=card?.getAttribute("data-step-card")||card?.getAttribute("data-fundamental-step")||card?.id||"mission";
@@ -26,7 +26,7 @@ function installMissionDrafts(missionId){
  let cache=read();
  const restore=()=>{
   root.querySelectorAll(selector).forEach(el=>{
-   if(el.disabled||el.readOnly||el.closest('[data-complete-step]'))return;
+   if(el.disabled||el.readOnly||el.closest('[data-complete-step],.mission-delivery'))return;
    const entry=cache[identify(el)];if(!entry)return;
    if(el.type==="checkbox"||el.type==="radio"){if(el.checked!==entry.checked)el.checked=entry.checked;}
    else if(!el.value&&entry.value)el.value=entry.value;
@@ -38,7 +38,7 @@ function installMissionDrafts(missionId){
  root.addEventListener("input",save,{capture:true});
  root.addEventListener("change",save,{capture:true});
  function save(event){
-  const el=event.target;if(!el.matches?.(selector)||el.disabled||el.readOnly)return;
+  const el=event.target;if(!el.matches?.(selector)||el.disabled||el.readOnly||el.closest(".mission-delivery"))return;
   cache[identify(el)]={value:el.value,checked:el.checked};
   try{localStorage.setItem(key,JSON.stringify(cache))}catch(error){console.warn("Rascunho local indisponível:",error)}
  }
