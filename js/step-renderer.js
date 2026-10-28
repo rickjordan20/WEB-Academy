@@ -18,9 +18,27 @@ const linkedText=value=>{
  return html+esc(raw.slice(last));
 };
 
-const r2Inline=value=>esc(value).replace(/(&lt;\/?[a-z][^&]*?&gt;|&lt;!DOCTYPE html&gt;|\b(?:href|src|alt|id|class|lang)\b)/gi,part=>'<code class="r2-inline-code">'+part+'</code>');
-const r2Style='<style>.r2-stack{display:grid;gap:14px;margin:16px 0 22px}.r2-card{border:1px solid rgba(125,169,221,.24);border-left:3px solid #6aa5ef;border-radius:12px;padding:17px 19px;background:rgba(96,147,220,.065);min-width:0}.r2-heading{font-size:14px;font-weight:700;color:#a8cdfa;margin-bottom:10px}.r2-card p{line-height:1.85!important;font-size:15px;margin:0!important;overflow-wrap:anywhere}.r2-inline-code{background:rgba(79,141,211,.18);border:1px solid rgba(125,169,221,.24);border-radius:5px;padding:2px 5px;color:#b8d9ff;font-size:.94em;overflow-wrap:anywhere;white-space:normal}@media(max-width:600px){.r2-card{padding:13px}.r2-card p{font-size:14px}}</style>';
-const r2Body=step=>r2Style+'<div class="r2-stack">'+(step.body||[]).map((p,i)=>'<section class="r2-card"><div class="r2-heading">'+['📘 Entenda','🔎 Observe','💡 Exemplo prático','🧩 Para lembrar'][Math.min(i,3)]+'</div><p>'+r2Inline(p)+'</p></section>').join('')+'</div>'+(step.code?'<div class="guided-code-example"><strong>⌨️ Exemplo de código HTML</strong><pre><code>'+esc(step.code)+'</code></pre></div>':'');
+
+const explanationHtml=value=>{
+ const source=String(value??"");
+ const hasHtml=/<\/?(?:p|strong|b|em|i|u|code|pre|h[2-6]|ul|ol|li|blockquote|a|br|div|span)\b/i.test(source);
+ const input=hasHtml?source:esc(source).replace(new RegExp('&#96;([^&]+)&#96;','g'),'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+ const doc=new DOMParser().parseFromString('<div>'+input+'</div>','text/html');
+ const allowed=new Set(['P','STRONG','B','EM','I','U','CODE','PRE','H2','H3','H4','H5','H6','UL','OL','LI','BLOCKQUOTE','A','BR','DIV','SPAN']);
+ const clean=node=>{
+  if(node.nodeType===3)return document.createTextNode(node.textContent);
+  if(node.nodeType!==1)return document.createTextNode('');
+  if(!allowed.has(node.tagName)){const fragment=document.createDocumentFragment();[...node.childNodes].forEach(child=>fragment.append(clean(child)));return fragment}
+  const el=document.createElement(node.tagName.toLowerCase());
+  if(node.tagName==='A'){const href=node.getAttribute('href')||'';try{const url=new URL(href,location.origin);if(['https:','http:'].includes(url.protocol)){el.href=url.href;el.target='_blank';el.rel='noopener noreferrer'}}catch{}}
+  [...node.childNodes].forEach(child=>el.append(clean(child)));
+  return el;
+ };
+ const output=document.createElement('div');
+ [...doc.body.firstElementChild.childNodes].forEach(node=>output.append(clean(node)));
+ return output.innerHTML;
+};
+const renderExplanation=step=>'<div class="learning-explanation">'+(step.body||[]).map(p=>'<div class="learning-explanation-paragraph">'+explanationHtml(p)+'</div>').join('')+'</div>'+(step.callouts?.length?'<div class="concept-grid">'+step.callouts.map(x=>'<div><strong>'+esc(x.title)+'</strong><span>'+esc(x.text)+'</span></div>').join('')+'</div>':'')+(step.code?'<div class="learning-example-code"><div class="learning-example-code-title">Exemplo de código</div><pre><code>'+esc(step.code)+'</code></pre></div>':'');
 const explainCommand=c=>{c=String(c);if(c==="git status")return"Veja os arquivos alterados";if(c==="git init")return"Inicie o Git nesta pasta";if(c==="git add .")return"Prepare os arquivos para o commit";if(c.startsWith("git commit"))return"Registre uma versão no computador";if(c.startsWith("git push"))return"Envie as versões ao GitHub";if(c.startsWith("git remote add"))return"Conecte ao repositório do GitHub";if(c==="git remote -v")return"Confira o endereço conectado";if(c.startsWith("git branch"))return"Defina a branch principal";if(c.startsWith("git config"))return"Confira seu nome ou e-mail";if(c.startsWith("git log"))return"Veja o histórico";return"Execute no terminal"};
 const renderCommand=command=>`<div class="learning-command"><div class="learning-command-details"><code>${esc(command)}</code><small>${esc(explainCommand(command))}</small></div><button type="button" class="learning-copy-btn" data-copy-command="${esc(command)}" aria-label="Copiar comando">Copiar</button></div>`;
 const guidedInstruction=value=>{const raw=String(value??"");const match=raw.match(/^(?:Digite|Execute) (git (?:--version|init|status|add \.|commit -m "[^"]+"|log -1 --oneline|config --global (?:user\.name|user\.email)(?: "[^"]+")?|remote (?:add origin [^ ]+|-v)|branch -M main|push(?: -u origin main)?|pull))(?=[., ]|$)/i);if(!match)return linkedText(raw);return linkedText(raw)+renderCommand(match[1])};
@@ -30,8 +48,7 @@ export function renderStep(step,missionId,done,options={}){
  let body="";
  if(step.type==="image-review"){const safeImage=typeof step.imageData==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(step.imageData)&&step.imageData.length<700000?step.imageData:"";body=`<figure class="learning-image-review" style="width:100%;max-width:100%;min-width:0;overflow:hidden;box-sizing:border-box">${(safeImage||(/^\/?assets\/[a-zA-Z0-9/_-]+\.svg$/.test(step.imageUrl||"")?step.imageUrl:""))?`<img src="${esc(safeImage||step.imageUrl)}" alt="${esc(step.imageCaption||step.title)}" loading="lazy" style="display:block;width:100%;max-width:100%;height:auto;object-fit:contain;box-sizing:border-box">`:`<p class="feedback error">Imagem de revisão não anexada. Avise o instrutor.</p>`}${step.imageCaption?`<figcaption>${esc(step.imageCaption)}</figcaption>`:""}</figure>`;}
  if(step.type==="visual-html")body=`<iframe class="learning-visual-frame" data-visual-content title="Conteúdo visual: ${esc(step.title)}" sandbox="" referrerpolicy="no-referrer"></iframe>`;
- if(step.type==="content"&&missionId==="R2")body=r2Body(step);
- if(step.type==="content"&&missionId!=="R2")body=`${step.id?.startsWith("f1-block-")?`<div class="learning-block-intro"><span aria-hidden="true">🧭</span><strong>O que você vai aprender neste bloco</strong></div>`:""}${(step.body||[]).map(p=>`<p>${linkedText(p)}</p>`).join("")}${step.callouts?.length?`<div class="concept-grid">${step.callouts.map(x=>`<div><strong>${esc(x.title)}</strong><span>${esc(x.text)}</span></div>`).join("")}</div>`:""}${step.code?`<pre><code>${esc(step.code)}</code></pre>`:""}`;
+ if(step.type==="content")body=renderExplanation(step);
  if(step.type==="visual-summary")body=`<div class="visual-idea">${esc(step.idea)}</div>${step.sections?.length?`<div class="learning-section-stack">${step.sections.map(section=>`<section class="learning-section ${/exemplo|veja/i.test(section.title)?"section-example":/dica|atenção|cuidado|importante|evite/i.test(section.title)?"section-tip":"section-concept"}"><div class="learning-section-head"><span aria-hidden="true">${/conceito|o que é|para que serve|termo/i.test(section.title)?"📘":/exemplo|veja|visual/i.test(section.title)?"👀":/dica|atenção|cuidado|importante/i.test(section.title)?"💡":"🧩"}</span><h3>${esc(section.title)}</h3></div><ul>${(section.items||[]).map(item=>`<li>${linkedText(item)}</li>`).join("")}</ul></section>`).join("")}</div>`:`<div class="visual-summary-grid">${(step.items||[]).map((x,i)=>`<div><span>${String(i+1).padStart(2,"0")}</span><strong>${esc(x)}</strong></div>`).join("")}</div>`}`;
  if(step.type==="match-cards"||step.type==="flashcards")body=`<div class="match-card-grid">${step.pairs.map((x,i)=>`<button type="button" class="match-card" data-reveal-card="${i}"><span>${esc(x[0])}</span><strong>Toque para revelar</strong><em>${esc(x[1])}</em></button>`).join("")}</div>`;
  if(step.type==="command-deck")body=`<div class="command-deck">${step.commands.map((x,i)=>`<button type="button" class="command-card" data-reveal-card="${i}"><code>${esc(x[0])}</code><span>Para que serve?</span><strong>${esc(x[1])}</strong></button>`).join("")}</div>`;
