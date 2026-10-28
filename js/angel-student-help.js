@@ -39,6 +39,17 @@ function validateFirstStep(){
  if($("#helpDescription").value.trim().length<10){$("#helpDescription").setCustomValidity("Descreva sua dificuldade com pelo menos 10 caracteres.");$("#helpDescription").reportValidity();$("#helpDescription").setCustomValidity("");return false}
  return true;
 }
+function validateSecondStep(){
+ const route=$("#helpRouting").value;
+ const field=route==="chosen_angel"?$("#helpAngel"):route==="instructor"?$("#helpReason"):null;
+ if(!field)return true;
+ if(!field.checkValidity()){field.reportValidity();field.focus();return false}
+ if(route==="instructor"&&field.value.trim().length<10){
+  field.setCustomValidity("Explique o motivo em pelo menos 10 caracteres.");
+  field.reportValidity();field.setCustomValidity("");field.focus();return false;
+ }
+ return true;
+}
 function helpProgress(status){const stage=status==="resolved"?3:status==="pending"||status==="escalated"?1:2;const title=status==="resolved"?"Missão concluída! 🎉":status==="awaiting_confirmation"?"Sua confirmação é a próxima etapa":status==="cancelled"?"Pedido cancelado":stage===1?"Pedido enviado — aguardando atendimento":"Orientação em andamento";return '<div class="help-progress" aria-label="Progresso do atendimento"><span class="done"></span><span class="'+(stage>1?"done":"current")+'"></span><span class="'+(stage===3?"done":stage===2?"current":"")+'"></span></div><div class="help-progress-label">'+esc(title)+'</div>'}
 function feedback(msg,error=false){$("#helpFeedback").innerHTML='<div class="angel-feedback"'+(error?' style="border-color:#e57373"':'')+'>'+esc(msg)+'</div>'}
 async function loadMissionOptions(){
@@ -49,6 +60,8 @@ async function loadMissionOptions(){
  const overrides=new Map((data||[]).map(x=>[x.mission_id,x.content||{}]));
  const registered=new Map(base.map(m=>[m.id,{id:m.id,title:m.subtitle||m.title||m.official||m.id}]));
  for(const [id,content] of overrides){
+  if(!["published","closed"].includes(content.status))continue;
+  if(id==="3A"&&(content.guild_template_version||content.guild_config||content.steps?.some(step=>String(step.id||"").startsWith("guild-3A-"))))continue;
   if(registered.has(id)){
    if(typeof content.title==="string"&&content.title.trim())registered.get(id).title=content.title.trim();
    else if(typeof content.subtitle==="string"&&content.subtitle.trim())registered.get(id).title=content.subtitle.trim();
@@ -101,7 +114,7 @@ async function init(){
  $("#helpClass").innerHTML=classes.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.code)+' — '+esc(x.name)+'</option>').join("");
  const preferred=localStorage.getItem("webacademy.student.activeClass");$("#helpClass").value=classes.find(x=>x.id===preferred)?.id||classes.find(x=>x.code==="2026.36.8")?.id||classes[0].id;
  $("#helpClass").onchange=()=>loadClass().catch(e=>feedback(e.message,true));$("#helpRouting").onchange=()=>{updateRouting();renderReview()};$("#helpAngel").onchange=renderReview;$("#helpRefresh").onclick=()=>loadRequests().catch(e=>feedback(e.message,true));
- $("#helpNext").onclick=()=>{if(validateFirstStep()){setWizardStep(2);$("#helpWizard").scrollIntoView({behavior:"smooth",block:"start"})}};$("#helpBack").onclick=()=>setWizardStep(1);$("#helpForm").onsubmit=async e=>{e.preventDefault();if(wizardStep!==2||!validateFirstStep())return;const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
+ $("#helpNext").onclick=()=>{if(validateFirstStep()){setWizardStep(2);$("#helpWizard").scrollIntoView({behavior:"smooth",block:"start"})}};$("#helpBack").onclick=()=>setWizardStep(1);$("#helpForm").onsubmit=async e=>{e.preventDefault();if(wizardStep!==2)return;if(!validateFirstStep()){setWizardStep(1);validateFirstStep();return}if(!validateSecondStep())return;const route=$("#helpRouting").value,button=$("#helpSubmit");button.disabled=true;const payload={p_class_id:classId,p_title:$("#helpTitle").value.trim(),p_topic:$("#helpTopic").value,p_description:$("#helpDescription").value.trim(),p_routing:route,p_angel_id:route==="chosen_angel"?$("#helpAngel").value:null,p_project_id:$("#helpProject").value||null,p_mission_id:$("#helpMission").value||null,p_escalation_reason:route==="instructor"?$("#helpReason").value.trim():null};
  const {error}=await sb.rpc("angel_create_help_request",payload);button.disabled=false;if(error)return feedback("Não foi possível enviar: "+error.message,true);$("#helpForm").reset();updateRouting();setWizardStep(1);feedback("🚀 Pedido enviado! Acompanhe o atendimento abaixo e confirme quando sua dúvida for resolvida.");await loadRequests();updateJourney(3);$("#helpTracking").scrollIntoView({behavior:"smooth",block:"start"})};
  setWizardStep(1);await loadClass();
  }catch(e){feedback("Erro ao abrir Central de Ajuda: "+e.message,true)}
