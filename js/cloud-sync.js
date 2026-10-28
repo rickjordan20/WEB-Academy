@@ -69,8 +69,13 @@ export function mergeStudentStates(remote,local){
   if(!xpEvents.has(identity))xpEvents.set(identity,event);
  }
  gamification.xpHistory=[...xpEvents.values()];
- // XP acumulado não pode diminuir ao reconciliar dispositivos; eventos continuam deduplicados.
- gamification.xp=Math.max(remote.gamification?.xp||0,local.gamification?.xp||0);
+ // Preserve o maior saldo legado, mas inclua recompensas únicas registradas
+ // em dispositivos diferentes. Divergências permanecem sinalizadas para revisão.
+ const eventTotal=gamification.xpHistory.reduce((sum,event)=>sum+(Number(event?.amount)||0),0);
+ const previousTotal=Math.max(Number(remote.gamification?.xp)||0,Number(local.gamification?.xp)||0);
+ gamification.xp=Math.max(previousTotal,eventTotal);
+ if(gamification.xp!==eventTotal)gamification.xpReconciliation={status:"review_required",eventTotal,accumulatedXp:gamification.xp};
+ else delete gamification.xpReconciliation;
  const mergedAnswers=mergeAnswers(remote.answers||{},local.answers||{},newer,records(remote.answerConflicts,local.answerConflicts));
  const competencies={...remote.competencies,...local.competencies};
  for(const key of unique(Object.keys(remote.competencies||{}),Object.keys(local.competencies||{})))competencies[key]=records(remote.competencies?.[key],local.competencies?.[key]);
