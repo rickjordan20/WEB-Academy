@@ -1,3 +1,4 @@
+import {initStudentNotifications} from "./student-notifications.js";
 import {initStudentNews} from "./student-news.js";
 import { getState, exportState, importState, clearState, setActiveUser, createInitialState, saveState, cacheCloudState } from "./storage.js";
 import { ensureGamification,nextLevelInfo,reconcileAchievements } from "./gamification.js";
@@ -14,6 +15,7 @@ if(cloudSession){
  if(membershipError)throw membershipError;
  if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
 }
+if(cloudSession)await initStudentNotifications();
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
 if(cloudSession){const {data:enrolled}=await sb.from("class_members").select("class_id").eq("user_id",cloudSession.user.id).eq("status","active").limit(1);if(enrolled?.[0]?.class_id)await initStudentNews(cloudSession.user.id,enrolled[0].class_id)}
 // Synchronize student progress saved on the dashboard, without re-running cloud-bootstrap.
