@@ -162,3 +162,6 @@
 .learning-step .guided-code-example button[data-copy-code]:focus-visible{outline:3px solid #c8beff;outline-offset:3px}
 .learning-step .guided-code-example button.learning-copy-btn:disabled,
 .learning-step .guided-code-example button[data-copy-code]:disabled{background:#37435c!important;color:#e7edff!important;opacity:.8!important;cursor:not-allowed!important}
+
+/* Respeitar o atributo hidden mesmo em elementos com display:grid/flex. */
+.mission-delivery [hidden]{display:none!important}
