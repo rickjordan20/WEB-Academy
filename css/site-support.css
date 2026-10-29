@@ -3,3 +3,6 @@
 .site-support-fab{right:18px;bottom:88px;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:34px;max-width:130px;z-index:11000}
 .site-support-fab:focus-visible{outline:3px solid #a8d9ff;outline-offset:3px}
 @media(max-width:550px){.site-support-fab{right:14px;bottom:82px;min-width:38px;min-height:38px}}
+
+/* Diagnóstico legível para estudantes e instrutores */
+.support-diag-view{display:grid;gap:9px;margin:12px 0;color:#eaf3ff}.support-diag-summary{display:grid;gap:5px;padding:12px;border:1px solid #56799b;border-radius:10px;background:#183553}.support-diag-summary small{opacity:.85;line-height:1.5}.support-diag-row{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #42607b;font-size:13px}.support-diag-row span{opacity:.8}.support-diag-row strong{text-align:right;overflow-wrap:anywhere}.support-diag-events{padding:0;list-style:none;display:grid;gap:7px;max-height:220px;overflow:auto}.support-diag-events li{display:grid;gap:3px;padding:9px;background:#193958;border-radius:8px;font-size:12px}.support-diag-events span{opacity:.9;overflow-wrap:anywhere}.support-diag-note{font-size:12px;opacity:.85;line-height:1.5}
