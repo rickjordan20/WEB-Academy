@@ -414,13 +414,8 @@ function openReview(box,id){
     const consolidation=indicatorEvidenceSuggestions(box,inds,entries);
     // A general AI mention is a suggestion, never proof that every linked block was assessed.
 
-    for(const item of consolidation){
-     if(!item.suggestion)continue;
-     const radios=[...box.querySelectorAll('input[name="eval-ind-'+item.code+'"]')];
-     if(radios.some(x=>x.checked))continue;
-     const radio=radios.find(x=>x.value===item.suggestion);
-     if(radio){radio.checked=true;applied++}
-    }
+    // AI indicator suggestions are advisory only; never preselect A/PA/NA.
+    if(status)status.textContent="Parecer gerado. Confira evidências, indicadores e XP antes de preencher as menções.";
     const xpInput=box.querySelector("[data-eval-xp]");
     if(xpInput){
      const aiBlocks=Array.isArray(data.blocks)?data.blocks:[];
@@ -440,9 +435,9 @@ function openReview(box,id){
      const reviewedBlocks=aiBlocks.filter(b=>xpPlan.items.some(item=>item.answered&&(b.review_key===item.key||(!b.review_key&&String(b.step_id)===String(item.step.id)))));
      const qualityMeasured=reviewedBlocks.some(b=>typeof b.quality_score==="number"||Array.isArray(b.question_analysis)&&b.question_analysis.length);
 
-     if(g.xp==null&&qualityMeasured){xpInput.value=String(aiXp);applied++}
+     // Preserve the instructor XP field; AI calculations are informational only.
      const xpNote=box.querySelector("[data-xp-plan]");
-     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA sugere "+aiXp+" XP com base em "+reviewedBlocks.length+" bloco(s) analisado(s). Distribuição: "+xpBreakdown.map(x=>x.title+": "+x.suggested+"/"+x.eligible+" XP"+(x.discount?" (redução de "+x.discount+" XP; conferir qualidade e evidência)":"")).join(" · ")+". Revise antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
+     if(xpNote)xpNote.textContent="XP elegível pelas respostas: "+xpPlan.total+"/"+maxXp+". "+(qualityMeasured?"IA estima "+aiXp+" XP (não aplicado) com base em "+reviewedBlocks.length+" bloco(s) analisado(s). Distribuição: "+xpBreakdown.map(x=>x.title+": "+x.suggested+"/"+x.eligible+" XP"+(x.discount?" (diferença estimada de "+x.discount+" XP; sem desconto automático — conferir justificativa por bloco)":"")).join(" · ")+". Revise antes de aprovar.":"IA não apresentou análise de qualidade por bloco: não há ajuste qualitativo validado.")
     }
     // Não aplicar menções gerais da IA sem correspondência com evidências da missão.
     for(const i of entries){
