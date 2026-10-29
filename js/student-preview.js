@@ -23,7 +23,7 @@ async function init(){
  if(profile.error||stateRow.error||submissions.error){root.textContent="Falha ao consultar dados autorizados.";return}
  const st=stateRow.data?.state||{},journey=st.journey||{},game=st.gamification||{},missions=submissions.data||[];
  const studentName=profile.data?.full_name||st.student?.name||"Estudante";
- document.querySelector("#studentName").textContent="Olá, "+studentName.split(/\\s+/)[0]+"!";
+ document.querySelector("#studentName").textContent="Olá, "+studentName.split(/\s+/)[0]+"!";
  document.querySelector("#studentAvatar").textContent=studentName.trim().charAt(0).toUpperCase();
  document.querySelector("#studentMeta").textContent="Última sincronização: "+(stateRow.data?.updated_at?new Date(stateRow.data.updated_at).toLocaleString("pt-BR"):"não disponível");
  const pages=[
