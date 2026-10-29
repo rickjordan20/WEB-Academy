@@ -22,17 +22,19 @@ async function init(){
  ]);
  if(profile.error||stateRow.error||submissions.error){root.textContent="Falha ao consultar dados autorizados.";return}
  const st=stateRow.data?.state||{},journey=st.journey||{},game=st.gamification||{},missions=submissions.data||[];
- document.querySelector("#studentName").textContent=profile.data?.full_name||st.student?.name||"Estudante";
+ const studentName=profile.data?.full_name||st.student?.name||"Estudante";
+ document.querySelector("#studentName").textContent="Olá, "+studentName.split(/\\s+/)[0]+"!";
+ document.querySelector("#studentAvatar").textContent=studentName.trim().charAt(0).toUpperCase();
  document.querySelector("#studentMeta").textContent="Última sincronização: "+(stateRow.data?.updated_at?new Date(stateRow.data.updated_at).toLocaleString("pt-BR"):"não disponível");
  const pages=[
- ["Visão geral",()=>stats([["XP homologado",game.xp||0],["Nível",game.level||1],["Progresso",String(journey.progress||0)+"%"],["Missões concluídas",(journey.completedMissions||[]).length],["Entregas enviadas",missions.length],["Avaliações concluídas",missions.filter(m=>m.status==="evaluated").length]])+'<h2>Histórico de XP</h2>'+list((game.xpHistory||[]).map(x=>({title:x.reason||x.key,description:String(x.amount)+" XP · "+(x.at||"")})))],
- ["Minha jornada",()=>stats([["Fase atual",journey.currentPhase||1],["Missões concluídas",(journey.completedMissions||[]).length]])+'<h2>Missões concluídas</h2>'+list((journey.completedMissions||[]).map(x=>({title:String(x)})))+'<h2>Progresso por missão</h2>'+list(entries(journey.missionProgress))],
- ["Missões e avaliações",()=>list(missions.map(m=>({title:"Missão "+m.mission_id+" · "+m.status,description:"Enviado: "+(m.submitted_at?new Date(m.submitted_at).toLocaleString("pt-BR"):"—")+"\nXP aprovado: "+(m.status==="evaluated"?(m.grades?.xp??"—"):"Pendente")+"\nFeedback: "+(m.feedback||"Ainda não informado")})))],
- ["Projetos",()=>'<h2>EduTech</h2>'+list(entries(st.edutech))+'<h2>Guilda</h2>'+list(entries(st.guild))],
- ["Competências",()=>list(entries(st.competencies))],
- ["Meu progresso",()=>stats([["XP",game.xp||0],["Nível",game.level||1],["Missões concluídas",(journey.completedMissions||[]).length]])+'<h2>Registros de aprendizagem</h2>'+list(entries(st.checkpoints))],
- ["Conquistas",()=>list((game.achievements||[]).map(x=>({title:x})))],
- ["Respostas e evidências",()=>'<h2>Respostas registradas</h2>'+list(entries(st.answers))+'<h2>Evidências</h2>'+list(entries(st.evidence))]
+ ["⌂ Visão Geral",()=>'<div class="preview-hero"><span class="pill pill-accent">JORNADA ATIVADA</span><h2>Prepare-se para construir a Web.</h2><p>Acompanhe seu progresso, suas missões e as competências desenvolvidas na WEB-Academy.</p></div>'+stats([["XP homologado",game.xp||0],["Nível",game.level||1],["Progresso",String(journey.progress||0)+"%"],["Missões concluídas",(journey.completedMissions||[]).length],["Entregas enviadas",missions.length],["Avaliações concluídas",missions.filter(m=>m.status==="evaluated").length]])+'<h2>Histórico de XP</h2>'+list((game.xpHistory||[]).map(x=>({title:x.reason||x.key,description:String(x.amount)+" XP · "+(x.at?new Date(x.at).toLocaleString("pt-BR"):"Sem data")})))],
+ ["🗺 Minha Jornada",()=>stats([["Fase atual",journey.currentPhase||1],["Missões concluídas",(journey.completedMissions||[]).length]])+'<h2>Missões concluídas</h2>'+list((journey.completedMissions||[]).map(x=>({title:String(x)})))+'<h2>Progresso por missão</h2>'+list(entries(journey.missionProgress))],
+ ["🎯 Missões",()=>list(missions.map(m=>({title:"Missão "+m.mission_id+" · "+m.status,description:"Enviado: "+(m.submitted_at?new Date(m.submitted_at).toLocaleString("pt-BR"):"—")+"\nXP aprovado: "+(m.status==="evaluated"?(m.grades?.xp??"—"):"Pendente")+"\nFeedback: "+(m.feedback||"Ainda não informado")})))],
+ ["📁 Meus Projetos",()=>'<h2>EduTech</h2>'+list(entries(st.edutech))+'<h2>Guilda</h2>'+list(entries(st.guild))],
+ ["⚡ Competências",()=>list(entries(st.competencies))],
+ ["📊 Meu Progresso",()=>stats([["XP",game.xp||0],["Nível",game.level||1],["Missões concluídas",(journey.completedMissions||[]).length]])+'<h2>Registros de aprendizagem</h2>'+list(entries(st.checkpoints))],
+ ["🏅 Conquistas",()=>list((game.achievements||[]).map(x=>({title:x})))],
+ ["📝 Respostas e Evidências",()=>'<h2>Respostas registradas</h2>'+list(entries(st.answers))+'<h2>Evidências</h2>'+list(entries(st.evidence))]
  ];
  function show(i){nav.querySelectorAll("button").forEach((b,n)=>b.setAttribute("aria-current",String(i===n)));root.innerHTML='<h2>'+esc(pages[i][0])+'</h2>'+pages[i][1]()}
  pages.forEach(([label],i)=>{const b=document.createElement("button");b.type="button";b.textContent=label;b.onclick=()=>show(i);nav.append(b)});
