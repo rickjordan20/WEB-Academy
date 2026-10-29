@@ -13,19 +13,19 @@ const indicatorLabel=code=>code+(indicatorCatalog.get(code)?.name?" — "+indica
 const indicatorDescription=code=>indicatorCatalog.get(code)?.description||"";
 function missionOf(id,classId){
  const builtin=getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id);
- if(builtin){const stored=overrides.get(classId+":"+id)||{};const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;const steps=Array.isArray(configured.steps)?configured.steps:builtin.steps||[];return {...builtin,steps,competencies:[...new Set([...(builtin.competencies||[]),...steps.flatMap(step=>step.indicators||step.competencies||[])])],maxXp:id==="R2"?steps.reduce((sum,step)=>sum+Math.max(0,Number(step.xp)||0),0):builtin.maxXp};}
+ if(builtin){const stored=overrides.get(classId+":"+id)||{};const configured=Array.isArray(stored.steps)&&stored.steps.length?stored:Array.isArray(stored.draft?.steps)&&stored.draft.steps.length?stored.draft:stored;const steps=Array.isArray(configured.steps)&&configured.steps.length?configured.steps:builtin.steps||[];return {...builtin,steps,competencies:[...new Set([...(builtin.competencies||[]),...steps.flatMap(step=>step.indicators||step.competencies||[])])],maxXp:id==="R2"?steps.reduce((sum,step)=>sum+Math.max(0,Number(step.xp)||0),0):builtin.maxXp};}
  const stored=overrides.get(classId+":"+id)||{};
- const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;
+ const configured=Array.isArray(stored.steps)&&stored.steps.length?stored:Array.isArray(stored.draft?.steps)&&stored.draft.steps.length?stored.draft:stored;
  const steps=Array.isArray(configured.steps)?configured.steps:[];
  const title=configured.title||stored.title||configured.name||stored.name||("Missão "+id);
  const competencies=Array.isArray(configured.competencies)?configured.competencies:Array.isArray(stored.competencies)?stored.competencies:[...new Set(steps.flatMap(step=>step.indicators||step.competencies||[]))];
  return {id,title,subtitle:configured.subtitle||stored.subtitle||"",steps,competencies,type:configured.type||stored.type||"custom",maxXp:Number(configured.maxXp??stored.maxXp??0)||0};
 }
 function effectiveDefinition(r,m,fundamental){
- const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=Array.isArray(stored.steps)?stored:Array.isArray(stored.draft?.steps)?stored.draft:stored;
+ const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=Array.isArray(stored.steps)&&stored.steps.length?stored:Array.isArray(stored.draft?.steps)&&stored.draft.steps.length?stored.draft:stored;
  const saved=r.progress_snapshot?.requirements;
  if(saved?.mission?.steps&&saved.missionId===r.mission_id)return {steps:saved.mission.steps,fundamental:fundamental?{steps:saved.fundamentals?.steps||fundamental.steps||[]}:null,source:"submission"};
- return {steps:content.steps||m?.steps||[],fundamental:fundamental?{steps:content.fundamental?.steps||fundamental.steps||[]}:null,source:"current"};
+ return {steps:Array.isArray(content.steps)&&content.steps.length?content.steps:m?.steps||[],fundamental:fundamental?{steps:Array.isArray(content.fundamental?.steps)&&content.fundamental.steps.length?content.fundamental.steps:fundamental.steps||[]}:null,source:"current"};
 }
 function completedIds(snapshot,kind){const ids=snapshot?.[kind]?.completedSteps;return Array.isArray(ids)?ids:[]}
 function historicalSteps(r,unit,configuredSteps){
