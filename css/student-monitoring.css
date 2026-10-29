@@ -1,1 +1,20 @@
 .student-monitoring-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 18px}.student-monitor-stat{background:#0b1a2d;border:1px solid #2b4261;border-radius:12px;padding:13px;display:grid;gap:5px;min-width:0}.student-monitor-stat small{color:#b5cce7;font-weight:700}.student-monitor-stat strong{font-size:1.65rem;color:#f4f8ff}.student-monitor-stat span{font-size:.73rem;color:#91a9c6}.student-monitoring-tools{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:0 0 14px}.student-monitoring-tools label{display:grid;gap:5px;color:#b5cce7;font-size:.8rem}.student-monitoring-tools select{min-width:175px}.student-monitoring-tools button{margin-bottom:1px}.student-monitor-detail h3{margin:0 0 12px}.student-monitor-detail h3:not(:first-child){margin-top:20px}.student-monitor-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.student-monitor-facts p{margin:0;padding:10px;border:1px solid #2b4261;border-radius:9px;overflow-wrap:anywhere}.student-monitor-tags{display:flex;gap:7px;flex-wrap:wrap}.student-monitor-tags span{border:1px solid #345a83;background:#102844;color:#d7e8ff;border-radius:8px;padding:6px 10px;font-size:.8rem;overflow-wrap:anywhere}.student-detail-card{width:min(860px,calc(100vw - 28px));max-width:860px;max-height:90vh;overflow-y:auto}@media(max-width:1050px){.student-monitoring-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.student-monitoring-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.student-monitoring-tools label,.student-monitoring-tools select{width:100%}.student-monitor-facts{grid-template-columns:1fr}.student-detail-card{width:calc(100vw - 20px)}}
+/* Acompanhamento compacto: informações agrupadas por aluno sem tabela excessivamente larga. */
+#studentsSection{min-width:0}
+#studentsSection .student-table-wrap{max-width:100%;overflow-x:auto}
+#studentsSection .student-compact-table{width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:0}
+#studentsSection .student-compact-table th:nth-child(1){width:26%}
+#studentsSection .student-compact-table th:nth-child(2){width:21%}
+#studentsSection .student-compact-table th:nth-child(3){width:13%}
+#studentsSection .student-compact-table th:nth-child(4){width:23%}
+#studentsSection .student-compact-table th:nth-child(5){width:17%}
+#studentsSection .student-compact-table th,#studentsSection .student-compact-table td{padding:13px 12px;vertical-align:middle;white-space:normal;overflow-wrap:anywhere}
+#studentsSection .student-compact-name,#studentsSection .student-compact-metrics{display:flex;flex-direction:column;gap:5px;min-width:0}
+#studentsSection .student-compact-name b{font-size:.93rem;line-height:1.35}
+#studentsSection .student-compact-name small,#studentsSection .student-compact-metrics small{font-size:.75rem;opacity:.78;overflow-wrap:anywhere}
+#studentsSection .student-compact-name span,#studentsSection .student-compact-metrics span{font-size:.8rem;line-height:1.45}
+#studentsSection .student-compact-metrics b{font-size:.96rem}
+#studentsSection .student-compact-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#studentsSection .student-compact-actions .btn{white-space:normal;line-height:1.3;padding:7px 10px}
+@media(max-width:900px){#studentsSection .student-compact-table{min-width:720px}#studentsSection .student-compact-table th,#studentsSection .student-compact-table td{padding:10px 8px}}
+@media(max-width:600px){#studentsSection .student-monitoring-tools{display:grid;grid-template-columns:1fr 1fr}#studentsSection .student-monitoring-tools label{min-width:0}#studentsSection .student-monitoring-tools select{min-width:0}#studentsSection .student-filters{display:grid;grid-template-columns:1fr}}
