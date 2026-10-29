@@ -87,7 +87,8 @@ export function reconcileAchievements(s=getState()){
 export function rewardMission(mission,s=getState()){
  s=ensureGamification(s);
  if(!s)return {awarded:0,state:s};
- const base=mission.id==="R2"?0:150;
+ // Mission XP is granted only after instructor approval in mission_submissions.
+ const base=0;
  const result=base>0?awardXp(base,`Missão ${mission.id} concluída`,`mission:${mission.id}`,s):{awarded:0,state:s};
  if(mission.type==="guild"&&!s.gamification.guildCompleted){s.gamification.guildCompleted=true;saveState(s)}
  reconcileAchievements(s);
