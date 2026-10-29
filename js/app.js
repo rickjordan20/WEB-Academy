@@ -7,6 +7,7 @@ import {pullCloudState,pushCloudState} from "./cloud-sync.js";
 
 const sb=await getSupabase();
 const cloudSession=sb?await getSession():null;
+let activeStudentClassId=null;
 if(sb&&!cloudSession){setActiveUser(null);location.replace("auth.html");throw new Error("AUTH_REDIRECT")}
 if(cloudSession){
  const {data:role}=await sb.from("profiles").select("role").eq("id",cloudSession.user.id).maybeSingle();
@@ -14,10 +15,11 @@ if(cloudSession){
  const {data:membership,error:membershipError}=await sb.from("class_members").select("class_id").eq("user_id",cloudSession.user.id).eq("status","active").limit(1);
  if(membershipError)throw membershipError;
  if(!membership?.length){location.replace("enrollment.html");throw new Error("ENROLLMENT_REQUIRED")}
+ activeStudentClassId=membership[0].class_id;
 }
-if(cloudSession)await initStudentNotifications();
+if(cloudSession)void initStudentNotifications().catch(e=>console.warn("Notificações indisponíveis:",e));
 if(cloudSession){setActiveUser(cloudSession.user.id);try{await pullCloudState()}catch(e){console.warn("Sincronização inicial indisponível:",e)}}
-if(cloudSession){const {data:enrolled}=await sb.from("class_members").select("class_id").eq("user_id",cloudSession.user.id).eq("status","active").limit(1);if(enrolled?.[0]?.class_id)await initStudentNews(cloudSession.user.id,enrolled[0].class_id)}
+if(cloudSession&&activeStudentClassId)void initStudentNews(cloudSession.user.id,activeStudentClassId).catch(e=>console.warn("Comunicados indisponíveis:",e));
 // Synchronize student progress saved on the dashboard, without re-running cloud-bootstrap.
 // Mission, journey and catalog pages already install their own listener there.
 if(cloudSession){
