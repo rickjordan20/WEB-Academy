@@ -17,6 +17,7 @@ export function canRecordMissionProgress(id){
  const entry=verifiedWindows.get(id);
  return Boolean(entry&&(entry.state==="open"||entry.state==="closed")&&Date.now()-entry.checkedAt<900000&&(!entry.opensAt||Date.now()>=new Date(entry.opensAt).getTime())&&(entry.state==="closed"||!entry.closesAt||Date.now()<new Date(entry.closesAt).getTime()));
 }
+export function progressAccessDiagnostic(id){const entry=verifiedWindows.get(id);return {mission:id,verified:Boolean(entry),state:entry?.state||"sem verificação",verificationAgeMs:entry?Date.now()-entry.checkedAt:null,opensAt:entry?.opensAt||null,closesAt:entry?.closesAt||null,canRecord:canRecordMissionProgress(id)}}
 const canRecordFundamental=phase=>canRecordMissionProgress(`${phase}A`)||(Number(phase)===2&&canRecordMissionProgress("2B"));
 const canRecordUnit=id=>/^F[0-9]+$/.test(id)?canRecordFundamental(Number(id.slice(1))):canRecordMissionProgress(id);
 
