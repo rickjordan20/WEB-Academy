@@ -59,6 +59,7 @@ export function mergeStudentStates(remote,local){
  journey.currentPhase=Math.max(remote.journey?.currentPhase||1,local.journey?.currentPhase||1);
  journey.progress=Math.max(remote.journey?.progress||0,local.journey?.progress||0);
  const gamification={...secondary.gamification,...primary.gamification};
+ const authoritativeXp=!!remote.gamification?.xpReconciledAt;
  gamification.rewarded=unique(remote.gamification?.rewarded,local.gamification?.rewarded);
  gamification.achievements=records(remote.gamification?.achievements,local.gamification?.achievements);
  // XP events have a stable reward key, not an id. Merge by key to avoid
@@ -69,14 +70,21 @@ export function mergeStudentStates(remote,local){
   const identity=event?.key!=null&&String(event.key).length?'key:'+String(event.key):event?.id!=null?'id:'+String(event.id):'legacy:'+JSON.stringify(event);
   if(!xpEvents.has(identity))xpEvents.set(identity,event);
  }
- gamification.xpHistory=[...xpEvents.values()];
- // Preserve o maior saldo legado, mas inclua recompensas únicas registradas
- // em dispositivos diferentes. Divergências permanecem sinalizadas para revisão.
- const eventTotal=gamification.xpHistory.reduce((sum,event)=>sum+(Number(event?.amount)||0),0);
- const previousTotal=Math.max(Number(remote.gamification?.xp)||0,Number(local.gamification?.xp)||0);
- gamification.xp=Math.max(previousTotal,eventTotal);
- if(gamification.xp!==eventTotal)gamification.xpReconciliation={status:"review_required",eventTotal,accumulatedXp:gamification.xp};
- else delete gamification.xpReconciliation;
+ gamification.xpHistory=authoritativeXp?(remote.gamification.xpHistory||[]):[...xpEvents.values()];
+ if(authoritativeXp){
+  gamification.xp=Number(remote.gamification.xp)||0;
+  gamification.level=remote.gamification.level;
+  gamification.levelName=remote.gamification.levelName;
+  gamification.xpReconciledAt=remote.gamification.xpReconciledAt;
+  gamification.legacyXpHistory=remote.gamification.legacyXpHistory;
+  delete gamification.xpReconciliation;
+ }else{
+  const eventTotal=gamification.xpHistory.reduce((sum,event)=>sum+(Number(event?.amount)||0),0);
+  const previousTotal=Math.max(Number(remote.gamification?.xp)||0,Number(local.gamification?.xp)||0);
+  gamification.xp=Math.max(previousTotal,eventTotal);
+  if(gamification.xp!==eventTotal)gamification.xpReconciliation={status:"review_required",eventTotal,accumulatedXp:gamification.xp};
+  else delete gamification.xpReconciliation;
+ }
  const mergedAnswers=mergeAnswers(remote.answers||{},local.answers||{},newer,records(remote.answerConflicts,local.answerConflicts));
  const competencies={...remote.competencies,...local.competencies};
  for(const key of unique(Object.keys(remote.competencies||{}),Object.keys(local.competencies||{})))competencies[key]=records(remote.competencies?.[key],local.competencies?.[key]);
