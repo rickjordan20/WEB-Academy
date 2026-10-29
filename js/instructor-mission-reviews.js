@@ -75,7 +75,21 @@ function answerHTML(v,depth=0){
  if(!entries.length)return '<p class="eval-empty">Nenhum dado registrado.</p>';
  return '<dl class="eval-answer-fields">'+entries.map(([key,value])=>'<div class="eval-answer-field"><dt>'+esc(answerLabels[key]||key.replace(/[_-]/g," "))+'</dt><dd>'+answerHTML(value,depth+1)+'</dd></div>').join("")+'</dl>';
 }
-function card(r){const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
+function readiness(r){
+ const m=missionOf(r.mission_id,r.class_id);
+ const entries=Object.entries(r.answers||{}).filter(([k,v])=>!k.endsWith(":revealed")&&v!=null&&v!==""&&!(Array.isArray(v)&&!v.length));
+ const form=r.answers?.[r.mission_id+":guild_self_review"]?.form||{};
+ const guildDetails=[form.taskReflection,form.contribution,form.participation,form.evidence].some(v=>typeof v==="string"&&v.trim());
+ const evidence=Array.isArray(r.evidence)?r.evidence.filter(Boolean):[];
+ const reasons=[];
+ if(!r.submitted_at)reasons.push("Data de envio ausente");
+ if(!entries.length&&!evidence.length&&!guildDetails)reasons.push("Sem respostas ou evidências registradas");
+ if(m?.type==="guild"&&!guildDetails&&!evidence.length)reasons.push("Ficha individual da Guilda não localizada");
+ const warnings=[];
+ if(r.progress_snapshot?.mission?.completed!==true)warnings.push("Snapshot não concluído");
+ return {ready:reasons.length===0,reasons,warnings};
+}
+function card(r){const check=readiness(r);const note=[...check.reasons,...check.warnings].join(' · ');const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag" title="'+esc(note||"Registros disponíveis para análise") +'" style="border-color:'+(check.ready?"#267a5a":"#b7791f")+';color:'+(check.ready?"#66d8a6":"#f2c16d") +'">'+(check.ready?"Apto para análise":"Verificar registros")+'</span><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
 function renderList(box){
  const missions=[...new Map(rows.map(r=>[r.mission_id,missionOf(r.mission_id,r.class_id)?.title||r.mission_id])).entries()];
  const counts={all:rows.length,submitted:0,changes_requested:0,evaluated:0};rows.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1});
