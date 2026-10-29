@@ -4,7 +4,7 @@ import {getSupabase} from "./supabase-client.js";
 import {mountGuildMissionBoard} from "./guild-mission-board.js";
 import {mountMissionDelivery,reapplyMissionRevision} from "./mission-delivery.js";
 import "./cloud-bootstrap.js";
-import {getMission,getFundamental,startMission,startFundamental,missionStatus,fundamentalStatus,completeFundamentalStep,STATUS} from "./mission-engine.js";
+import {getMission,getFundamental,startMission,startFundamental,missionStatus,fundamentalStatus,completeFundamentalStep,setVerifiedMissionWindow,STATUS} from "./mission-engine.js";
 import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
@@ -172,6 +172,7 @@ function applyEduTechReviewTemplate(){
  });
 }
 function render(readOnly=false,access=null){
+ if(access?.state==="open"||access?.state==="closed")setVerifiedMissionWindow(id,access);
  applyEduTechReviewTemplate();
  const s=getState(),p=s.journey.missionProgress[id]||{completedSteps:[]},done=p.completedSteps||[],fund=getFundamental(mission.phase),fundDone=s.journey.completedFundamentals?.includes(`F${mission.phase}`),total=mission.steps.length,pct=Math.round(done.length/total*100);
  const retrospective=id==="1A"||id==="1B"||id==="2A";
