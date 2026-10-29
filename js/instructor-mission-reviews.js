@@ -341,7 +341,7 @@ function openReview(box,id){
   try{
    const sb=window.__evalSupabase;
    const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:[...(reviewFundamental?.steps||[]).map(step=>({...step,reviewKey:(reviewFundamental?.id||"fundamental")+":"+step.id})),...(reviewMission.steps||[]).map(step=>({...step,reviewKey:reviewMission.id+":"+step.id}))],competencies:inds}}});
-   if(error){let detail=data?.error;try{if(!detail&&error.context?.json){const body=await error.context.json();detail=body?.error||body?.message}}catch{}throw new Error(detail||error.message||"Falha de conexão")}
+   if(error){const httpStatus=error.context?.status;let detail=data?.error;try{if(!detail&&error.context?.json){const body=await error.context.json();detail=body?.error||body?.message}}catch{}if(httpStatus===429||/429|rate.limit|too many requests/i.test(String(detail||error.message||"")))throw new Error("Limite temporário de requisições do Supabase (429). Aguarde alguns minutos antes de tentar novamente. Enquanto isso, utilize Gerar sugestões de feedback, que não depende da IA. Não houve alteração nas avaliações.");throw new Error(detail||error.message||"Falha de conexão")}
    if(data?.error)throw new Error(data.error);
    const result=box.querySelector("[data-ai-review-result]");
    const entries=Array.isArray(data.indicators)?data.indicators:[];
