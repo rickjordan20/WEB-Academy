@@ -8,6 +8,9 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const fmt=d=>d?new Date(d).toLocaleString("pt-BR"):"—";
 const statuses={submitted:"Aguardando avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
 let rows=[],names=new Map(),classes=[],overrides=new Map(),current=null,filter="submitted",search="",missionFilter="";
+let indicatorCatalog=new Map();
+const indicatorLabel=code=>code+(indicatorCatalog.get(code)?.name?" — "+indicatorCatalog.get(code).name:"");
+const indicatorDescription=code=>indicatorCatalog.get(code)?.description||"";
 function missionOf(id,classId){
  const builtin=getMission(id)||EXTRA_MISSIONS.find(m=>m.id===id);
  if(builtin){const stored=overrides.get(classId+":"+id)||{};const configured=stored.steps?stored:stored.draft?.steps?stored.draft:stored;const steps=Array.isArray(configured.steps)?configured.steps:builtin.steps||[];return {...builtin,steps,competencies:[...new Set([...(builtin.competencies||[]),...steps.flatMap(step=>step.indicators||step.competencies||[])])],maxXp:id==="R2"?steps.reduce((sum,step)=>sum+Math.max(0,Number(step.xp)||0),0):builtin.maxXp};}
@@ -89,7 +92,7 @@ function readiness(r){
  if(r.progress_snapshot?.mission?.completed!==true)warnings.push("Snapshot não concluído");
  return {ready:reasons.length===0,reasons,warnings};
 }
-function card(r){const check=readiness(r);const note=[...check.reasons,...check.warnings].join(' · ');const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag" title="'+esc(note||"Registros disponíveis para análise") +'" style="border-color:'+(check.ready?"#267a5a":"#b7791f")+';color:'+(check.ready?"#66d8a6":"#f2c16d") +'">'+(check.ready?"Apto para análise":"Verificar registros")+'</span><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
+function card(r){const check=readiness(r);const note=[...check.reasons,...check.warnings].join(' · ');const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).map(indicatorLabel).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag" title="'+esc(note||"Registros disponíveis para análise") +'" style="border-color:'+(check.ready?"#267a5a":"#b7791f")+';color:'+(check.ready?"#66d8a6":"#f2c16d") +'">'+(check.ready?"Apto para análise":"Verificar registros")+'</span><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
 function renderList(box){
  const missions=[...new Map(rows.map(r=>[r.mission_id,missionOf(r.mission_id,r.class_id)?.title||r.mission_id])).entries()];
  const counts={all:rows.length,submitted:0,changes_requested:0,evaluated:0};rows.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1});
@@ -497,6 +500,8 @@ export async function renderLateSubmissions(){
  const {data:configuredRows,error:configError}=await sb.from("mission_content_overrides").select("class_id,mission_id,content").in("class_id",classes.map(c=>c.id));
  if(configError){box.textContent="Não foi possível carregar o XP configurado nas missões: "+configError.message;return}
  overrides=new Map((configuredRows||[]).map(item=>[item.class_id+":"+item.mission_id,item.content||{}]));
+ const {data:officialIndicators,error:indError}=await sb.from("curriculum_indicators").select("code,name,description").in("class_id",classes.map(c=>c.id)).eq("active",true);
+ indicatorCatalog=new Map((indError?[]:officialIndicators||[]).map(i=>[i.code,i]));
  const {data,error}=await sb.from("mission_submissions").select("id,class_id,student_id,mission_id,status,is_late,late_reason,late_explanation,submitted_at,feedback,answers,evidence,grades,progress_snapshot").in("class_id",classes.map(c=>c.id)).order("submitted_at",{ascending:false}).limit(500);
  if(error){box.textContent="Entregas indisponíveis: "+error.message;return}
  rows=data||[];
