@@ -292,7 +292,6 @@ function openReview(box,id){
  const pendingMission=(m?.steps||[]).filter(step=>!(snapshot.mission?.completedSteps||[]).includes(step.id));
  const progressNote=hasSnapshot?'<div class="eval-pending-summary"><strong>'+pendingMission.length+' etapa(s) sem check na missão</strong><p>'+ (pendingMission.length?pendingMission.map(step=>esc(step.title||step.id)).join(" · "):"Todas as etapas da missão têm check.")+'</p></div>':'<div class="eval-pending-summary"><strong>Entrega antiga: checks não disponíveis</strong><p>Não é possível inferir a conclusão das etapas a partir da ausência de registro.</p></div>';const fundamental=m?.type==="training"?getFundamental(m.phase):null;
  const configured=effectiveDefinition(r,m,fundamental);
- const historicalDefinitionAvailable=!!(r.progress_snapshot?.missionDefinition||r.progress_snapshot?.definitionSnapshot);
 
  const versionNotice=`<div class="eval-pending-summary"><strong>Conferência de requisitos históricos</strong><p>Definição atual exibida como referência, não como versão histórica comprovada. Verifique se as etapas eram exigidas no envio; respostas históricas não devem ser penalizadas por mudanças posteriores.</p><p>Missão: ${esc(r.mission_id)} · Envio: ${fmt(r.submitted_at)} · Versão do registro: ${esc(r.progress_snapshot?.version||"não identificada")}</p></div>`;
  const reviewMission={...m,steps:configured.steps};
