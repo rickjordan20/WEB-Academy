@@ -211,6 +211,7 @@ function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const response=responseForStep(r.answers,unitId,step);
  const answer=response.value;
  const prompt=step.question||step.prompt||step.instruction||step.summary||"";
+ const requirementNote='<p class="muted"><strong>Rastreabilidade:</strong> compare o requisito com a resposta preservada e com a evidência efetiva. Link informado não significa repositório inspecionado; check não comprova aprendizagem isoladamente.</p>';
  const promptHtml=prompt?'<p class="eval-question-prompt"><strong>Enunciado / orientação:</strong> '+esc(prompt)+'</p>':"";
  const selectedIndex=(typeof answer==="number"||typeof answer==="string"&&/^[0-9]+$/.test(answer.trim()))?Number(answer):null;
  const displayAnswer=step.type==="quiz"&&Array.isArray(step.options)&&selectedIndex!==null&&step.options[selectedIndex]!==undefined?'<div class="eval-answer-text"><strong>Alternativa '+(selectedIndex+1)+':</strong> '+esc(step.options[selectedIndex])+'</div>':answerHTML(answer);
@@ -223,7 +224,7 @@ function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const progress=Array.isArray(r.evidence)?r.evidence.filter(x=>x?.stepId===step.id):[];
  const blockCodes=[...new Set((step.indicators||step.competencies||[]).filter(x=>/^I[1-6]$/.test(x)))];
  const blockValues=r.grades?.blockIndicators?.[unitId+":"+step.id]||{};
- const blockAssessment=blockCodes.length?'<div class="eval-block-indicators"><strong>Indicadores deste bloco</strong>'+blockCodes.map(code=>'<div class="eval-indicator"><span>'+esc(code)+'</span><div class="eval-concepts">'+["A","PA","NA"].map(v=>'<label><input type="radio" name="block-ind-'+esc(unitId+":"+step.id+":"+code)+'" value="'+v+'" '+(blockValues[code]===v?"checked":"")+'> '+v+'</label>').join("")+'</div></div>').join("")+'</div>':"";
+ const blockAssessment=blockCodes.length?'<div class="eval-block-indicators"><strong>Indicadores deste bloco</strong>'+blockCodes.map(code=>'<div class="eval-indicator"><span><strong>'+esc(indicatorLabel(code))+'</strong>'+(indicatorDescription(code)?'<small style="display:block">'+esc(indicatorDescription(code))+'</small>':'')+'</span><div class="eval-concepts">'+["A","PA","NA"].map(v=>'<label><input type="radio" name="block-ind-'+esc(unitId+":"+step.id+":"+code)+'" value="'+v+'" '+(blockValues[code]===v?"checked":"")+'> '+v+'</label>').join("")+'</div></div>').join("")+'</div>':"";
  const blockKeyValue=unitId+":"+step.id;
  const existingCheck=r.grades?.blockChecks?.[blockKeyValue]===true;
  const xpConfigured=Number(step.xp)||0;
