@@ -7,6 +7,13 @@ if(!sb||!session){location.replace("auth.html");throw new Error("AUTH_REQUIRED")
 const meResult=await sb.from("profiles").select("id,full_name,role").eq("id",session.user.id).single();
 if(meResult.error||meResult.data?.role!=="instructor"){location.replace("app.html");throw new Error("INSTRUCTOR_REQUIRED")}
 const $=s=>document.querySelector(s);
+$("#previewStudentView")?.addEventListener("click",()=>{
+ const id=$("#studentDialog")?.dataset.studentId;
+ if(!id||id.startsWith("roster:")){alert("Este estudante ainda não possui conta vinculada.");return}
+ const student=students.find(x=>x.id===id)||allStudents.find(x=>x.id===id);
+ if(!student?.state){alert("Ainda não há dados sincronizados para este estudante.");return}
+ window.open("student-preview.html?student="+encodeURIComponent(id),"_blank","noopener");
+});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 let students=[],allStudents=[],guilds=[],memberships=[],managedClasses=[],classRow=null,selectedGuildId=null,realtimeChannel=null,realtimeTimer=null,isReloading=false,reloadQueued=false;
 async function load(){
