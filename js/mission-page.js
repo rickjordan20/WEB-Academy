@@ -4,7 +4,7 @@ import {getSupabase} from "./supabase-client.js";
 import {mountGuildMissionBoard} from "./guild-mission-board.js";
 import {mountMissionDelivery,reapplyMissionRevision} from "./mission-delivery.js";
 import "./cloud-bootstrap.js";
-import {getMission,getFundamental,startMission,startFundamental,missionStatus,fundamentalStatus,completeFundamentalStep,setVerifiedMissionWindow,STATUS} from "./mission-engine.js";
+import {getMission,getFundamental,startMission,startFundamental,missionStatus,fundamentalStatus,completeFundamentalStep,setVerifiedMissionWindow,progressAccessDiagnostic,STATUS} from "./mission-engine.js";
 import {getState} from "./storage.js";
 import {renderStep,bindStep} from "./step-renderer.js";
 import {getMissionProjectContext,renderProjectContext} from "./project-context.js";
@@ -184,7 +184,7 @@ function render(readOnly=false,access=null){
  root.innerHTML=`<section class="mission-header"><p class="eyebrow">Fase ${pad(mission.phase)} • Missão ${escapeMissionText(mission.displayId||mission.id)} • ${scheduledLesson?`Aula ${pad(scheduledLesson.lesson_number)}`:"Aula a definir"}</p><h1>${mission.title}</h1><p>${mission.subtitle}</p><div class="mission-meta"><span class="pill">4h</span>${scheduledLesson?`<span class="pill">📅 Aula ${String(scheduledLesson.lesson_number).padStart(2,"0")} · ${scheduledLesson.lesson_date.split("-").reverse().join("/")} · ${scheduledLesson.execution_mode}${scheduledLesson.start&&scheduledLesson.end?" · "+scheduledLesson.start+"–"+scheduledLesson.end:""}</span>`:""}<span class="pill">${retrospective?(mission.type==="training"?"📘 EduTech":"⚔️ Projeto Restaurante"):(mission.type==="training"?"📘 + 🎓 EduTech":"⚔️ Projeto Restaurante")}</span><span class="pill">${pct}% da prática registrada</span></div></section>${guidedContent}`;
  if(mission.type==="training"&&!retrospective&&!readOnly){
   startFundamental(mission.phase);
-  fund.steps.forEach(step=>bindStep(step,`F${mission.phase}`,()=>render(false,missionAccess),(_,stepId)=>completeFundamentalStep(mission.phase,stepId),{completed:fundamentalProgress.includes(step.id)}));
+  fund.steps.forEach(step=>bindStep(step,`F${mission.phase}`,()=>render(false,missionAccess),(_,stepId)=>{const ok=completeFundamentalStep(mission.phase,stepId);if(!ok)console.warn("Etapa dos fundamentos bloqueada",{phase:mission.phase,stepId,access:progressAccessDiagnostic(id),currentAccess:missionAccess?.state});return ok},{completed:fundamentalProgress.includes(step.id)}));
  }
  if(mission.type==="training"&&!retrospective)organizeEduTechPanels();
  reapplyMissionRevision(root,mission);
