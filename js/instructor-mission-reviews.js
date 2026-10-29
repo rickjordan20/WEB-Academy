@@ -23,7 +23,9 @@ function missionOf(id,classId){
 }
 function effectiveDefinition(r,m,fundamental){
  const stored=overrides.get(r.class_id+":"+r.mission_id)||{};const content=Array.isArray(stored.steps)?stored:Array.isArray(stored.draft?.steps)?stored.draft:stored;
- return {steps:content.steps||m?.steps||[],fundamental:fundamental?{steps:content.fundamental?.steps||fundamental.steps||[]}:null};
+ const saved=r.progress_snapshot?.requirements;
+ if(saved?.mission?.steps&&saved.missionId===r.mission_id)return {steps:saved.mission.steps,fundamental:fundamental?{steps:saved.fundamentals?.steps||fundamental.steps||[]}:null,source:"submission"};
+ return {steps:content.steps||m?.steps||[],fundamental:fundamental?{steps:content.fundamental?.steps||fundamental.steps||[]}:null,source:"current"};
 }
 function completedIds(snapshot,kind){const ids=snapshot?.[kind]?.completedSteps;return Array.isArray(ids)?ids:[]}
 function historicalSteps(r,unit,configuredSteps){
@@ -293,7 +295,7 @@ function openReview(box,id){
  const progressNote=hasSnapshot?'<div class="eval-pending-summary"><strong>'+pendingMission.length+' etapa(s) sem check na missão</strong><p>'+ (pendingMission.length?pendingMission.map(step=>esc(step.title||step.id)).join(" · "):"Todas as etapas da missão têm check.")+'</p></div>':'<div class="eval-pending-summary"><strong>Entrega antiga: checks não disponíveis</strong><p>Não é possível inferir a conclusão das etapas a partir da ausência de registro.</p></div>';const fundamental=m?.type==="training"?getFundamental(m.phase):null;
  const configured=effectiveDefinition(r,m,fundamental);
 
- const versionNotice=`<div class="eval-pending-summary"><strong>Conferência de requisitos históricos</strong><p>Definição atual exibida como referência, não como versão histórica comprovada. Verifique se as etapas eram exigidas no envio; respostas históricas não devem ser penalizadas por mudanças posteriores.</p><p>Missão: ${esc(r.mission_id)} · Envio: ${fmt(r.submitted_at)} · Versão do registro: ${esc(r.progress_snapshot?.version||"não identificada")}</p></div>`;
+ const versionNotice=`<div class="eval-pending-summary"><strong>Conferência de requisitos históricos</strong><p>${configured.source==="submission"?"Requisitos preservados na entrega: esta avaliação utiliza as etapas registradas no momento do envio.":"Definição atual exibida como referência, não como versão histórica comprovada. Verifique se as etapas eram exigidas no envio; respostas históricas não devem ser penalizadas por mudanças posteriores."}</p><p>Missão: ${esc(r.mission_id)} · Envio: ${fmt(r.submitted_at)} · Versão do registro: ${esc(r.progress_snapshot?.version||"não identificada")}</p></div>`;
  const reviewMission={...m,steps:configured.steps};
  const reviewFundamental=fundamental?{...fundamental,steps:configured.fundamental.steps}:null;
  const xpPlan=suggestedXpPlan(reviewMission,reviewFundamental,maxXp,r);
