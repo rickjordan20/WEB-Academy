@@ -113,6 +113,20 @@ export async function mountMissionDelivery(missionId,access,root){
     codeAttempts:Object.fromEntries(Object.entries(state?.codeAttempts||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith(fundamentalId+":")))
    };
    const currentMission=getMission(missionId),fundamental=currentMission?.type==="training"?getFundamental(phase):null;
+   // Freeze the requirements visible at submission time for future instructor reviews.
+   // Existing historical submissions remain untouched.
+   const captureSteps=items=>(items||[]).map(step=>({
+    id:step.id,title:step.title,type:step.type,description:step.description,
+    instructions:step.instructions,instruction:step.instruction,question:step.question,
+    prompt:step.prompt,goal:step.goal,required:step.required,criteria:step.criteria,
+    indicators:step.indicators,competencies:step.competencies,options:step.options,
+    correctAnswer:step.correctAnswer,xp:step.xp
+   }));
+   progressSnapshot.requirements={
+    capturedAt:progressSnapshot.capturedAt,missionId,
+    mission:{title:currentMission?.title||"",type:currentMission?.type||"",steps:captureSteps(currentMission?.steps)},
+    fundamentals:fundamental?{id:fundamental.id,steps:captureSteps(fundamental.steps)}:null
+   };
    const steps=currentMission?.steps||[],completed=new Set(progressSnapshot.mission.completedSteps);
    const pending=steps.filter(step=>!completed.has(step.id));
    const fundamentalPending=(fundamental?.steps||[]).filter(step=>!progressSnapshot.fundamentals.completedSteps.includes(step.id));
