@@ -5,6 +5,10 @@ const labels={open:"Aberto",in_review:"Em análise",resolved:"Resolvido",closed:
 async function init(){if(!sb||!session){$("#supportList").textContent="Faça login para acessar seus chamados.";return}
  const role=await sb.from("profiles").select("role").eq("id",session.user.id).maybeSingle();instructor=role.data?.role==="instructor";
  $("#supportBack").href=instructor?"instructor.html":"app.html";
+ $("#supportHomeNav").href=instructor?"instructor.html":"app.html";
+ $("#supportHomeNav").textContent=instructor?"▦ Painel do Instrutor":"⌂ Visão Geral";
+ $("#supportSidebarBack").href=instructor?"instructor.html":"app.html";
+ if(instructor){const nav=document.querySelector(".sidebar .nav-list");nav.innerHTML='<a class="nav-item" href="instructor.html">▦ Painel da Turma</a><a class="nav-item" href="angel-instructor.html">💙 Alunos Anjos</a><a class="nav-item" href="achievement-manager.html">🏅 Gerenciar Conquistas</a><a class="nav-item" href="popup-manager.html">📢 Gerenciar Pop-ups</a><a class="nav-item" href="notification-manager.html">🔔 Gerenciar Notificações</a><a class="nav-item" href="class-schedule.html">📅 Cronograma de Aulas</a><a class="nav-item active" aria-current="page" href="support-tickets.html">🛠️ Chamados de Suporte</a>';}
  $("#supportSubtitle").textContent=instructor?"Chamados enviados pelos estudantes das suas turmas.":"Consulte a situação e a resposta do instrutor.";
  $("#supportReload").addEventListener("click",load);
  $("#supportNew").addEventListener("click",()=>document.querySelector(".site-support-fab")?.click());
