@@ -1,7 +1,7 @@
 import {getSupabase,getSession} from "./supabase-client.js";
 const css=document.createElement("link");css.rel="stylesheet";css.href="css/site-support.css";document.head.append(css);
 const supportLogs=[];const supportStart=Date.now();const log=(type,detail)=>{supportLogs.push({time:new Date().toISOString(),elapsedMs:Date.now()-supportStart,type,detail:String(detail||"").slice(0,350)});if(supportLogs.length>35)supportLogs.shift()};
-const safeError=event=>{const msg=event?.message||event?.reason?.name||event?.reason?.message||"Erro não identificado";return String(msg).replace(/https?:\\/\\/\\S+/g,"[endereço omitido]").replace(/[?#][^\\s]+/g,"[parâmetros omitidos]").slice(0,250)};
+const safeError=event=>{const msg=event?.message||event?.reason?.name||event?.reason?.message||"Erro não identificado";return String(msg).replaceAll(location.origin,"[site]").slice(0,250)};
 window.addEventListener("error",event=>{if(event.target!==window){const tag=event.target?.tagName||"recurso";log("recurso",tag+" não carregou");return}log("erro_js",safeError(event))},true);
 window.addEventListener("unhandledrejection",event=>log("promessa_rejeitada",safeError(event)));
 window.addEventListener("offline",()=>log("conexão","Sem conexão"));
