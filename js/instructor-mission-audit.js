@@ -15,17 +15,19 @@ export function initMissionAudit(sb,getStudents){
   const matching=submissions.filter(x=>ids.has(x.student_id)&&classes.has(x.class_id));
   const missing=matching.filter(x=>!completed(students.find(s=>s.user_id===x.student_id&&s.class_id===x.class_id),x.mission_id));
   const empty=matching.filter(x=>x.answers&&Object.keys(x.answers).length===0);
-  const cards=[["Entregas registradas",matching.length],["Estudantes com entregas",new Set(matching.map(x=>x.student_id)).size],["Entregas fora de concluídas",missing.length],["Respostas estruturadas vazias",empty.length]];
+  const snapshots=matching.filter(x=>x.progress_snapshot?.mission?.completed!==true);
+  const duplicates=matching.length-new Set(matching.map(x=>x.class_id+":"+x.student_id+":"+x.mission_id)).size;
+  const cards=[["Entregas registradas",matching.length],["Estudantes com entregas",new Set(matching.map(x=>x.student_id)).size],["Entregas fora de concluídas",missing.length],["Respostas estruturadas vazias",empty.length],["Snapshots não concluídos",snapshots.length],["Entregas duplicadas",duplicates]];
   summary.innerHTML=cards.map(([name,value])=>'<article class="student-monitor-stat"><small>'+esc(name)+'</small><strong>'+value+'</strong></article>').join("");
   const grouped=new Map();
   for(const s of students){if(!s.user_id)continue;const key=s.class_id+":"+s.user_id;grouped.set(key,{s,items:[]})}
   for(const x of matching){const g=grouped.get(x.class_id+":"+x.student_id);if(g)g.items.push(x)}
   rows.innerHTML=[...grouped.values()].map(({s,items})=>{
    const mismatches=items.filter(x=>!completed(s,x.mission_id)),empties=items.filter(x=>x.answers&&Object.keys(x.answers).length===0);
-   const detail=items.length?'<details><summary>Ver '+items.length+' entrega(s)</summary><div class="mission-audit-chips">'+items.sort((a,b)=>a.mission_id.localeCompare(b.mission_id,undefined,{numeric:true})).map(x=>'<div class="mission-audit-chip"><b>'+esc(x.mission_id)+'</b> · '+esc(x.status)+' · '+(completed(s,x.mission_id)?"Concluída no estado":"Não consta como concluída")+' · Snapshot: '+(x.progress_snapshot?.mission?.completed===true?"concluído":"não concluído")+(x.answers&&Object.keys(x.answers).length===0?' · Respostas estruturadas vazias':'')+'<small>Enviada: '+esc(format(x.submitted_at))+'</small></div>').join("")+'</div></details>':'<span class="muted">Sem entregas registradas</span>';
+   const detail=items.length?'<details><summary>Ver '+items.length+' entrega(s)</summary><div class="mission-audit-chips">'+items.sort((a,b)=>a.mission_id.localeCompare(b.mission_id,undefined,{numeric:true})).map(x=>'<div class="mission-audit-chip"><b>'+esc(x.mission_id)+'</b> · '+esc(x.status)+' · '+(completed(s,x.mission_id)?"Concluída no estado":"Não consta como concluída")+' · Snapshot: '+(x.progress_snapshot?.mission?.completed===true?"concluído":"não concluído — verificar")+(x.answers&&Object.keys(x.answers).length===0?' · Respostas estruturadas vazias':'')+'<small>Enviada: '+esc(format(x.submitted_at))+'</small></div>').join("")+'</div></details>':'<span class="muted">Sem entregas registradas</span>';
    return '<tr><td><b>'+esc(s.full_name)+'</b><small>'+esc(s.class_code)+'</small></td><td>'+items.length+'</td><td>'+done(s).length+'</td><td>'+mismatches.length+'</td><td>'+empties.length+'</td><td>'+detail+'</td></tr>';
   }).join("")||'<tr><td colspan="6">Nenhum estudante encontrado no filtro.</td></tr>';
-  status.textContent="Leitura concluída. Entrega submetida e missão concluída são estados diferentes; divergência não prova perda. Nenhum dado foi alterado.";
+  status.textContent="Leitura concluída. Respostas vazias e snapshots não concluídos são alertas para revisão, não reprovação automática. Verifique também o Kanban e as evidências do GitHub. Nenhum dado foi alterado.";
  }
  async function refresh(){
   status.textContent="Conferindo entregas no banco...";rows.innerHTML="";loaded=false;
