@@ -99,7 +99,7 @@ function ensureMissionWindowFields(){
  const wrapper=document.createElement("div");wrapper.className="schedule-mission-window-fields";wrapper.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0";
  for(const [name,label] of [["mission_open_at","Abertura da missão (opcional)"],["mission_close_at","Prazo final da missão (opcional)"]]){const field=document.createElement("label");field.textContent=label;field.style.display="grid";field.style.gap="6px";const input=document.createElement("input");input.type="datetime-local";input.name=name;input.style.cssText="width:100%;padding:10px;background:#111c30;color:white;border:1px solid #667899;border-radius:8px";field.append(input);wrapper.append(field)}
  const hint=document.createElement("p");hint.textContent="Sem datas específicas, a missão acompanha a data e os horários da aula. Defina as duas datas para usar um período próprio. Alterações não apagam entregas ou progresso.";hint.style.gridColumn="1 / -1";wrapper.append(hint);
- form.insertBefore(wrapper,form.querySelector("button[type=submit]")||form.lastElementChild);
+ form.insertBefore(wrapper,form.querySelector("footer")||form.lastElementChild);
 }
 const toLocalInput=value=>{if(!value)return "";const d=new Date(value);const parts=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(d);return parts.replace(" ","T")};
 const toIso=value=>value?new Date(value+":00-03:00").toISOString():null;
