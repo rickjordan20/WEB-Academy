@@ -134,7 +134,7 @@ test('sincronização conserva respostas conflitantes de dois dispositivos',asyn
  assert.equal(again.answerConflicts.length,1);
 });
 
-test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos informativos',async()=>{
+test('R2: registra conclusão dos blocos sem conceder XP antes da homologação',async()=>{
  let state=fresh(),awards=[];
  const mission={id:'R2',type:'remote',steps:[{id:'r2-01',type:'content',xp:0},{id:'r2-02',type:'quiz',xp:20},{id:'r2-03',type:'editor',xp:25}]};
  const engine=await loadModule('../js/mission-engine.js',{
@@ -151,10 +151,9 @@ test('R2: concede XP por bloco apenas uma vez e não concede XP em blocos inform
  assert.equal(engine.completeStep('R2','r2-01'),true);
  assert.equal(awards.length,0);
  assert.equal(engine.completeStep('R2','r2-02'),true);
- assert.equal(engine.completeStep('R2','r2-02'),false); // A sequência rejeita a repetição; nenhum XP adicional deve ser concedido.
+ assert.equal(engine.completeStep('R2','r2-02'),false); // A sequência rejeita a repetição; nenhum XP antecipado deve ser concedido.
  assert.equal(engine.completeStep('R2','r2-03'),true);
- assert.deepEqual(awards.map(x=>x.xp),[20,25]);
- assert.deepEqual(awards.map(x=>x.key),['mission:R2:step:r2-02','mission:R2:step:r2-03']);
+ assert.deepEqual(awards,[]); // XP só entra após avaliação homologada no Supabase.
 });
 
 test('sincronização soma recompensas distintas sem duplicar a mesma chave',async()=>{
