@@ -97,7 +97,7 @@ export async function mountMissionDelivery(missionId,access,root){
      feedback.textContent="Preencha todas as seções obrigatórias da ficha individual antes de entregar.";reviewForm.scrollIntoView({behavior:"smooth",block:"nearest"});return
     }
     if(reviewData.evidence&&!/^https:\/\//i.test(reviewData.evidence)){feedback.textContent="Informe um link HTTPS válido na ficha.";return}
-    guildReview={version:1,missionId,submittedAt:new Date().toISOString(),form:reviewData,exceptional:!myTasks.length||hasPendingTasks,justification:exceptionReason,tasks:myTasks.map(t=>({id:t.id,title:t.title,status:t.status}))};
+    guildReview={version:1,missionId,form:reviewData,exceptional:!myTasks.length||hasPendingTasks,justification:exceptionReason,tasks:myTasks.map(t=>({id:t.id,title:t.title,status:t.status}))};
    }
    const state=getState(),answers=Object.fromEntries(Object.entries(state?.answers||{}).filter(([key])=>key.startsWith(missionId+":")||key.startsWith("F"+missionId.slice(0,-1)+":")));
    if(guildReview)answers[missionId+":guild_self_review"]=guildReview;
@@ -144,6 +144,7 @@ export async function mountMissionDelivery(missionId,access,root){
     return;
    }
    button.disabled=true;feedback.textContent="Enviando...";
+   if(answers[missionId+":guild_self_review"])answers[missionId+":guild_self_review"].submittedAt=new Date().toISOString();
    const payload={class_id:classId,student_id:session.user.id,mission_id:missionId,answers,evidence:(state?.evidence||[]).filter(e=>e?.missionId===missionId||e?.source===missionId),progress_snapshot:progressSnapshot,status:"submitted",reviewed_at:null,reviewed_by:null,feedback:"",grades:{},is_late:!!isLate,deadline_at:latestAccess.closesAt||null,late_reason:isLate?reason.value:null,late_explanation:isLate?explanation.value.trim():"",submitted_at:new Date().toISOString()};
    // Upsert atômico evita corrida entre a consulta inicial e a gravação.
    // Nunca sobrescreva uma entrega já avaliada: a política RLS também impede isso.
