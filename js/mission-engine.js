@@ -15,7 +15,7 @@ export function setVerifiedMissionWindow(id,access){
 }
 export function canRecordMissionProgress(id){
  const entry=verifiedWindows.get(id);
- return Boolean(entry&&entry.state==="open"&&Date.now()-entry.checkedAt<900000&&(!entry.opensAt||Date.now()>=new Date(entry.opensAt).getTime())&&(!entry.closesAt||Date.now()<new Date(entry.closesAt).getTime()));
+ return Boolean(entry&&(entry.state==="open"||entry.state==="closed")&&Date.now()-entry.checkedAt<900000&&(!entry.opensAt||Date.now()>=new Date(entry.opensAt).getTime())&&(entry.state==="closed"||!entry.closesAt||Date.now()<new Date(entry.closesAt).getTime()));
 }
 const canRecordFundamental=phase=>canRecordMissionProgress(`${phase}A`)||(Number(phase)===2&&canRecordMissionProgress("2B"));
 const canRecordUnit=id=>/^F[0-9]+$/.test(id)?canRecordFundamental(Number(id.slice(1))):canRecordMissionProgress(id);
