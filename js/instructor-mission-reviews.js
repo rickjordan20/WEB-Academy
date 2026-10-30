@@ -189,7 +189,7 @@ function autoPanel(r,mission,fundamental){
   const key=unit+":"+step.id;
   const selected=result.answered?step.options[result.selected]:"Sem resposta";
   const question=step.question||step.prompt||step.title||step.id;
-  return '<div class="eval-objective-item"><strong>'+(i+1)+'. '+esc(question)+'</strong><p class="muted">Resposta: '+esc(selected)+'</p><p class="muted">Gabarito: '+esc(step.options[result.correct])+'</p><p class="eval-check-status">'+(result.answered?(result.passed?'✓ Correta':'✗ Incorreta'):'Não respondida')+'</p><label class="eval-comment-label">Feedback desta questão (opcional)<textarea class="admin-input" rows="2" data-block-comment="'+esc(key)+'" placeholder="Orientação específica desta questão">'+esc(saved[key]||"")+'</textarea></label></div>';
+  return '<div class="eval-objective-item"><strong>'+(i+1)+'. '+esc(step.title||question)+'</strong>'+fullQuestionStatement(step,true)+'<p class="muted">Resposta: '+esc(selected)+'</p><p class="muted">Gabarito: '+esc(step.options[result.correct])+'</p><p class="eval-check-status">'+(result.answered?(result.passed?'✓ Correta':'✗ Incorreta'):'Não respondida')+'</p><label class="eval-comment-label">Feedback desta questão (opcional)<textarea class="admin-input" rows="2" data-block-comment="'+esc(key)+'" placeholder="Orientação específica desta questão">'+esc(saved[key]||"")+'</textarea></label></div>';
  }).join(""):'<p class="muted">Não há questões objetivas com gabarito configurado.</p>')+'</section>';
 }
 function guildSelfReviewPanel(r){
@@ -213,12 +213,19 @@ function guildSelfReviewPanel(r){
  (evidence?'<p class="eval-guild-link"><a href="'+esc(evidence)+'" target="_blank" rel="noopener noreferrer">Abrir evidência complementar ↗</a></p>':'<p class="muted">Não foi informado um link de evidência na ficha individual.</p>')+
  '<p class="eval-guild-footnote">As respostas e a autoavaliação não atribuem XP ou menção automaticamente. Confira a produção efetiva e registre sua avaliação nos campos abaixo.</p></section>';
 }
+function fullQuestionStatement(step,includeOptions=false){
+ const entries=[["Contexto",step.context],["Objetivo",step.goal],["Enunciado",step.question],["Orientação",step.prompt],["Instrução",step.instruction],["Resumo",step.summary],["Descrição",step.description],["Resultado esperado",step.outcome],["Critérios",step.criteria],["Passo a passo",step.instructions],["Atividades",step.tasks],["Requisitos",step.requirements],["Comandos",step.commands],["Dicas",step.tip]];
+ if(includeOptions)entries.push(["Alternativas",step.options]);
+ const seen=new Set();
+ const html=entries.filter(([,v])=>v!=null&&v!==""&&(!Array.isArray(v)||v.length)).filter(([,v])=>{const key=JSON.stringify(v);if(seen.has(key))return false;seen.add(key);return true}).map(([label,value])=>'<div class="eval-statement-part"><strong>'+esc(label)+'</strong>'+(Array.isArray(value)?'<ol>'+value.map(v=>'<li>'+esc(typeof v==="string"?v:JSON.stringify(v))+'</li>').join("")+'</ol>':typeof value==="object"?'<pre>'+esc(JSON.stringify(value,null,2))+'</pre>':'<p>'+esc(value)+'</p>')+'</div>').join("");
+ return '<div class="eval-full-statement"><strong>Enunciado completo da atividade</strong>'+(html||'<p class="muted">Sem enunciado textual detalhado nesta versão da missão.</p>')+'</div>';
+}
 function reviewBlock(r,m,step,idx,unitId=m.id,completed=[]){
  const response=responseForStep(r.answers,unitId,step);
  const answer=response.value;
  const prompt=step.question||step.prompt||step.instruction||step.summary||"";
  const requirementNote='<p class="muted"><strong>Rastreabilidade:</strong> compare o requisito com a resposta preservada e com a evidência efetiva. Link informado não significa repositório inspecionado; check não comprova aprendizagem isoladamente.</p>';
- const promptHtml=prompt?'<p class="eval-question-prompt"><strong>Enunciado / orientação:</strong> '+esc(prompt)+'</p>':"";
+ const promptHtml=fullQuestionStatement(step,["quiz","checkpoint"].includes(step.type));
  const selectedIndex=(typeof answer==="number"||typeof answer==="string"&&/^[0-9]+$/.test(answer.trim()))?Number(answer):null;
  const displayAnswer=step.type==="quiz"&&Array.isArray(step.options)&&selectedIndex!==null&&step.options[selectedIndex]!==undefined?'<div class="eval-answer-text"><strong>Alternativa '+(selectedIndex+1)+':</strong> '+esc(step.options[selectedIndex])+'</div>':answerHTML(answer);
  const attempts=r.progress_snapshot?.codeAttempts?.[unitId+":"+step.id];
