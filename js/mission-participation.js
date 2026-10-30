@@ -38,7 +38,7 @@ export async function mountMissionParticipation(target,{missionId,classId=null,s
   const membership=await sb.from("guild_members").select("guild_id").eq("user_id",uid);
   if(membership.error)throw membership.error;
   const guildIds=[...new Set((membership.data||[]).map(m=>m.guild_id))];
-  const guildLookup=guildIds.length?await sb.from("guilds").select("id,class_id").in("id",guildIds).eq("class_id",classId):{data:[],error:null};
+  const guildLookup=guildIds.length?await (classId?sb.from("guilds").select("id,class_id").in("id",guildIds).eq("class_id",classId):sb.from("guilds").select("id,class_id").in("id",guildIds)):{data:[],error:null};
   if(guildLookup.error)throw guildLookup.error;
   if((guildLookup.data||[]).length!==1){target.innerHTML='<p class="muted">Vínculo da Guilda ausente ou ambíguo nesta turma. Confira a associação antes de avaliar as contribuições.</p>';return}
   guildId=guildLookup.data[0].id;
