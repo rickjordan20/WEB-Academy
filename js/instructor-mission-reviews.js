@@ -9,6 +9,10 @@ const fmt=d=>d?new Date(d).toLocaleString("pt-BR"):"—";
 const statuses={submitted:"Aguardando avaliação",changes_requested:"Ajustes solicitados",evaluated:"Avaliada"};
 let rows=[],names=new Map(),classes=[],overrides=new Map(),current=null,filter="submitted",search="",missionFilter="";
 let indicatorCatalog=new Map();
+let guildNamesByStudent=new Map();
+const missionCategory=m=>m?.type==="guild"?"group":m?.type==="guided"?"guided":"individual";
+const missionCategoryLabel=m=>missionCategory(m)==="group"?"👥 Em grupo · Restaurante":missionCategory(m)==="guided"?"👤 Individual · EduTech":"👤 Individual";
+const guildNameFor=r=>guildNamesByStudent.get(r.class_id+":"+r.student_id)||"Grupo não identificado";
 const indicatorLabel=code=>code+(indicatorCatalog.get(code)?.name?" — "+indicatorCatalog.get(code).name:"");
 const indicatorDescription=code=>indicatorCatalog.get(code)?.description||"";
 function missionOf(id,classId){
@@ -94,11 +98,11 @@ function readiness(r){
  if(r.progress_snapshot?.mission?.completed!==true)warnings.push("Snapshot não concluído");
  return {ready:reasons.length===0,reasons,warnings};
 }
-function card(r){const check=readiness(r);const note=[...check.reasons,...check.warnings].join(' · ');const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><strong>'+esc(m?.title||r.mission_id)+'</strong><p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).map(indicatorLabel).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag" title="'+esc(note||"Registros disponíveis para análise") +'" style="border-color:'+(check.ready?"#267a5a":"#b7791f")+';color:'+(check.ready?"#66d8a6":"#f2c16d") +'">'+(check.ready?"Apto para análise":"Verificar registros")+'</span><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
+function card(r){const check=readiness(r);const note=[...check.reasons,...check.warnings].join(' · ');const m=missionOf(r.mission_id,r.class_id);return '<article class="eval-row"><div><div class="eval-mission-identification"><span class="eval-mission-type '+(missionCategory(m)==='group'?'eval-mission-group':'eval-mission-individual')+'">'+esc(missionCategoryLabel(m))+'</span><span class="eval-mission-code">Missão '+esc(r.mission_id)+'</span></div><strong>'+esc(m?.title||r.mission_id)+'</strong>'+(missionCategory(m)==='group'?'<p class="eval-guild-name">Grupo: '+esc(guildNameFor(r))+'</p>':'')+'<p>'+esc(names.get(r.student_id)||"Estudante")+' · '+esc(classes.find(c=>c.id===r.class_id)?.code||"Turma")+' · '+fmt(r.submitted_at)+'</p><small>'+esc(indicators(m).map(indicatorLabel).join(" · ")||"Sem indicadores associados")+(r.is_late?' · <span class="eval-late">Fora do prazo</span>':"")+'</small></div><div class="eval-row-actions"><span class="eval-tag" title="'+esc(note||"Registros disponíveis para análise") +'" style="border-color:'+(check.ready?"#267a5a":"#b7791f")+';color:'+(check.ready?"#66d8a6":"#f2c16d") +'">'+(check.ready?"Apto para análise":"Verificar registros")+'</span><span class="eval-tag">'+esc(statuses[r.status]||r.status)+'</span><button class="btn btn-primary btn-small" data-open-eval="'+esc(r.id)+'">'+(r.status==="evaluated"?"Reavaliar":"Abrir avaliação")+' →</button></div></article>'}
 function renderList(box){
- const missions=[...new Map(rows.map(r=>[r.mission_id,missionOf(r.mission_id,r.class_id)?.title||r.mission_id])).entries()];
+ const missions=[...new Map(rows.map(r=>{const m=missionOf(r.mission_id,r.class_id);return [r.mission_id,'['+r.mission_id+'] '+missionCategoryLabel(m)+' — '+(m?.title||r.mission_id)]})).entries()];
  const counts={all:rows.length,submitted:0,changes_requested:0,evaluated:0};rows.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1});
- const list=rows.filter(r=>(filter==="all"||r.status===filter)&&(!missionFilter||r.mission_id===missionFilter)&&(!search||[names.get(r.student_id),missionOf(r.mission_id,r.class_id)?.title,r.mission_id].some(v=>String(v||"").toLowerCase().includes(search))));
+ const list=rows.filter(r=>(filter==="all"||r.status===filter)&&(!missionFilter||r.mission_id===missionFilter)&&(!search||[names.get(r.student_id),missionOf(r.mission_id,r.class_id)?.title,r.mission_id,missionCategoryLabel(missionOf(r.mission_id,r.class_id)),guildNameFor(r)].some(v=>String(v||"").toLowerCase().includes(search))));
  box.innerHTML='<div class="eval-heading"><div><p class="eyebrow">UC7 · Acompanhamento formativo</p><h2>Central de Avaliação</h2><p class="muted">Abra cada entrega para analisar respostas, evidências, indicadores e feedback.</p></div></div><div class="eval-filters">'+["submitted","changes_requested","evaluated","all"].map(s=>'<button type="button" data-eval-filter="'+s+'" class="eval-filter '+(filter===s?"active":"")+'">'+({submitted:"Pendentes",changes_requested:"Ajustes solicitados",evaluated:"Avaliadas",all:"Todas"}[s])+' ('+(counts[s]||0)+')</button>').join("")+'</div><div class="eval-search"><input class="admin-input" data-eval-search placeholder="Buscar estudante ou missão" value="'+esc(search)+'"><select class="admin-input" data-eval-mission><option value="">Todas as missões</option>'+missions.map(([id,title])=>'<option value="'+esc(id)+'" '+(missionFilter===id?"selected":"")+'>'+esc(title)+'</option>').join("")+'</select></div><div class="eval-list">'+(list.length?list.map(card).join(""):'<p class="muted">Nenhuma entrega corresponde aos filtros.</p>')+'</div>';
  box.querySelectorAll("[data-eval-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.evalFilter;renderList(box)});
  box.querySelector("[data-eval-search]").oninput=e=>{const pos=e.target.selectionStart;search=e.target.value.toLowerCase().trim();renderList(box);const input=box.querySelector("[data-eval-search]");input.focus();input.setSelectionRange(pos,pos)};
@@ -509,5 +513,11 @@ export async function renderLateSubmissions(){
  rows=data||[];
  const ids=[...new Set(rows.map(r=>r.student_id))];
  if(ids.length){const {data:profiles}=await sb.from("profiles").select("id,full_name").in("id",ids);names=new Map((profiles||[]).map(p=>[p.id,p.full_name]))}
+ const {data:guilds,guildError}=await sb.from("guilds").select("id,class_id,name").in("class_id",classes.map(c=>c.id));
+ guildNamesByStudent=new Map();
+ if(!guildError&&guilds?.length){
+  const {data:members,error:memberError}=await sb.from("guild_members").select("guild_id,user_id").in("guild_id",guilds.map(g=>g.id));
+  if(!memberError){const lookup=new Map(guilds.map(g=>[g.id,g]));for(const member of members||[]){const guild=lookup.get(member.guild_id);if(guild)guildNamesByStudent.set(guild.class_id+":"+member.user_id,guild.name)}}
+ }
  renderList(box);
 }
