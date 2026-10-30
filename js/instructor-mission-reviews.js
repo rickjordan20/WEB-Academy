@@ -361,7 +361,7 @@ function openReview(box,id){
   if(status)status.textContent="Analisando as evidências por indicador. Nenhuma menção será aplicada automaticamente.";
   try{
    const sb=window.__evalSupabase;
-   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{steps:[...(reviewFundamental?.steps||[]).map(step=>({...step,reviewKey:(reviewFundamental?.id||"fundamental")+":"+step.id})),...(reviewMission.steps||[]).map(step=>({...step,reviewKey:reviewMission.id+":"+step.id}))],competencies:inds}}});
+   const {data,error}=await sb.functions.invoke("mission-ai-review",{body:{submissionId:r.id,clientDefinition:{missionType:m?.type,steps:[...(reviewFundamental?.steps||[]).map(step=>({...step,reviewKey:(reviewFundamental?.id||"fundamental")+":"+step.id})),...(reviewMission.steps||[]).map(step=>({...step,reviewKey:reviewMission.id+":"+step.id}))],competencies:inds}}});
    if(error){const httpStatus=error.context?.status;let detail=data?.error;try{if(!detail&&error.context?.json){const body=await error.context.json();detail=body?.error||body?.message}}catch{}if(httpStatus===429||/429|rate.limit|too many requests/i.test(String(detail||error.message||"")))throw new Error("Limite temporário dos provedores de IA (429). Verifique Groq e Gemini; utilize as sugestões de feedback locais enquanto isso. Nenhuma avaliação foi alterada.");throw new Error(detail||error.message||"Falha de conexão")}
    if(data?.error)throw new Error(data.error);
    const result=box.querySelector("[data-ai-review-result]");
