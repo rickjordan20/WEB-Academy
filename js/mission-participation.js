@@ -35,9 +35,13 @@ export async function mountMissionParticipation(target,{missionId,classId=null,s
   const sb=await getSupabase(),session=await getSession();if(!sb||!session)return;
   const uid=studentId||session.user.id;
   let guildId=null;
-  const membership=await sb.from("guild_members").select("guild_id").eq("user_id",uid).maybeSingle();
-  if(membership.error)throw membership.error;guildId=membership.data?.guild_id;
-  if(!guildId){target.innerHTML='<p class="muted">Não há Guilda vinculada a este estudante.</p>';if(!teacher)mountGuildSelfReview(target,uid,missionId,[]);return}
+  const membership=await sb.from("guild_members").select("guild_id").eq("user_id",uid);
+  if(membership.error)throw membership.error;
+  const guildIds=[...new Set((membership.data||[]).map(m=>m.guild_id))];
+  const guildLookup=guildIds.length?await sb.from("guilds").select("id,class_id").in("id",guildIds).eq("class_id",classId):{data:[],error:null};
+  if(guildLookup.error)throw guildLookup.error;
+  if((guildLookup.data||[]).length!==1){target.innerHTML='<p class="muted">Vínculo da Guilda ausente ou ambíguo nesta turma. Confira a associação antes de avaliar as contribuições.</p>';return}
+  guildId=guildLookup.data[0].id;
   const taskQuery=sb.from("guild_tasks").select("id,title,status,responsible_user_id,mission_id,source").eq("guild_id",guildId).eq("mission_id",missionId);
   const {data:tasks,error:te}=await taskQuery;if(te)throw te;
   if(teacher){
