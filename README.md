@@ -81,6 +81,72 @@ O Projeto Restaurante utiliza tarefas em Kanban, atribuição de responsabilidad
 
 A plataforma apoia o acompanhamento dos indicadores da UC e o registro de evidências. O **XP é motivacional** e não determina automaticamente menções ou o resultado final da unidade curricular. A homologação pedagógica continua sob responsabilidade do instrutor.
 
+## Avaliação com IA, evidências e ficha individual (31/10/2026)
+
+A **Central de Avaliação** (`instructor.html#evaluations`, `js/instructor-mission-reviews.js`) permite analisar entregas individuais e de Guilda. A listagem identifica a modalidade, o código da missão e, para atividades do Restaurante, procura apresentar o nome da Guilda do estudante. A ficha exibe enunciados e orientações disponíveis nas definições da missão, respostas, checks, evidências, histórico de colaboração e indicadores.
+
+### Contrato da análise por IA
+
+A função Supabase Edge `supabase/functions/mission-ai-review/index.ts` (implantada como `mission-ai-review`, **v33** em 30/10/2026) autentica o solicitante, confirma que é instrutor da turma, lê a entrega e consulta indicadores curriculares e eventuais sobrescritas de conteúdo. O frontend fornece as etapas e suas chaves de revisão. A função utiliza Groq como primeira opção e Gemini como alternativa quando configurados; a saída estruturada contém resumo, feedback, indicadores, análises por bloco e observações sobre checks.
+
+**Critérios pedagógicos incorporados à instrução da IA:**
+
+| Classificação de observação | Conduta esperada |
+| --- | --- |
+| Requisito atendido | Reconhecer o acerto com referência à resposta |
+| Erro comprovado | Explicar a falha demonstrável e a correção pertinente |
+| Evidência insuficiente | Indicar o que não foi possível verificar, sem presumir erro |
+| Melhoria opcional | Sugerir sem reduzir a qualidade ou a menção |
+
+- Julgar a resposta **pelo enunciado original**, sem exigir CSS, JavaScript, uma página inteira ou requisitos adicionais quando não solicitados.
+- Não tratar a ausência de elementos fora de um **fragmento de código** como erro comprovado.
+- Preservar acertos em questões objetivas e evitar feedback repetitivo ou genérico.
+- Consolidar primeiro competências demonstradas; depois erros comprovados, lacunas de evidência e melhorias opcionais.
+- Tratar `A`, `PA`, `NA` e `SEM_EVIDENCIA` como **sugestões sujeitas à decisão docente**. `SEM_EVIDENCIA` não equivale automaticamente a `NA`.
+- **Não atribuir XP por IA.** O XP elegível/calculado pela plataforma, a qualidade técnica e a menção pedagógica são informações distintas. Homologação permanece com o instrutor.
+
+Essas são **instruções do modelo**, não garantias determinísticas: a saída ainda exige conferência humana. A função limita e filtra parte do JSON retornado, mas não comprova automaticamente a correção semântica de todas as afirmações.
+
+### Tratamento específico das missões em grupo — Restaurante
+
+Quando o frontend identifica a missão como `type: "guild"`, a função busca no Supabase os vínculos do estudante, a Guilda da turma, tarefas e contribuições do Kanban. O contexto fornecido à IA diferencia:
+
+- **Tarefas da missão atual:** criadas ou atribuídas ao estudante, com status e evidências cadastradas.
+- **Tarefas históricas:** registros de outros IDs, mantidos como histórico, **sem conversão automática** entre missões A/B.
+- **Contribuições individuais:** descrições e evidências registradas pelo estudante.
+- **Autoavaliação:** declaração do estudante, que deve ser confrontada com os registros, e não tomada como prova suficiente.
+
+Uma tarefa criada não equivale a tarefa concluída; uma tarefa concluída não comprova, isoladamente, a autoria ou qualidade do código. Se a Guilda não puder ser identificada inequivocamente, o parecer deve ficar pendente de revisão, **não** concluir falta de participação. A IA **não inspeciona automaticamente commits nem arquivos do GitHub**.
+
+**Limites conhecidos:** o gatilho para consultar a Guilda depende do `missionType` enviado pelo frontend; o servidor ainda não valida independentemente a classificação da missão. O vínculo de Guilda pode ser ambíguo em históricos de múltiplos grupos; tarefas com IDs antigos exigem conciliação manual. A disponibilidade de dados também depende das políticas de acesso do Supabase. Não assumir que a IA viu evidências que não foram retornadas pela consulta.
+
+### Fluxo de homologação recomendado
+
+1. Abrir a entrega e conferir o identificador e a modalidade da missão, turma, estudante e Guilda.
+2. Ler os **enunciados completos** e confrontá-los com cada resposta; conferir o gabarito quando configurado.
+3. Para Restaurante, comparar autoavaliação, tarefas atribuídas/criadas/concluídas e contribuições; verificar repositório quando necessário.
+4. Executar **Analisar entrega com IA** e revisar o parecer por bloco e indicador. Uma análise ausente não deve ser apresentada como avaliação concluída.
+5. Corrigir afirmações não sustentadas, separar requisitos obrigatórios de melhorias opcionais e registrar feedback individualizado.
+6. Somente então homologar menção e XP conforme regras do sistema, sem confundir pontuação com evidência pedagógica.
+
+**Estado de validação:** função v33 implantada no Supabase e alterações do frontend registradas no GitHub. **Não foi comprovado teste autenticado ponta a ponta com entrega real após essas mudanças.** Pareceres anteriores não são reprocessados automaticamente.
+
+## Ranking de destaques
+
+A página `leaderboard.html` apresenta todos os alunos e Guildas da turma em ordem decrescente, com destaque visual para os três primeiros. A consulta é feita pela função Supabase `uc7_class_leaderboard`:
+
+- **Alunos:** XP, depois missões concluídas, entregas registradas e nome como desempate.
+- **Guildas:** tarefas concluídas, depois média de XP dos integrantes e nome como desempate.
+- A página exibe XP, progresso e entregas individuais; para Guildas, tarefas concluídas/total, percentual, média de XP e número de integrantes.
+
+A classificação é **formativa**, não determina nota, menção nem aprovação. É necessário validar os totais e o vínculo de turma em sessões reais antes de usá-la como relatório oficial.
+
+## Notificações e suporte técnico
+
+- `notification-manager.html` e `js/student-notifications.js`: avisos da turma, notificações de entregas e atualizações relevantes, conforme os eventos configurados.
+- `support-tickets.html` e `js/site-support.js`: abertura e acompanhamento de chamados com contexto da página, eventos recentes do navegador e diagnóstico técnico. A coleta é limitada à sessão do componente; não substitui logs de servidor.
+- O botão global de suporte e a visualização de chamados devem ser testados em telas responsivas e com perfis de estudante/instrutor.
+
 ## Arquitetura e persistência
 
 - **Frontend:** HTML5, CSS3 e JavaScript com ES Modules, sem TypeScript e sem framework obrigatório.
